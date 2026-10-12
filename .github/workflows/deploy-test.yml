@@ -1,0 +1,128 @@
+# Deploys /opt/salesdam-v3 on Salesdam-V3-PRODUCTION when test is updated.
+# Live domain: https://test.salesdam.com
+#
+# Required repository secrets (Settings → Secrets and variables → Actions):
+#   DEPLOY_HOST      — e.g. 52.224.241.22
+#   DEPLOY_USER      — e.g. azureuser
+#   DEPLOY_SSH_KEY   — full private key PEM (public half in the VM's ~/.ssh/authorized_keys)
+#
+# Syncs code via tarball from the Actions runner (VM has no GitHub credentials).
+
+name: Deploy test to VM
+
+on:
+  push:
+    branches:
+      - test
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-test
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Check deploy secrets
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+        run: |
+          set -euo pipefail
+          test -n "$DEPLOY_HOST" || { echo "::error::Missing DEPLOY_HOST"; exit 1; }
+          test -n "$DEPLOY_USER" || { echo "::error::Missing DEPLOY_USER"; exit 1; }
+          test -n "$DEPLOY_SSH_KEY" || { echo "::error::Missing DEPLOY_SSH_KEY"; exit 1; }
+
+      - name: Checkout test
+        uses: actions/checkout@v4
+        with:
+          ref: test
+
+      - name: Pack release tarball
+        run: |
+          set -euo pipefail
+          # Write outside the tree so tar doesn't fail with "file changed as we read it".
+          tar -czf /tmp/salesdam-v3-release.tar.gz \
+            --exclude='./.git' \
+            --exclude='./node_modules' \
+            --exclude='./frontend/node_modules' \
+            --exclude='./backend/node_modules' \
+            --exclude='./admin/node_modules' \
+            --exclude='./landing/node_modules' \
+            --exclude='./backend/.env' \
+            --exclude='./mongo-keyfile' \
+            --exclude='./.mongo-creds' \
+            .
+          mv /tmp/salesdam-v3-release.tar.gz ./salesdam-v3-release.tar.gz
+          ls -lh salesdam-v3-release.tar.gz
+
+      - name: Upload tarball to VM
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          source: "salesdam-v3-release.tar.gz"
+          target: "/tmp"
+          overwrite: true
+
+      - name: Deploy on VM
+        uses: appleboy/ssh-action@v1.2.2
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          command_timeout: 40m
+          script: |
+            set -euo pipefail
+            test -f /tmp/salesdam-v3-release.tar.gz
+            cd /opt/salesdam-v3
+            # Refresh deploy.sh from the uploaded release before running it.
+            tar -xzf /tmp/salesdam-v3-release.tar.gz ./deploy.sh
+            chmod +x deploy.sh
+            export DEPLOY_BRANCH=test
+            export APP_URL=https://test.salesdam.com
+            export RELEASE_TARBALL=/tmp/salesdam-v3-release.tar.gz
+            export DEPLOYED_SHA="${{ github.sha }}"
+            ./deploy.sh
+
+      - name: Verify test.salesdam.com
+        run: |
+          set -euo pipefail
+          for i in 1 2 3 4 5 6; do
+            code="$(curl -s -o /dev/null -w '%{http_code}' https://test.salesdam.com/login || true)"
+            if [ "$code" = "200" ]; then
+              echo "Smoke check passed (login=$code)"
+              exit 0
+            fi
+            echo "Waiting for test.salesdam.com (attempt $i, login=$code)..."
+            sleep 10
+          done
+          echo "::error::https://test.salesdam.com/login did not return 200"
+          exit 1
+
+      - name: Verify deployed commit marker
+        uses: appleboy/ssh-action@v1.2.2
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          script: |
+            set -euo pipefail
+            cd /opt/salesdam-v3
+            expected="${{ github.sha }}"
+            actual="$(tr -d '[:space:]' < .deployed-sha)"
+            echo "Expected: $expected"
+            echo "Deploy marker:"
+            cat .deployed-sha
+            echo "Deploy meta:"
+            cat .deployed-meta 2>/dev/null || true
+            echo "Git HEAD (may lag if tarball deploy): $(git rev-parse HEAD 2>/dev/null || echo n/a)"
+            if [ "$actual" != "$expected" ]; then
+              echo "::error::Deploy marker mismatch (expected $expected, got $actual)"
+              exit 1
+            fi
+            echo "Deploy marker matches github.sha"
