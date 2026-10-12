@@ -1,0 +1,103 @@
+---
+import MainLayout from '../../layouts/MainLayout.astro';
+
+const STACK = [
+  ['Backend', 'Node.js + Express', 'ESM throughout. Route → controller → service layering.'],
+  ['Database', 'MongoDB + Mongoose', 'Replica set required — record writes use transactions.'],
+  ['Auth', 'Server-side sessions + API keys', 'Sessions in MongoDB, so they are revocable. Keys stored as SHA-256 hashes.'],
+  ['Validation', 'Joi + a custom engine', 'Joi guards request shape; the engine applies field metadata and formula rules.'],
+  ['Frontend', 'React + Vite', 'CSS modules with design tokens. No CSS framework.'],
+  ['Server state', 'TanStack Query', '5-minute staleTime; refetch on focus and reconnect are off.'],
+  ['Routing', 'react-router-dom', 'One flat declarative <Routes> block.'],
+  ['Docs & marketing', 'Astro', 'Static output, no adapter. Scoped styles per component.'],
+  ['Icons', 'lucide', 'lucide-react in the app, lucide-astro in the static sites.'],
+  ['Rate limiting', 'express-rate-limit', 'Three limiters — auth, general, webhooks.'],
+  ['Email', 'Nodemailer', 'In development, messages are logged rather than sent.'],
+  ['Payments', 'Paystack', 'Checkout plus an inbound webhook.'],
+  ['PDF', 'Client-side generation', 'Quotes and invoices rendered in the browser.'],
+];
+---
+
+<MainLayout
+  title="Tech Stack"
+  description="Languages, frameworks and infrastructure, and the reasoning behind the notable choices."
+>
+  <h1>Tech Stack</h1>
+  <p class="lead">
+    JavaScript end to end — Node on the server, React in the app, Astro for the
+    static sites.
+  </p>
+
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th>Layer</th><th>Choice</th><th>Notes</th></tr></thead>
+      <tbody>
+        {STACK.map(([layer, choice, notes]) => (
+          <tr>
+            <td><strong>{layer}</strong></td>
+            <td>{choice}</td>
+            <td>{notes}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+
+  <h2>Choices worth explaining</h2>
+
+  <h3>Sessions rather than JWTs</h3>
+  <p>
+    Sessions live in MongoDB and are looked up per request. That costs a read, and
+    buys immediate revocation: <code>DELETE /auth/sessions/:id</code> ends a session
+    now, whereas a signed token stays valid until it expires. Users can also list
+    their active sessions. For a CRM holding customer data, revocability was worth
+    the read.
+  </p>
+
+  <h3>A metadata model rather than per-object collections</h3>
+  <p>
+    Every record of every object lives in one <code>DynamicRecord</code> collection,
+    with values in a <code>data</code> map described by <code>FieldMeta</code>. So a
+    tenant can add an object or a field with no migration and no deploy. The cost is
+    that queries need the field metadata to coerce operands to the right BSON type,
+    and that indexing is coarser than a purpose-built schema.
+  </p>
+
+  <h3>A hand-written formula parser</h3>
+  <p>
+    Formulas are parsed by a recursive-descent parser into an AST and walked by an
+    interpreter. There is no <code>eval</code> and no sandbox to escape: only
+    whitelisted functions and six string methods can be reached, with caps on
+    expression length, nesting depth and evaluation steps. Tenant-authored
+    expressions run on the server, so this was not a place for a scripting engine.
+  </p>
+
+  <h3>CSS modules and tokens rather than a framework</h3>
+  <p>
+    Colours, spacing and radii are CSS custom properties in
+    <code>variables.css</code>; dark mode is a token override on
+    <code>[data-theme='dark']</code>. Components style themselves through
+    <code>X.module.css</code>. Any component that reaches for a raw hex loses dark
+    mode, which is the main rule to follow.
+  </p>
+
+  <h3>Astro for the static sites</h3>
+  <p>
+    Documentation is mostly content, so it ships as HTML with a little inline
+    JavaScript — no client framework. The trade-off is real: with no SSR adapter
+    there is no server-side request handling, which is why the docs access gate is a
+    client-side check rather than a true boundary.
+  </p>
+
+  <h2>Data flow on a record write</h2>
+  <ol>
+    <li>Rate limiter, authentication, tenant resolution, permission check.</li>
+    <li>Fields the caller may not edit are stripped from the body.</li>
+    <li>Field validation — types, required, uniqueness.</li>
+    <li>Validation rules, against the incoming data plus computed formula values.</li>
+    <li>A transaction opens.</li>
+    <li>Auto-numbers allocated, rollups aggregated, formulas computed.</li>
+    <li>Search text rebuilt, record saved, audit entry written.</li>
+    <li>Transaction commits — all of it, or none.</li>
+  </ol>
+</MainLayout>

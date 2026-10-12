@@ -1,0 +1,142 @@
+---
+import MainLayout from '../../layouts/MainLayout.astro';
+
+const config = `{
+  "label": "Line items total",
+  "apiName": "line_items_total",
+  "type": "rollup_summary",
+  "rollupObjectApiName": "deal_line_item",
+  "rollupRelationField": "deal",
+  "rollupType": "SUM",
+  "rollupField": "subtotal",
+  "rollupFilter": "NOT ISBLANK(unit_price)"
+}`;
+
+const TYPES = [
+  ['COUNT', 'Number of matching child records', 'Ignores rollupField'],
+  ['SUM', 'Total of a numeric child field', 'Requires rollupField'],
+  ['AVG', 'Mean of a numeric child field', 'Requires rollupField'],
+  ['MIN', 'Smallest value', 'Requires rollupField'],
+  ['MAX', 'Largest value', 'Requires rollupField'],
+];
+---
+
+<MainLayout
+  title="Rollup Summaries"
+  description="Aggregating child records onto a parent: configuration, filters and constraints."
+>
+  <h1>Rollup Summaries</h1>
+  <p class="lead">
+    A rollup summary aggregates child records onto their parent — a deal's total
+    line-item value, a client's open deal count. The value is computed and stored
+    on the parent whenever a child changes, so list views and filters read it
+    directly.
+  </p>
+
+  <h2>Configuration</h2>
+  <pre><code>{config}</code></pre>
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th>Property</th><th>Meaning</th></tr></thead>
+      <tbody>
+        <tr><td><code>rollupObjectApiName</code></td><td>The child object to aggregate.</td></tr>
+        <tr><td><code>rollupRelationField</code></td><td>The lookup on the child pointing back at this parent.</td></tr>
+        <tr><td><code>rollupType</code></td><td>The aggregate: <code>COUNT</code>, <code>SUM</code>, <code>AVG</code>, <code>MIN</code>, <code>MAX</code>.</td></tr>
+        <tr><td><code>rollupField</code></td><td>The child field to aggregate. Ignored by <code>COUNT</code>.</td></tr>
+        <tr><td><code>rollupFilter</code></td><td>Optional expression — only children where it is <strong>true</strong> are counted.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>Aggregate types</h2>
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th>Type</th><th>Computes</th><th>Notes</th></tr></thead>
+      <tbody>
+        {TYPES.map(([t, computes, notes]) => (
+          <tr><td><code>{t}</code></td><td>{computes}</td><td>{notes}</td></tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+
+  <h2>The relationship requirement</h2>
+  <p>
+    A rollup only makes sense over records that <em>belong</em> to the parent. Here
+    that means the child's relationship field must be a lookup with
+    <strong>cascade delete</strong> enabled — the child is removed with its parent,
+    so an aggregate can never include orphaned rows.
+  </p>
+  <p>
+    Only objects with such a relationship are offered as the summarised object. If
+    the child object you want isn't listed, the relationship field on it needs
+    cascade delete turned on.
+  </p>
+
+  <div class="warning">
+    <strong>Only numeric child fields can be aggregated</strong> by
+    <code>SUM</code> and <code>AVG</code> — <code>number</code>,
+    <code>currency</code>, <code>percent</code> or a numeric <code>formula</code>.
+    <code>COUNT</code> aggregates nothing and so has no such requirement.
+  </div>
+
+  <h2>Filters</h2>
+  <p>
+    <code>rollupFilter</code> uses the same expression syntax as
+    <a href="/concepts/formula-fields">formula fields</a>, evaluated against each
+    child record. Unlike a validation rule, the direction here is
+    <strong>inclusive</strong>: a child counts when the filter is true.
+  </p>
+  <pre><code>stage == "won"
+NOT ISBLANK(unit_price)
+quantity &gt; 0 AND status != "cancelled"</code></pre>
+
+  <div class="note">
+    <strong>An unevaluable filter excludes the child.</strong> If the expression
+    throws for a given record, that record is left out and a warning is logged —
+    chosen so a broken filter under-reports rather than silently inflating a total
+    someone is invoicing against.
+  </div>
+
+  <h2>Evaluation order</h2>
+  <p>
+    Rollups are computed <strong>before</strong> formula fields on save, so a
+    formula may read a rollup value. That is how a currency-formatted total is
+    built: a hidden rollup does the aggregation, and a formula field presents it.
+  </p>
+  <pre><code>line_items_selling_total   rollup_summary, SUM, isHidden: true
+order_value                formula, ROUND(line_items_selling_total, 2), currency</code></pre>
+  <p>
+    The rollup carries the number; the formula gives it a return type and therefore
+    a display format. Marking the rollup <code>isHidden</code> keeps it out of
+    layouts and column pickers while remaining referenceable.
+  </p>
+
+  <h2>When values refresh</h2>
+  <p>
+    A parent's rollups are recomputed when a child is created, updated or deleted,
+    within the same transaction as the child's write — so the parent is never
+    briefly wrong. They are also recomputed when the parent itself is saved.
+  </p>
+
+  <div class="note">
+    <strong><code>COUNT</code> with no filter never loads the children.</strong> It
+    issues a count query instead. Any other aggregate, or any filter, has to read
+    the child documents to evaluate it — worth knowing when a parent has very many
+    children.
+  </div>
+
+  <h2>Constraints</h2>
+  <ul>
+    <li>Rollup values are read-only over the API.</li>
+    <li>Rollup fields are excluded from CSV export.</li>
+    <li>A rollup cannot aggregate across tenants — the child query is always tenant-scoped.</li>
+    <li>Soft-deleted children are excluded.</li>
+    <li>
+      Rollups are treated as numeric for list-view filtering, which is correct for
+      <code>COUNT</code>, <code>SUM</code> and <code>AVG</code>. A
+      <code>MIN</code>/<code>MAX</code> over a date field is a date, so filter those
+      with care.
+    </li>
+  </ul>
+</MainLayout>

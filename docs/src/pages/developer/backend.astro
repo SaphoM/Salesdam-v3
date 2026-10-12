@@ -1,0 +1,146 @@
+---
+import MainLayout from '../../layouts/MainLayout.astro';
+
+const controller = `import { asyncHandler, sendSuccess, AppError } from '../utils/errors.js';
+
+const getThing = asyncHandler(async (req, res) => {
+  const thing = await Thing.findOne({
+    tenantId: req.tenantId,        // never omit this
+    _id: req.params.id,
+  });
+  if (!thing) throw new AppError('Thing not found.', 404);
+  sendSuccess(res, { data: thing });
+});`;
+
+const listing = `import { paginate } from '../utils/errors.js';
+
+const listThings = asyncHandler(async (req, res) => {
+  const { page = 1, limit = 50 } = req.query;
+  const skip = (parseInt(page) - 1) * parseInt(limit);
+
+  const [rows, total] = await Promise.all([
+    Thing.find({ tenantId: req.tenantId }).skip(skip).limit(parseInt(limit)),
+    Thing.countDocuments({ tenantId: req.tenantId }),
+  ]);
+
+  sendSuccess(res, paginate(rows, total, page, limit));
+});`;
+
+const migration = `// scripts/backfillSomething.js
+const run = async () => {
+  const dryRun = process.argv.includes('--dry-run');
+  await connectDB();
+
+  const pending = await Model.find({ field: { $exists: false } });
+  logger.info(\`\${pending.length} document(s) to update.\`);
+
+  for (const doc of pending) {
+    if (!dryRun) await Model.updateOne({ _id: doc._id }, { $set: { field: value } });
+  }
+
+  await mongoose.disconnect();
+};
+
+run().catch(async (err) => {
+  logger.error(\`Migration failed: \${err.message}\`);
+  await mongoose.disconnect().catch(() => {});
+  process.exit(1);
+});`;
+---
+
+<MainLayout
+  title="Backend Development"
+  description="Layering, adding an endpoint, tenancy, transactions and migration scripts."
+>
+  <h1>Backend Development</h1>
+  <p class="lead">
+    Express with a route → controller → service split. Routes declare paths,
+    controllers own HTTP, services own domain logic.
+  </p>
+
+  <h2>A controller</h2>
+  <pre><code>{controller}</code></pre>
+  <ul>
+    <li><code>asyncHandler</code> forwards rejected promises to the error middleware. Without it a throw hangs the request.</li>
+    <li><code>AppError(message, status)</code> produces the standard error envelope.</li>
+    <li><code>{'sendSuccess(res, { data })'}</code> keeps the success envelope uniform.</li>
+  </ul>
+
+  <div class="error">
+    <strong>Every query must be scoped by <code>req.tenantId</code>.</strong> It is
+    the only thing separating tenants. A query that omits it will read or write
+    another customer's data, and no other layer will catch the mistake.
+  </div>
+
+  <h2>Listing with pagination</h2>
+  <pre><code>{listing}</code></pre>
+
+  <h2>Where logic belongs</h2>
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th>Put it in…</th><th>When</th></tr></thead>
+      <tbody>
+        <tr><td><code>routes/</code></td><td>Declaring a path or attaching middleware. Never logic.</td></tr>
+        <tr><td><code>controllers/</code></td><td>Reading the request, choosing a status code, shaping the response.</td></tr>
+        <tr><td><code>services/</code></td><td>Anything a second caller might need, or anything worth testing without HTTP.</td></tr>
+        <tr><td><code>middleware/</code></td><td>Cross-cutting concerns applied to many routes.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>
+    The record write path is the reference example: the controller orchestrates,
+    while <code>validationService</code>, <code>rollupService</code> and
+    <code>formulaService</code> each own one step and none of them know about
+    <code>req</code>.
+  </p>
+
+  <h2>Transactions</h2>
+  <p>
+    Record creates and updates run in a Mongoose session so validation,
+    auto-numbers, rollups, formulas, search text and the audit entry either all land
+    or none do. Anything that writes more than one document should do the same, and
+    every query inside must be passed <code>.session(session)</code> — a query that
+    forgets it runs outside the transaction and won't roll back.
+  </p>
+
+  <div class="warning">
+    <strong>Order matters on the write path.</strong> Auto-numbers are allocated
+    before rollups, rollups before formulas — because a formula may read a rollup.
+    Validation rules run <em>before</em> auto-numbers, so a rejected save doesn't
+    consume a sequence number and leave a gap.
+  </div>
+
+  <h2>Request validation</h2>
+  <p>
+    Declare a Joi schema in <code>utils/validators.js</code> and attach it with
+    <code>validate(schemas.yourSchema)</code>.
+  </p>
+  <div class="error">
+    <strong><code>stripUnknown: true</code> is on.</strong> Any key not declared in
+    the schema is deleted before the controller runs. This has silently dropped real
+    field values more than once — if a value appears to save but doesn't persist,
+    check the schema first.
+  </div>
+
+  <h2>Migration scripts</h2>
+  <p>
+    One-off data changes go in <code>backend/scripts/</code> with an npm alias.
+    Support <code>--dry-run</code>, be idempotent, and log what changed:
+  </p>
+  <pre><code>{migration}</code></pre>
+  <p>
+    Existing examples: <code>migrateListViewFields.js</code>,
+    <code>migrate-line-item-rollups.js</code>,
+    <code>backfillFormulaReturnTypes.js</code>.
+  </p>
+
+  <h2>Conventions</h2>
+  <ul>
+    <li>ESM only — <code>import</code>, not <code>require</code>.</li>
+    <li>Log through <code>utils/logger.js</code>, not <code>console</code>.</li>
+    <li>Never log a credential, session id or API key.</li>
+    <li>Guard development-only behaviour with <code>process.env.NODE_ENV === 'development'</code>.</li>
+    <li>For a default-on boolean flag, use <code>process.env.FLAG !== 'false'</code>; for default-off, <code>=== 'true'</code>. For anything security-related, choose the form that fails closed.</li>
+    <li>Document new endpoints in <code>docs/src/data/openapi.js</code>.</li>
+  </ul>
+</MainLayout>

@@ -1,0 +1,193 @@
+---
+import { Zap } from 'lucide-astro';
+
+const currentPath = Astro.url.pathname;
+const isActive = (path) => {
+  if (path === '/') return currentPath === '/';
+  return currentPath.startsWith(path);
+};
+---
+
+<header class="header">
+  <div class="container">
+    <nav class="nav">
+      <a href="/" class="logo">
+        <div class="logo-icon">
+          <Zap size={20} strokeWidth={2.5} />
+        </div>
+        <span class="logo-text">Mini CRM</span>
+      </a>
+
+      <ul class="nav-links" id="navLinks">
+        <li><a href="/" class={isActive('/') ? 'active' : ''}>Home</a></li>
+        <li><a href="/features" class={isActive('/features') ? 'active' : ''}>Features</a></li>
+        <li>
+          <a href="/user-guide" class={isActive('/user-guide') ? 'active' : ''}>
+            User Guide
+          </a>
+        </li>
+        <li><a href="/getting-started" class={isActive('/getting-started') ? 'active' : ''}>Getting Started</a></li>
+        <li><a href="/#pricing">Pricing</a></li>
+        <li><a href="/faq" class={isActive('/faq') ? 'active' : ''}>FAQ</a></li>
+        <li><a href="/contact" class={isActive('/contact') ? 'active' : ''}>Contact</a></li>
+      </ul>
+
+      <div class="nav-cta">
+        <a href="http://localhost:3000/login" class="btn btn-ghost btn-sm">Sign in</a>
+        <a href="http://localhost:3000/register" class="btn btn-primary btn-sm">Get Started Free</a>
+      </div>
+
+      <button class="mobile-toggle" id="mobileToggle" aria-label="Toggle menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </nav>
+
+    <!-- Mobile menu -->
+    <div class="mobile-menu" id="mobileMenu">
+      <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="/features">Features</a></li>
+        <li><a href="/user-guide">User Guide</a></li>
+        <li><a href="/getting-started">Getting Started</a></li>
+        <li><a href="/#pricing">Pricing</a></li>
+        <li><a href="/faq">FAQ</a></li>
+        <li><a href="/contact">Contact</a></li>
+      </ul>
+      <div class="mobile-cta">
+        <a href="http://localhost:3000/login" class="btn btn-ghost btn-sm">Sign in</a>
+        <a href="http://localhost:3000/register" class="btn btn-primary btn-sm">Get Started Free</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<style>
+  .header {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    background: rgba(255,255,255,0.95);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 1px 0 var(--border);
+    z-index: 1000;
+  }
+
+  .nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 0;
+    gap: 24px;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--text);
+    flex-shrink: 0;
+  }
+  .logo:hover { color: var(--primary); }
+
+  .logo-icon {
+    width: 28px;
+    height: 28px;
+    background: #0066FF;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+  }
+
+  .nav-links {
+    display: flex;
+    list-style: none;
+    gap: 4px;
+    align-items: center;
+    flex: 1;
+    justify-content: center;
+  }
+
+  .nav-links a {
+    display: block;
+    padding: 6px 12px;
+    color: var(--text-secondary);
+    font-weight: 500;
+    font-size: 0.9375rem;
+    border-radius: var(--radius-sm);
+    transition: all var(--transition-fast);
+  }
+
+  .nav-links a:hover,
+  .nav-links a.active {
+    color: var(--primary);
+    background: var(--primary-subtle);
+  }
+
+  .nav-cta {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  /* Mobile */
+  .mobile-toggle {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    background: none;
+    border: none;
+    padding: 8px;
+    border-radius: var(--radius-sm);
+  }
+  .mobile-toggle span {
+    display: block;
+    width: 22px;
+    height: 2px;
+    background: var(--text);
+    border-radius: 2px;
+    transition: all var(--transition);
+  }
+
+  .mobile-menu {
+    display: none;
+    padding: 16px 0 20px;
+    border-top: 1px solid var(--border);
+  }
+  .mobile-menu ul {
+    list-style: none;
+    margin-bottom: 16px;
+  }
+  .mobile-menu li a {
+    display: block;
+    padding: 10px 12px;
+    color: var(--text-secondary);
+    font-weight: 500;
+    border-radius: var(--radius-sm);
+    transition: all var(--transition-fast);
+  }
+  .mobile-menu li a:hover { color: var(--primary); background: var(--primary-subtle); }
+  .mobile-cta { display: flex; gap: 8px; padding: 0 12px; }
+
+  .mobile-menu.open { display: block; }
+
+  @media (max-width: 900px) {
+    .nav-links { display: none; }
+    .nav-cta { display: none; }
+    .mobile-toggle { display: flex; }
+  }
+</style>
+
+<script>
+  const toggle = document.getElementById('mobileToggle');
+  const menu   = document.getElementById('mobileMenu');
+  toggle?.addEventListener('click', () => {
+    menu?.classList.toggle('open');
+  });
+</script>

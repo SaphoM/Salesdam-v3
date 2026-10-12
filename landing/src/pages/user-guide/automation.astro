@@ -1,0 +1,403 @@
+---
+import DocsLayout from '../../layouts/DocsLayout.astro';
+---
+
+<DocsLayout
+  title="Automation - User Guide - Mini CRM"
+  description="Learn how to build automation flows to streamline your processes"
+>
+  <h1>Automation</h1>
+
+  <p>
+    Automation flows in Mini CRM help you eliminate repetitive tasks, ensure consistency,
+    and respond instantly to business events. This guide covers everything from simple
+    automations to complex multi-step workflows.
+  </p>
+
+  <h2>Understanding Automation Flows</h2>
+
+  <p>
+    An automation flow consists of three key components:
+  </p>
+
+  <ul>
+    <li><strong>Trigger:</strong> The event that starts the flow (when something happens)</li>
+    <li><strong>Conditions:</strong> Optional filters to determine if actions should run</li>
+    <li><strong>Actions:</strong> What the flow does (create records, send emails, etc.)</li>
+  </ul>
+
+  <p>
+    Think of it like: "When [trigger] happens, if [conditions] are met, then [do actions]."
+  </p>
+
+  <h2>Creating Your First Flow</h2>
+
+  <ol>
+    <li>Navigate to <strong>Automation</strong> from the main menu</li>
+    <li>Click <strong>"New Flow"</strong></li>
+    <li>Enter flow details:
+      <ul>
+        <li><strong>Name:</strong> Descriptive name (e.g., "Welcome New Customers")</li>
+        <li><strong>Description:</strong> Explain what the flow does and why</li>
+        <li><strong>Active:</strong> Enable or disable the flow</li>
+      </ul>
+    </li>
+    <li>Configure the trigger (see below)</li>
+    <li>Add conditions if needed</li>
+    <li>Add one or more actions</li>
+    <li>Test the flow</li>
+    <li>Activate it</li>
+  </ol>
+
+  <h2>Triggers</h2>
+
+  <p>Triggers determine when your flow runs. Mini CRM supports several trigger types:</p>
+
+  <h3>Record Created</h3>
+  <p>Runs when a new record is created in the specified object.</p>
+  <ul>
+    <li><strong>Use case:</strong> Send welcome emails, create follow-up tasks, assign records</li>
+    <li><strong>Example:</strong> When a new Customer is created, send a welcome email</li>
+  </ul>
+
+  <h3>Record Updated</h3>
+  <p>Runs when any field on a record is modified.</p>
+  <ul>
+    <li><strong>Use case:</strong> Alert stakeholders of changes, trigger approvals</li>
+    <li><strong>Example:</strong> When an Opportunity amount changes, notify the sales manager</li>
+  </ul>
+
+  <h3>Field Changed</h3>
+  <p>Runs only when specific fields are modified.</p>
+  <ul>
+    <li><strong>Use case:</strong> React to status changes, stage transitions</li>
+    <li><strong>Example:</strong> When Opportunity stage changes to "Closed Won", create invoice</li>
+    <li><strong>Configuration:</strong> Select which fields to monitor</li>
+  </ul>
+
+  <h3>Scheduled</h3>
+  <p>Runs on a recurring schedule (daily, weekly, monthly).</p>
+  <ul>
+    <li><strong>Use case:</strong> Send reminders, generate reports, clean up data</li>
+    <li><strong>Example:</strong> Every Monday at 9am, send weekly pipeline report</li>
+    <li><strong>Configuration:</strong> Set frequency and time</li>
+  </ul>
+
+  <h2>Conditions</h2>
+
+  <p>
+    Conditions filter which records trigger the flow. Only records meeting all conditions
+    will execute the actions.
+  </p>
+
+  <h3>Condition Types</h3>
+  <ul>
+    <li><strong>Field equals value:</strong> Field = "Specific Value"</li>
+    <li><strong>Field not equals:</strong> Field != "Value"</li>
+    <li><strong>Field contains:</strong> Text field contains substring</li>
+    <li><strong>Field is empty:</strong> Field has no value</li>
+    <li><strong>Field is not empty:</strong> Field has any value</li>
+    <li><strong>Numeric comparisons:</strong> Greater than, less than, between</li>
+    <li><strong>Date comparisons:</strong> Before, after, within range</li>
+  </ul>
+
+  <h3>Logical Operators</h3>
+  <p>Combine multiple conditions:</p>
+  <ul>
+    <li><strong>AND:</strong> All conditions must be true</li>
+    <li><strong>OR:</strong> At least one condition must be true</li>
+    <li><strong>Custom logic:</strong> (1 AND 2) OR (3 AND 4)</li>
+  </ul>
+
+  <h3>Example Conditions</h3>
+  <pre><code>// Only for high-value opportunities
+Amount > 100000 AND Stage = "Negotiation"
+
+// For urgent or high-priority cases
+Priority = "High" OR Status = "Urgent"
+
+// For customers in specific regions
+(Country = "USA" OR Country = "Canada") AND Active = true</code></pre>
+
+  <h2>Actions</h2>
+
+  <p>Actions are what your flow actually does. You can add multiple actions to a single flow.</p>
+
+  <h3>Create Record</h3>
+  <p>Automatically create new records in any object.</p>
+  <ul>
+    <li><strong>Configuration:</strong>
+      <ul>
+        <li>Select target object</li>
+        <li>Map field values (use trigger record fields or static values)</li>
+        <li>Set relationships to trigger record</li>
+      </ul>
+    </li>
+    <li><strong>Example:</strong> When Opportunity is won, create Project record</li>
+  </ul>
+
+  <h3>Update Record</h3>
+  <p>Modify field values on the trigger record or related records.</p>
+  <ul>
+    <li><strong>Configuration:</strong>
+      <ul>
+        <li>Choose which record to update (trigger or related)</li>
+        <li>Select fields to modify</li>
+        <li>Set new values (static or formula-based)</li>
+      </ul>
+    </li>
+    <li><strong>Example:</strong> When Case is resolved, set Status = "Closed" and Closed Date = TODAY()</li>
+  </ul>
+
+  <h3>Send Email</h3>
+  <p>Send automated emails using templates.</p>
+  <ul>
+    <li><strong>Configuration:</strong>
+      <ul>
+        <li>Select email template</li>
+        <li>Choose recipient (field value, related user, static email)</li>
+        <li>Add CC/BCC recipients</li>
+        <li>Merge fields populate automatically</li>
+      </ul>
+    </li>
+    <li><strong>Example:</strong> Send welcome email to new customer using their email field</li>
+  </ul>
+
+  <h3>Call Webhook</h3>
+  <p>Integrate with external systems via HTTP requests.</p>
+  <ul>
+    <li><strong>Configuration:</strong>
+      <ul>
+        <li>Enter webhook URL</li>
+        <li>Select HTTP method (POST, PUT, PATCH)</li>
+        <li>Include record data as JSON payload</li>
+        <li>Add custom headers for authentication</li>
+      </ul>
+    </li>
+    <li><strong>Example:</strong> Post new lead to Slack channel when created</li>
+  </ul>
+
+  <h3>Assign Owner</h3>
+  <p>Automatically reassign record ownership.</p>
+  <ul>
+    <li><strong>Use round-robin:</strong> Distribute among team members evenly</li>
+    <li><strong>Use rules:</strong> Assign based on criteria (region, industry, etc.)</li>
+    <li><strong>Example:</strong> Assign leads to sales reps based on territory</li>
+  </ul>
+
+  <h2>Flow Examples</h2>
+
+  <h3>Example 1: Welcome New Customers</h3>
+  <pre><code>Trigger: Record Created (Customer)
+Conditions: Status = "Active"
+Actions:
+  1. Send Email (Welcome Template) to Customer.Email
+  2. Create Record (Task) - "Follow up with new customer" in 3 days
+  3. Update Record (Customer) - Set Last Contacted = TODAY()</code></pre>
+
+  <h3>Example 2: Opportunity Stage Changes</h3>
+  <pre><code>Trigger: Field Changed (Opportunity.Stage)
+Conditions: Stage = "Closed Won"
+Actions:
+  1. Create Record (Project) linked to Opportunity
+  2. Send Email (Congratulations Template) to Account Manager
+  3. Call Webhook (Notify accounting system of new sale)</code></pre>
+
+  <h3>Example 3: Case Escalation</h3>
+  <pre><code>Trigger: Record Updated (Case)
+Conditions:
+  Priority = "High" AND
+  Days Since Created > 2 AND
+  Status != "Closed"
+Actions:
+  1. Update Record (Case) - Set Status = "Escalated"
+  2. Assign Owner (Case) to Support Manager
+  3. Send Email (Escalation Alert) to Manager and Case Owner</code></pre>
+
+  <h3>Example 4: Weekly Summary Report</h3>
+  <pre><code>Trigger: Scheduled (Every Monday at 9:00 AM)
+Conditions: None
+Actions:
+  1. Send Email (Weekly Report Template) to Sales Team
+     - Template includes metrics from past week
+     - Lists open opportunities and upcoming tasks</code></pre>
+
+  <h2>Testing Flows</h2>
+
+  <p>Always test flows before activating them:</p>
+
+  <ol>
+    <li>Create test records with various scenarios</li>
+    <li>Check that triggers fire correctly</li>
+    <li>Verify conditions work as expected</li>
+    <li>Confirm actions produce desired results</li>
+    <li>Test edge cases (empty fields, null values)</li>
+    <li>Review error logs if something fails</li>
+  </ol>
+
+  <div class="note">
+    <strong>Pro Tip:</strong> Use a dedicated "Test" record or add a "Test Mode" checkbox field
+    that your flows can check to avoid affecting real data during testing.
+  </div>
+
+  <h2>Flow Management</h2>
+
+  <h3>Activating and Deactivating</h3>
+  <ul>
+    <li>Toggle the <strong>Active</strong> checkbox to enable/disable flows</li>
+    <li>Inactive flows don't run but are preserved for later</li>
+    <li>Use this for seasonal automations or maintenance</li>
+  </ul>
+
+  <h3>Monitoring Flow Execution</h3>
+  <ul>
+    <li>View <strong>Flow History</strong> to see execution logs</li>
+    <li>Each run shows:
+      <ul>
+        <li>Trigger record</li>
+        <li>Execution time</li>
+        <li>Success or failure</li>
+        <li>Error messages if failed</li>
+      </ul>
+    </li>
+    <li>Filter by date, status, or flow name</li>
+  </ul>
+
+  <h3>Debugging Failed Flows</h3>
+  <p>If a flow fails:</p>
+  <ol>
+    <li>Check the error message in Flow History</li>
+    <li>Common issues:
+      <ul>
+        <li>Missing required fields in Create Record action</li>
+        <li>Invalid email addresses</li>
+        <li>Webhook URL unreachable</li>
+        <li>Permission errors</li>
+        <li>Formula syntax errors</li>
+      </ul>
+    </li>
+    <li>Fix the issue and re-test</li>
+    <li>Failed flows can be manually retried</li>
+  </ol>
+
+  <h2>Advanced Features</h2>
+
+  <h3>Delay Actions</h3>
+  <p>Wait before executing actions:</p>
+  <ul>
+    <li>Set delay in days, hours, or minutes</li>
+    <li>Use for follow-up reminders</li>
+    <li>Example: Send reminder 3 days after record creation</li>
+  </ul>
+
+  <h3>Branch Logic</h3>
+  <p>Different actions based on conditions:</p>
+  <ul>
+    <li>If Priority = "High", assign to Manager</li>
+    <li>Else if Priority = "Medium", assign to Team Lead</li>
+    <li>Else assign round-robin to team members</li>
+  </ul>
+
+  <h3>Loop Through Records</h3>
+  <p>Perform actions on multiple related records:</p>
+  <ul>
+    <li>Example: Send email to all Contacts related to an Account</li>
+    <li>Loop through related list</li>
+    <li>Execute actions for each record</li>
+  </ul>
+
+  <h2>Best Practices</h2>
+
+  <h3>Flow Design</h3>
+  <ul>
+    <li>Keep flows simple and focused on one purpose</li>
+    <li>Use descriptive names and detailed descriptions</li>
+    <li>Document complex logic in the description</li>
+    <li>Avoid creating too many flows on the same trigger</li>
+    <li>Consider consolidating similar flows</li>
+  </ul>
+
+  <h3>Performance</h3>
+  <ul>
+    <li>Limit the number of actions per flow (aim for under 10)</li>
+    <li>Use conditions to minimize unnecessary executions</li>
+    <li>Avoid recursive flows (flows that trigger themselves)</li>
+    <li>Be cautious with scheduled flows on large datasets</li>
+  </ul>
+
+  <h3>Maintenance</h3>
+  <ul>
+    <li>Regularly review Flow History for errors</li>
+    <li>Deactivate flows that are no longer needed</li>
+    <li>Update flows when object structures change</li>
+    <li>Test flows after system updates</li>
+  </ul>
+
+  <h3>Error Handling</h3>
+  <ul>
+    <li>Add fallback actions for critical processes</li>
+    <li>Use try-catch patterns where possible</li>
+    <li>Set up email notifications for flow failures</li>
+    <li>Regularly check error logs</li>
+  </ul>
+
+  <h2>Common Use Cases</h2>
+
+  <h3>Lead Management</h3>
+  <ul>
+    <li>Auto-assign new leads based on territory</li>
+    <li>Send welcome emails to leads</li>
+    <li>Escalate old uncontacted leads</li>
+    <li>Convert leads to opportunities automatically</li>
+  </ul>
+
+  <h3>Sales Pipeline</h3>
+  <ul>
+    <li>Update opportunity stages based on activity</li>
+    <li>Notify managers of big deals</li>
+    <li>Create quotes when opportunities reach certain stages</li>
+    <li>Send reminders for stale opportunities</li>
+  </ul>
+
+  <h3>Customer Support</h3>
+  <ul>
+    <li>Auto-respond to new cases</li>
+    <li>Escalate unresolved cases</li>
+    <li>Survey customers after case closure</li>
+    <li>Update knowledge base from common cases</li>
+  </ul>
+
+  <h3>Onboarding</h3>
+  <ul>
+    <li>Create task lists for new customers</li>
+    <li>Schedule onboarding calls</li>
+    <li>Send training materials</li>
+    <li>Track onboarding progress</li>
+  </ul>
+
+  <h2>Troubleshooting</h2>
+
+  <h3>Flow Not Triggering</h3>
+  <ul>
+    <li>Verify flow is active</li>
+    <li>Check trigger configuration matches the event</li>
+    <li>Ensure conditions are being met</li>
+    <li>Review user permissions (flows run as system user)</li>
+  </ul>
+
+  <h3>Actions Not Executing</h3>
+  <ul>
+    <li>Check Flow History for error messages</li>
+    <li>Verify required fields in actions are populated</li>
+    <li>Confirm permissions on target objects</li>
+    <li>Test with a simpler action first</li>
+  </ul>
+
+  <h3>Emails Not Sending</h3>
+  <ul>
+    <li>Verify email template exists</li>
+    <li>Check recipient email address is valid</li>
+    <li>Ensure email service is configured</li>
+    <li>Review merge fields in template</li>
+  </ul>
+</DocsLayout>

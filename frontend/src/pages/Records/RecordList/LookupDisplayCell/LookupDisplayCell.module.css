@@ -1,0 +1,7 @@
+.empty {
+  color: var(--color-gray-400);
+}
+
+.resolving {
+  color: var(--color-gray-400);
+}

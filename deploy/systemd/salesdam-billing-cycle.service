@@ -1,0 +1,33 @@
+# Salesdam Insurance Workspace - Billing Cycle
+# Runs daily at 3:00 AM to create premium debits for policies due
+
+[Unit]
+Description=Salesdam Insurance Workspace - Billing Cycle
+Documentation=https://salesdam.example.com/docs/billing
+After=network.target mongod.service
+Wants=mongod.service
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/salesdam/backend
+ExecStart=/usr/bin/node scripts/run-billing-cycle.js
+User=salesdam
+Group=salesdam
+Environment=NODE_ENV=production
+EnvironmentFile=-/etc/salesdam/environment
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=salesdam-billing-cycle
+TimeoutSec=600
+
+MemoryMax=512M
+CPUQuota=200%
+
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/salesdam/backend/logs /opt/salesdam/backend/uploads
+
+[Install]
+WantedBy=multi-user.target

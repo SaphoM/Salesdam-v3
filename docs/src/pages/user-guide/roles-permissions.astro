@@ -1,0 +1,131 @@
+﻿---
+import MainLayout from '../../layouts/MainLayout.astro';
+---
+
+<MainLayout title="Roles & Permissions | Salesdam Docs" description="Managing roles and access control">
+  <div class="content-wrapper">
+    <h1>Roles & Permissions</h1>
+
+    <p class="intro">Salesdam uses role-based access control (RBAC) to manage who can do what in your CRM.</p>
+
+    <h2>Default Roles</h2>
+
+    <table>
+      <tr>
+        <th>Role</th>
+        <th>Description</th>
+        <th>Access Level</th>
+      </tr>
+      <tr>
+        <td>Superuser</td>
+        <td>Full system access, manage everything</td>
+        <td>Full Control</td>
+      </tr>
+      <tr>
+        <td>Admin</td>
+        <td>Administrative functions, user management</td>
+        <td>Admin</td>
+      </tr>
+      <tr>
+        <td>Standard User</td>
+        <td>Normal CRM usage, create and edit records</td>
+        <td>Limited</td>
+      </tr>
+      <tr>
+        <td>Read Only</td>
+        <td>View-only access, cannot create or edit</td>
+        <td>View Only</td>
+      </tr>
+    </table>
+
+    <h2>Permission Types</h2>
+
+    <h3>App Permissions</h3>
+    <p>System-level permissions:</p>
+    <ul>
+      <li>Manage Users</li>
+      <li>Manage Roles</li>
+      <li>Manage Objects & Fields</li>
+      <li>Manage Automations</li>
+      <li>Manage Integrations</li>
+      <li>View Analytics</li>
+    </ul>
+
+    <h3>Object Permissions</h3>
+    <p>Per-object access control:</p>
+    <ul>
+      <li>Create</li>
+      <li>Read / View</li>
+      <li>Update / Edit</li>
+      <li>Delete</li>
+      <li>Import</li>
+      <li>Export</li>
+    </ul>
+
+    <h3>Field-Level Permissions</h3>
+    <p>Control access to specific fields:</p>
+    <ul>
+      <li>View field</li>
+      <li>Edit field</li>
+      <li>Required field</li>
+    </ul>
+
+    <h2>Creating Custom Roles</h2>
+
+    <p>Go to Settings → Roles → Create Role:</p>
+
+    <ol>
+      <li>Enter role name</li>
+      <li>Select app permissions</li>
+      <li>For each object:
+        <ul>
+          <li>Select object permissions (Create, Read, Update, Delete)</li>
+          <li>Optionally restrict to owned records</li>
+        </ul>
+      </li>
+      <li>Assign field-level permissions if needed</li>
+      <li>Click "Save Role"</li>
+    </ol>
+
+    <h2>Assigning Roles</h2>
+
+    <ol>
+      <li>Go to Settings → Users</li>
+      <li>Select a user</li>
+      <li>Click "Edit Role"</li>
+      <li>Select a role from dropdown</li>
+      <li>Click "Update"</li>
+    </ol>
+
+    <h2>Permission Hierarchy</h2>
+
+    <pre><code>Organization (Tenant)
+├─ Users (email, status)
+├─ Roles (permissions)
+├─ Objects (client, contact, deal, etc.)
+│  ├─ Permissions (Create, Read, Update, Delete)
+│  ├─ Fields
+│  │  └─ Field Permissions (View, Edit)
+│  └─ Records (tenant data isolation)</code></pre>
+
+    <h2>Best Practices</h2>
+
+    <ul>
+      <li>✓ Use principle of least privilege</li>
+      <li>✓ Create roles for different job functions</li>
+      <li>✓ Review permissions quarterly</li>
+      <li>✓ Document custom roles</li>
+      <li>✗ Don't make everyone admin</li>
+      <li>✗ Don't create duplicate roles</li>
+      <li>✗ Don't assign excessive permissions</li>
+    </ul>
+
+    <div class="note">
+      <strong>💡 Tip:</strong> Sales team typically needs Create/Read/Update on all objects. Support team might only need Read on Cases. Customize based on your workflow.
+    </div>
+
+    <div class="success">
+      <strong>✓ Set Up Complete!</strong> For more info, see <a href="/user-guide/authentication">Authentication</a>.
+    </div>
+  </div>
+</MainLayout>

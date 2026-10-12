@@ -1,0 +1,986 @@
+---
+import { ChevronRight, Play, Lock, Copy, Loader } from 'lucide-astro';
+import { OPENAPI, OPERATIONS_BY_TAG } from '../data/openapi.js';
+import { requestBodyOf, responsesOf, paramsOf } from '../utils/schema.js';
+
+/**
+ * Swagger-style endpoint reference with a live request runner.
+ *
+ * Everything renderable is computed here at build time — resolved schemas,
+ * example payloads, parameter tables — so the client script only has to build a
+ * URL, send a fetch, and print the result.
+ */
+
+const apiUrl = import.meta.env.PUBLIC_API_URL || 'http://localhost:5000/api/v1';
+
+// Pre-resolve each operation so the template stays declarative.
+const groups = OPERATIONS_BY_TAG.map((group) => ({
+  ...group,
+  operations: group.operations.map((op) => {
+    const source = OPENAPI.paths[op.path][op.method.toLowerCase()];
+    return {
+      ...op,
+      params: paramsOf(OPENAPI, source),
+      body: requestBodyOf(OPENAPI, source),
+      responses: responsesOf(OPENAPI, source),
+      // security: [] on an operation means it overrides the global requirement
+      // and needs no credential — login, password reset and so on.
+      isPublic: Array.isArray(source.security) && source.security.length === 0,
+    };
+  }),
+}));
+
+const totalOps = groups.reduce((n, g) => n + g.operations.length, 0);
+---
+
+<div class="explorer" data-api-url={apiUrl}>
+  <!-- ── Credential bar ─────────────────────────────────────────────────── -->
+  <div class="cred">
+    <div class="cred-head">
+      <Lock size={15} class="cred-icon" />
+      <div>
+        <p class="cred-title">Authorize</p>
+        <p class="cred-sub">
+          Paste an API key to send real requests. It is held in this tab only —
+          never stored, never sent anywhere but your API.
+        </p>
+      </div>
+    </div>
+    <div class="cred-row">
+      <input
+        type="password"
+        id="api-key"
+        class="cred-input"
+        placeholder="X-API-Key — create one under Integrations"
+        autocomplete="off"
+        spellcheck="false"
+      />
+      <label class="cred-cookie">
+        <input type="checkbox" id="use-cookie" />
+        Use my session instead
+      </label>
+    </div>
+    <p class="cred-note">
+      <strong>Session mode</strong> sends your logged-in cookie via
+      <code>credentials: 'include'</code>. It only works when the docs origin is on
+      the API's CORS allow-list; otherwise use a key.
+    </p>
+  </div>
+
+  <p class="op-count">{totalOps} documented endpoints across {groups.length} groups</p>
+
+  <!-- ── Operations ─────────────────────────────────────────────────────── -->
+  {groups.map((group) => (
+    <section class="group" id={`tag-${group.name.toLowerCase().replace(/\s+/g, '-')}`}>
+      <h2 class="group-title">{group.name}</h2>
+      {group.description && <p class="group-desc">{group.description}</p>}
+
+      <div class="ops">
+        {group.operations.map((op) => (
+          <details class="op" id={op.id} data-method={op.method} data-path={op.path}>
+            <summary class="op-summary">
+              <ChevronRight size={14} class="op-chevron" aria-hidden="true" />
+              <span class={`method method-${op.method.toLowerCase()}`}>{op.method}</span>
+              <code class="op-path">{op.path}</code>
+              <span class="op-desc">{op.summary}</span>
+              {op.isPublic && <span class="op-badge">no auth</span>}
+            </summary>
+
+            <div class="op-body">
+              {op.description && <p class="prose">{op.description}</p>}
+
+              <!-- Parameters -->
+              {(op.params.path.length > 0 || op.params.query.length > 0 || op.params.header.length > 0) && (
+                <div class="block">
+                  <h3 class="block-title">Parameters</h3>
+                  <div class="table-wrap">
+                    <table class="table">
+                      <thead>
+                        <tr><th>Name</th><th>In</th><th>Type</th><th>Description</th></tr>
+                      </thead>
+                      <tbody>
+                        {[...op.params.path, ...op.params.query, ...op.params.header].map((p) => (
+                          <tr>
+                            <td>
+                              <code>{p.name}</code>
+                              {p.required && <span class="req" title="Required">*</span>}
+                            </td>
+                            <td><span class="pill">{p.in}</span></td>
+                            <td class="mono-cell">
+                              {p.schema?.enum ? p.schema.enum.join(' | ') : p.schema?.type || 'string'}
+                              {p.schema?.default !== undefined && (
+                                <span class="default">default {String(p.schema.default)}</span>
+                              )}
+                            </td>
+                            <td>{p.description || ''}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+
+              <!-- Request body -->
+              {op.body && (
+                <div class="block">
+                  <h3 class="block-title">
+                    Request body
+                    <span class="mt">{op.body.mediaType}</span>
+                    {op.body.required && <span class="req-tag">required</span>}
+                  </h3>
+                  {op.body.rows.length > 0 && (
+                    <div class="table-wrap">
+                      <table class="table">
+                        <thead>
+                          <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+                        </thead>
+                        <tbody>
+                          {op.body.rows.map((r) => (
+                            <tr>
+                              <td>
+                                <code>{r.name}</code>
+                                {r.required && <span class="req" title="Required">*</span>}
+                              </td>
+                              <td class="mono-cell">{r.type}</td>
+                              <td>{r.description}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              <!-- Try it -->
+              <div class="block">
+                <h3 class="block-title">Try it</h3>
+                <form class="try" data-try>
+                  {op.params.path.length > 0 && (
+                    <div class="fields">
+                      {op.params.path.map((p) => (
+                        <label class="field">
+                          <span class="field-label">{p.name} <span class="req">*</span></span>
+                          <input
+                            class="field-input"
+                            data-param-in="path"
+                            data-param-name={p.name}
+                            placeholder={String(p.schema?.example ?? p.name)}
+                            value={p.schema?.example ?? ''}
+                            required
+                          />
+                        </label>
+                      ))}
+                    </div>
+                  )}
+
+                  {op.params.query.length > 0 && (
+                    <div class="fields">
+                      {op.params.query.map((p) => (
+                        <label class="field">
+                          <span class="field-label">
+                            {p.name}
+                            {p.required && <span class="req"> *</span>}
+                          </span>
+                          <input
+                            class="field-input"
+                            data-param-in="query"
+                            data-param-name={p.name}
+                            placeholder={
+                              p.schema?.default !== undefined
+                                ? `default ${p.schema.default}`
+                                : String(p.schema?.example ?? 'optional')
+                            }
+                          />
+                        </label>
+                      ))}
+                    </div>
+                  )}
+
+                  {op.body && op.body.mediaType === 'application/json' && (
+                    <label class="field field-full">
+                      <span class="field-label">Body (JSON)</span>
+                      <textarea
+                        class="body-input"
+                        data-body
+                        rows="8"
+                        spellcheck="false"
+                      >{JSON.stringify(op.body.example, null, 2)}</textarea>
+                    </label>
+                  )}
+
+                  {op.body && op.body.mediaType === 'multipart/form-data' && (
+                    <p class="note">
+                      This endpoint takes a file upload. The runner below can't
+                      attach files — use the <code>curl</code> snippet instead.
+                    </p>
+                  )}
+
+                  <div class="try-actions">
+                    <button type="submit" class="send" data-send>
+                      <Play size={13} />
+                      Send
+                    </button>
+                    <button type="button" class="copy" data-copy-curl>
+                      <Copy size={13} />
+                      Copy as curl
+                    </button>
+                    <span class="try-status" data-status aria-live="polite"></span>
+                  </div>
+
+                  <pre class="response" data-response hidden></pre>
+                </form>
+              </div>
+
+              <!-- Responses -->
+              <div class="block">
+                <h3 class="block-title">Responses</h3>
+                <div class="responses">
+                  {op.responses.map((r) => (
+                    <div class="resp">
+                      <span class={`status status-${r.status[0]}xx`}>{r.status}</span>
+                      <div class="resp-body">
+                        <p class="resp-desc">{r.description}</p>
+                        {r.example !== null && r.status[0] === '2' && (
+                          <pre class="example">{JSON.stringify(r.example, null, 2)}</pre>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </details>
+        ))}
+      </div>
+    </section>
+  ))}
+</div>
+
+<script is:inline>
+  (() => {
+    const root = document.querySelector('.explorer');
+    if (!root) return;
+    const apiUrl = root.dataset.apiUrl.replace(/\/$/, '');
+    const keyInput = document.getElementById('api-key');
+    const cookieToggle = document.getElementById('use-cookie');
+
+    // Remember the key for this tab only. sessionStorage rather than
+    // localStorage: a credential should not outlive the tab it was pasted into.
+    const KEY_STORE = 'salesdam.docs.apiKey';
+    try {
+      const saved = sessionStorage.getItem(KEY_STORE);
+      if (saved) keyInput.value = saved;
+    } catch { /* private mode */ }
+    keyInput?.addEventListener('input', () => {
+      try { sessionStorage.setItem(KEY_STORE, keyInput.value); } catch {}
+    });
+
+    /** Build the concrete URL and request init for one <form data-try>. */
+    const buildRequest = (form) => {
+      const op = form.closest('.op');
+      const method = op.dataset.method;
+      let path = op.dataset.path;
+
+      form.querySelectorAll('[data-param-in="path"]').forEach((el) => {
+        const val = el.value.trim();
+        path = path.replace(`{${el.dataset.paramName}}`, encodeURIComponent(val));
+      });
+
+      const qs = new URLSearchParams();
+      form.querySelectorAll('[data-param-in="query"]').forEach((el) => {
+        const val = el.value.trim();
+        if (val) qs.set(el.dataset.paramName, val);
+      });
+
+      const headers = { Accept: 'application/json' };
+      const useCookie = cookieToggle?.checked;
+      const key = keyInput?.value.trim();
+      if (!useCookie && key) headers['X-API-Key'] = key;
+
+      const bodyEl = form.querySelector('[data-body]');
+      let body;
+      if (bodyEl && !['GET', 'DELETE'].includes(method)) {
+        body = bodyEl.value.trim();
+        if (body) headers['Content-Type'] = 'application/json';
+      }
+
+      const url = `${apiUrl}${path}${qs.toString() ? `?${qs}` : ''}`;
+      return { url, method, headers, body, useCookie };
+    };
+
+    const setStatus = (el, text, kind) => {
+      el.textContent = text;
+      el.className = `try-status${kind ? ` is-${kind}` : ''}`;
+    };
+
+    root.querySelectorAll('[data-try]').forEach((form) => {
+      const out = form.querySelector('[data-response]');
+      const statusEl = form.querySelector('[data-status]');
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const req = buildRequest(form);
+
+        if (!req.useCookie && !req.headers['X-API-Key']) {
+          setStatus(statusEl, 'Add an API key above, or tick "use my session".', 'err');
+          return;
+        }
+
+        // Validate the body before sending, so a typo reads as a JSON error here
+        // rather than an opaque 400 from the server.
+        if (req.body) {
+          try {
+            JSON.parse(req.body);
+          } catch (err) {
+            setStatus(statusEl, `Body isn't valid JSON: ${err.message}`, 'err');
+            return;
+          }
+        }
+
+        setStatus(statusEl, 'Sending…', 'busy');
+        out.hidden = true;
+        const started = performance.now();
+
+        try {
+          const res = await fetch(req.url, {
+            method: req.method,
+            headers: req.headers,
+            body: req.body || undefined,
+            credentials: req.useCookie ? 'include' : 'omit',
+          });
+          const ms = Math.round(performance.now() - started);
+          const text = await res.text();
+          let pretty = text;
+          try {
+            pretty = JSON.stringify(JSON.parse(text), null, 2);
+          } catch {
+            // Non-JSON (a CSV export, an HTML error page) — show it verbatim.
+          }
+          setStatus(
+            statusEl,
+            `${res.status} ${res.statusText} · ${ms}ms`,
+            res.ok ? 'ok' : 'err',
+          );
+          out.textContent = pretty || '(empty response)';
+          out.hidden = false;
+        } catch (err) {
+          // fetch only rejects on network/CORS failure, never on 4xx/5xx.
+          setStatus(statusEl, 'Request failed', 'err');
+          out.textContent =
+            `${err.message}\n\n` +
+            `This is a network or CORS failure, not an API error — the request ` +
+            `never got a response.\n` +
+            `• Is the API running at ${apiUrl}?\n` +
+            `• Is this origin (${location.origin}) on the API's CORS allow-list?`;
+          out.hidden = false;
+        }
+      });
+
+      form.querySelector('[data-copy-curl]')?.addEventListener('click', async () => {
+        const req = buildRequest(form);
+        const parts = [`curl -X ${req.method} '${req.url}'`];
+        Object.entries(req.headers).forEach(([k, v]) => {
+          // Never paste a real credential into the clipboard snippet.
+          const shown = k === 'X-API-Key' ? '$SALESDAM_API_KEY' : v;
+          parts.push(`  -H '${k}: ${shown}'`);
+        });
+        if (req.useCookie) parts.push(`  -b 'sid=$SESSION_COOKIE'`);
+        if (req.body) parts.push(`  -d '${req.body.replace(/'/g, "'\\''")}'`);
+        const snippet = parts.join(' \\\n');
+        try {
+          await navigator.clipboard.writeText(snippet);
+          setStatus(statusEl, 'curl copied', 'ok');
+        } catch {
+          setStatus(statusEl, 'Copy failed — clipboard blocked', 'err');
+        }
+      });
+    });
+
+    // Deep links: /api/reference#get-records-objectapiname opens that operation.
+    const openFromHash = () => {
+      const id = location.hash.slice(1);
+      if (!id) return;
+      const target = document.getElementById(id);
+      if (target?.tagName === 'DETAILS') {
+        target.open = true;
+        target.scrollIntoView({ block: 'center' });
+      }
+    };
+    openFromHash();
+    window.addEventListener('hashchange', openFromHash);
+  })();
+</script>
+
+<style>
+  /* ── Credential bar ─────────────────────────────────────────────────────── */
+  .cred {
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-md);
+    background: var(--color-gray-50);
+    padding: var(--spacing-4);
+    margin-bottom: var(--spacing-5);
+  }
+
+  .cred-head {
+    display: flex;
+    gap: var(--spacing-3);
+    align-items: flex-start;
+  }
+
+  .cred-icon {
+    color: var(--color-primary);
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .cred-title {
+    margin: 0;
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-gray-800);
+  }
+
+  .cred-sub,
+  .cred-note {
+    margin: 2px 0 0;
+    font-size: var(--font-size-xs);
+    color: var(--color-gray-500);
+    line-height: 1.5;
+  }
+
+  .cred-row {
+    display: flex;
+    gap: var(--spacing-3);
+    align-items: center;
+    margin: var(--spacing-3) 0 var(--spacing-2);
+    flex-wrap: wrap;
+  }
+
+  .cred-input {
+    flex: 1;
+    min-width: 240px;
+    padding: var(--spacing-2) var(--spacing-3);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    background: var(--surface);
+    font-family: var(--font-mono);
+    font-size: var(--font-size-sm);
+    color: var(--color-gray-900);
+  }
+
+  .cred-input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px var(--color-primary-light);
+  }
+
+  .cred-cookie {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-2);
+    font-size: var(--font-size-xs);
+    color: var(--color-gray-600);
+    white-space: nowrap;
+    cursor: pointer;
+  }
+
+  .cred-note code,
+  .note code {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    background: var(--surface);
+    border: 1px solid var(--border-color);
+    padding: 1px 4px;
+    border-radius: var(--border-radius-sm);
+  }
+
+  .op-count {
+    font-size: var(--font-size-xs);
+    color: var(--color-gray-500);
+    margin: 0 0 var(--spacing-4);
+  }
+
+  /* ── Groups ─────────────────────────────────────────────────────────────── */
+  .group {
+    margin-bottom: var(--spacing-8);
+    scroll-margin-top: calc(var(--docs-header-height) + var(--spacing-4));
+  }
+
+  .group-title {
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-gray-900);
+    margin: 0 0 var(--spacing-1);
+    padding-bottom: var(--spacing-2);
+    border-bottom: 2px solid var(--border-color);
+  }
+
+  .group-desc {
+    font-size: var(--font-size-sm);
+    color: var(--color-gray-500);
+    margin: var(--spacing-2) 0 var(--spacing-4);
+    line-height: 1.6;
+  }
+
+  .ops {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-2);
+  }
+
+  /* ── One operation ──────────────────────────────────────────────────────── */
+  .op {
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-md);
+    background: var(--surface);
+    overflow: hidden;
+    scroll-margin-top: calc(var(--docs-header-height) + var(--spacing-4));
+  }
+
+  .op[open] {
+    border-color: var(--color-gray-300);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .op-summary {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-3);
+    padding: var(--spacing-3);
+    cursor: pointer;
+    list-style: none;
+    user-select: none;
+  }
+
+  .op-summary::-webkit-details-marker { display: none; }
+  .op-summary::marker { content: ''; }
+
+  .op-summary:hover {
+    background: var(--color-gray-50);
+  }
+
+  .op-summary:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: -2px;
+  }
+
+  .op-chevron {
+    color: var(--color-gray-400);
+    flex-shrink: 0;
+    transition: transform var(--transition-fast);
+  }
+
+  .op[open] .op-chevron {
+    transform: rotate(90deg);
+  }
+
+  .method {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: var(--font-weight-bold);
+    padding: 3px 6px;
+    border-radius: var(--border-radius-sm);
+    flex-shrink: 0;
+    min-width: 54px;
+    text-align: center;
+    letter-spacing: 0.02em;
+  }
+
+  .method-get { color: var(--method-get); background: var(--method-get-bg); }
+  .method-post { color: var(--method-post); background: var(--method-post-bg); }
+  .method-put { color: var(--method-put); background: var(--method-put-bg); }
+  .method-patch { color: var(--method-patch); background: var(--method-patch-bg); }
+  .method-delete { color: var(--method-delete); background: var(--method-delete-bg); }
+
+  .op-path {
+    font-family: var(--font-mono);
+    font-size: var(--font-size-sm);
+    color: var(--color-gray-800);
+    font-weight: var(--font-weight-medium);
+    flex-shrink: 0;
+  }
+
+  .op-desc {
+    font-size: var(--font-size-xs);
+    color: var(--color-gray-500);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
+  }
+
+  .op-badge {
+    margin-left: auto;
+    flex-shrink: 0;
+    font-size: 10px;
+    font-weight: var(--font-weight-semibold);
+    padding: 2px 6px;
+    border-radius: var(--border-radius-full);
+    background: var(--color-gray-100);
+    color: var(--color-gray-500);
+  }
+
+  .op-body {
+    padding: var(--spacing-4);
+    border-top: 1px solid var(--border-color);
+    background: var(--color-gray-50);
+  }
+
+  .prose {
+    font-size: var(--font-size-sm);
+    color: var(--color-gray-600);
+    line-height: 1.65;
+    margin: 0 0 var(--spacing-4);
+  }
+
+  .block {
+    margin-bottom: var(--spacing-5);
+  }
+
+  .block:last-child {
+    margin-bottom: 0;
+  }
+
+  .block-title {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2);
+    font-size: 11px;
+    font-weight: var(--font-weight-bold);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-gray-500);
+    margin: 0 0 var(--spacing-2);
+  }
+
+  .mt {
+    font-family: var(--font-mono);
+    text-transform: none;
+    letter-spacing: 0;
+    font-weight: var(--font-weight-normal);
+    color: var(--color-gray-400);
+  }
+
+  .req-tag {
+    text-transform: none;
+    letter-spacing: 0;
+    font-size: 10px;
+    color: var(--color-danger);
+    background: var(--color-danger-light);
+    padding: 1px 5px;
+    border-radius: var(--border-radius-sm);
+  }
+
+  /* ── Tables ─────────────────────────────────────────────────────────────── */
+  /* Wrapper scrolls instead of the page, so a wide parameter table can't push
+     the whole layout sideways on a phone. */
+  .table-wrap {
+    overflow-x: auto;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    background: var(--surface);
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--font-size-sm);
+    min-width: 480px;
+  }
+
+  .table th {
+    text-align: left;
+    padding: var(--spacing-2) var(--spacing-3);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--color-gray-500);
+    border-bottom: 1px solid var(--border-color);
+    background: var(--color-gray-50);
+    white-space: nowrap;
+  }
+
+  .table td {
+    padding: var(--spacing-2) var(--spacing-3);
+    border-bottom: 1px solid var(--border-color);
+    color: var(--color-gray-600);
+    vertical-align: top;
+    line-height: 1.5;
+  }
+
+  .table tr:last-child td {
+    border-bottom: none;
+  }
+
+  .table code {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--color-gray-900);
+  }
+
+  .mono-cell {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--color-gray-500);
+    white-space: nowrap;
+  }
+
+  .default {
+    display: block;
+    color: var(--color-gray-400);
+    font-size: 10px;
+  }
+
+  .req {
+    color: var(--color-danger);
+    font-weight: var(--font-weight-bold);
+    margin-left: 2px;
+  }
+
+  .pill {
+    font-size: 10px;
+    padding: 1px 6px;
+    border-radius: var(--border-radius-full);
+    background: var(--color-gray-100);
+    color: var(--color-gray-500);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+
+  /* ── Try it ─────────────────────────────────────────────────────────────── */
+  .try {
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    background: var(--surface);
+    padding: var(--spacing-3);
+  }
+
+  .fields {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: var(--spacing-3);
+    margin-bottom: var(--spacing-3);
+  }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+  }
+
+  .field-full {
+    margin-bottom: var(--spacing-3);
+  }
+
+  .field-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--color-gray-600);
+  }
+
+  .field-input,
+  .body-input {
+    padding: var(--spacing-2);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-sm);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    background: var(--surface);
+    color: var(--color-gray-900);
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .body-input {
+    resize: vertical;
+    line-height: 1.5;
+  }
+
+  .field-input:focus,
+  .body-input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px var(--color-primary-light);
+  }
+
+  .try-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2);
+    flex-wrap: wrap;
+  }
+
+  .send,
+  .copy {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px var(--spacing-3);
+    border-radius: var(--border-radius);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-medium);
+    font-family: var(--font-family);
+    cursor: pointer;
+    border: 1px solid transparent;
+  }
+
+  .send {
+    background: var(--color-primary);
+    color: #ffffff;
+  }
+
+  .send:hover {
+    background: var(--color-primary-hover);
+  }
+
+  .copy {
+    background: var(--surface);
+    border-color: var(--border-color);
+    color: var(--color-gray-600);
+  }
+
+  .copy:hover {
+    border-color: var(--color-gray-300);
+    color: var(--color-gray-900);
+  }
+
+  .try-status {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--color-gray-500);
+  }
+
+  .try-status.is-ok { color: var(--color-success); }
+  .try-status.is-err { color: var(--color-danger); }
+  .try-status.is-busy { color: var(--color-gray-400); }
+
+  .note {
+    font-size: var(--font-size-xs);
+    color: var(--color-warning);
+    background: var(--color-warning-light);
+    padding: var(--spacing-2) var(--spacing-3);
+    border-radius: var(--border-radius-sm);
+    margin: 0 0 var(--spacing-3);
+    line-height: 1.5;
+  }
+
+  .response,
+  .example {
+    margin: var(--spacing-3) 0 0;
+    padding: var(--spacing-3);
+    background: var(--color-gray-900);
+    color: #e2e8f0;
+    border-radius: var(--border-radius);
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    line-height: 1.6;
+    overflow-x: auto;
+    white-space: pre;
+    max-height: 340px;
+    overflow-y: auto;
+  }
+
+  /* The dark ramp inverts in dark mode, so pin the code surface explicitly —
+     otherwise --color-gray-900 becomes near-white and the text vanishes. */
+  :global([data-theme='dark']) .response,
+  :global([data-theme='dark']) .example {
+    background: #0b1220;
+    border: 1px solid var(--border-color);
+  }
+
+  /* ── Responses ──────────────────────────────────────────────────────────── */
+  .responses {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-2);
+  }
+
+  .resp {
+    display: flex;
+    gap: var(--spacing-3);
+    align-items: flex-start;
+    padding: var(--spacing-3);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    background: var(--surface);
+  }
+
+  .status {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: var(--font-weight-bold);
+    padding: 2px 7px;
+    border-radius: var(--border-radius-sm);
+    flex-shrink: 0;
+  }
+
+  .status-2xx { color: var(--color-success); background: var(--color-success-light); }
+  .status-4xx { color: var(--color-warning); background: var(--color-warning-light); }
+  .status-5xx { color: var(--color-danger); background: var(--color-danger-light); }
+
+  .resp-body {
+    min-width: 0;
+    flex: 1;
+  }
+
+  .resp-desc {
+    margin: 0;
+    font-size: var(--font-size-sm);
+    color: var(--color-gray-600);
+    line-height: 1.5;
+  }
+
+  .example {
+    max-height: 240px;
+  }
+
+  /* ── Responsive ─────────────────────────────────────────────────────────── */
+  @media (max-width: 720px) {
+    /* The one-line summary can't hold four things on a phone. Drop the prose
+       description and let method + path wrap onto two rows. */
+    .op-summary {
+      flex-wrap: wrap;
+      gap: var(--spacing-2);
+    }
+
+    .op-desc {
+      flex-basis: 100%;
+      white-space: normal;
+      padding-left: 30px;
+    }
+
+    .op-badge {
+      margin-left: 0;
+    }
+
+    .op-body {
+      padding: var(--spacing-3);
+    }
+
+    .fields {
+      grid-template-columns: 1fr;
+    }
+
+    .cred-input {
+      min-width: 0;
+    }
+
+    .try-actions {
+      gap: var(--spacing-2);
+    }
+
+    .send,
+    .copy {
+      flex: 1;
+      justify-content: center;
+    }
+
+    .try-status {
+      flex-basis: 100%;
+    }
+  }
+</style>

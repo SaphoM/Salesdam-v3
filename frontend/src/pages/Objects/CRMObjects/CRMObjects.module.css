@@ -1,0 +1,135 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-5);
+}
+
+.card {
+  background: var(--color-white);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+  transition: box-shadow var(--transition-fast);
+}
+
+.card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.top {
+  display: flex;
+  justify-content: space-between;
+}
+
+.icon {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--border-radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.system,
+.standard,
+.custom {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+
+.system {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.standard {
+  background: var(--color-gray-100);
+  color: var(--color-gray-600);
+}
+
+.custom {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+}
+
+.name {
+  font-weight: 600;
+}
+
+.api {
+  font-size: 12px;
+  color: var(--color-gray-500);
+  font-family: monospace;
+}
+
+.desc {
+  font-size: 12px;
+  color: var(--color-gray-600);
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.view,
+.edit {
+  font-size: 12px;
+  padding: 4px 8px;
+  border: 1px solid;
+  border-radius: 6px;
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  text-decoration: none;
+}
+
+.view {
+  background: var(--color-gray-50);
+  border-color: var(--border-color);
+}
+
+.edit {
+  color: var(--color-primary);
+  border-color: currentColor;
+}
+
+/* Matches the .view / .edit sizing so all three actions line up. */
+.delete {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  background: var(--color-white);
+  color: var(--color-danger);
+  cursor: pointer;
+  transition:
+    background var(--transition-fast),
+    border-color var(--transition-fast);
+}
+
+.delete:hover {
+  background: var(--color-danger-light);
+  border-color: var(--color-danger);
+}
+
+.delete:focus-visible {
+  outline: 2px solid var(--color-danger);
+  outline-offset: 1px;
+}
+
+.skeleton {
+  height: 180px;
+  border-radius: var(--border-radius-lg);
+  background: var(--color-gray-100);
+}

@@ -1,0 +1,50 @@
+---
+import '../styles/global.css';
+
+const {
+  title = "Mini CRM — The CRM Built for Growth",
+  description = "A powerful multi-tenant CRM platform with custom objects, automation, analytics, and AI-powered onboarding. Build the exact CRM your business needs.",
+  image = "/og-image.svg",
+  type = "website",
+  canonicalUrl,
+} = Astro.props;
+
+const siteUrl = "http://localhost:4321";
+const fullUrl = canonicalUrl || siteUrl + Astro.url.pathname;
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content={description} />
+  <title>{title}</title>
+
+  <!-- Canonical -->
+  <link rel="canonical" href={fullUrl} />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content={type} />
+  <meta property="og:title" content={title} />
+  <meta property="og:description" content={description} />
+  <meta property="og:url" content={fullUrl} />
+  <meta property="og:image" content={siteUrl + image} />
+  <meta property="og:site_name" content="Mini CRM" />
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content={title} />
+  <meta name="twitter:description" content={description} />
+  <meta name="twitter:image" content={siteUrl + image} />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+  <!-- Theme color -->
+  <meta name="theme-color" content="#0066FF" />
+</head>
+<body>
+  <slot />
+</body>
+</html>

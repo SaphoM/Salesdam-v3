@@ -1,0 +1,278 @@
+---
+import { Zap } from 'lucide-astro';
+
+const year = new Date().getFullYear();
+---
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <a href="/" class="footer-logo">
+          <div class="footer-logo-icon">
+            <Zap size={18} strokeWidth={2.5} />
+          </div>
+          <span>Mini CRM</span>
+        </a>
+        <p>
+          A powerful multi-tenant CRM platform built for modern businesses.
+          Custom objects, automation, and AI — all in one place.
+        </p>
+        <div class="footer-app-links">
+          <a href="http://localhost:3000/login" class="footer-app-btn"
+            >Sign In</a
+          >
+          <a
+            href="http://localhost:3000/register"
+            class="footer-app-btn footer-app-btn-primary">Start Free</a
+          >
+        </div>
+      </div>
+
+      <div class="footer-links-wrap">
+        <div class="footer-col">
+          <h5>Quick Links</h5>
+          <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/features">Features</a></li>
+            <li><a href="/#pricing">Pricing</a></li>
+            <li><a href="/getting-started">Getting Started</a></li>
+            <li><a href="/faq">FAQ</a></li>
+            <li><a href="/contact">Get in Touch</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h5>User Guide</h5>
+          <ul>
+            <li><a href="/user-guide">Overview</a></li>
+            <li><a href="/user-guide/objects">Object Settings</a></li>
+            <li><a href="/user-guide/records">Records</a></li>
+            <li><a href="/user-guide/automation">Automation</a></li>
+            <li><a href="/user-guide/dashboards">Dashboards</a></li>
+            <li><a href="/user-guide/users-roles">Users &amp; Roles</a></li>
+            <li><a href="/user-guide/integrations">Integrations</a></li>
+            <li><a href="/user-guide/analytics">Analytics</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h5>Resources</h5>
+          <ul>
+            <li><a href="/getting-started">Getting Started</a></li>
+            <li><a href="/user-guide">Documentation</a></li>
+            <li><a href="/faq">FAQ</a></li>
+            <li><a href="/contact">Support</a></li>
+          </ul>
+          <div class="footer-dev-section">
+            <h5>Internal</h5>
+            <ul>
+              <li>
+                <a
+                  href="/developer"
+                  class="dev-link"
+                  title="Internal developer documentation">Developer Guide</a>
+              </li>
+              <li>
+                <a href="/developer/architecture" class="dev-link"
+                  >Architecture</a>
+              </li>
+              <li>
+                <a href="/developer/api" class="dev-link">API Reference</a>
+              </li>
+              <li>
+                <a href="/developer/data-model" class="dev-link">Data Model</a>
+              </li>
+              <li>
+                <a href="/developer/user-stories" class="dev-link"
+                  >User Stories</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p>&copy; {year} Mini CRM. All rights reserved.</p>
+      <div class="footer-legal">
+        <a href="/privacy">Privacy Policy</a>
+        <a href="/terms">Terms of Service</a>
+        <a href="/contact">Contact</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    background: #0f172a;
+    color: white;
+    padding: 64px 0 0;
+  }
+
+  .footer-top {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 64px;
+    padding-bottom: 48px;
+    border-bottom: 1px solid #1e293b;
+  }
+
+  /* Brand column */
+  .footer-brand {
+  }
+  .footer-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: white;
+    margin-bottom: 16px;
+  }
+  .footer-logo:hover {
+    color: #3385ff;
+  }
+
+  .footer-logo-icon {
+    width: 26px;
+    height: 26px;
+    background: #3385ff;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+  }
+  .footer-brand p {
+    color: #64748b;
+    font-size: 0.9rem;
+    line-height: 1.7;
+    margin-bottom: 20px;
+  }
+  .footer-app-links {
+    display: flex;
+    gap: 10px;
+  }
+  .footer-app-btn {
+    display: inline-block;
+    padding: 8px 18px;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    border: 1px solid #334155;
+    color: #94a3b8;
+    transition: all 0.2s;
+  }
+  .footer-app-btn:hover {
+    border-color: #64748b;
+    color: white;
+  }
+  .footer-app-btn-primary {
+    background: #0066ff;
+    border-color: #0066ff;
+    color: white;
+  }
+  .footer-app-btn-primary:hover {
+    background: #0052cc;
+    border-color: #0052cc;
+    color: white;
+  }
+
+  /* Links columns */
+  .footer-links-wrap {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 32px;
+  }
+
+  .footer-col h5 {
+    color: white;
+    font-size: 0.875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 16px;
+  }
+
+  .footer-col ul {
+    list-style: none;
+    margin-bottom: 8px;
+  }
+
+  .footer-col li {
+    margin-bottom: 8px;
+  }
+
+  .footer-col a {
+    color: #64748b;
+    font-size: 0.9rem;
+    transition: color 0.15s;
+  }
+  .footer-col a:hover {
+    color: white;
+  }
+
+  .footer-dev-section {
+    margin-top: 28px;
+  }
+
+  .dev-link {
+    font-size: 0.825rem !important;
+    opacity: 0.7;
+  }
+  .dev-link:hover {
+    opacity: 1;
+  }
+
+  /* Bottom bar */
+  .footer-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 0;
+    color: #475569;
+    font-size: 0.875rem;
+  }
+
+  .footer-legal {
+    display: flex;
+    gap: 24px;
+  }
+  .footer-legal a {
+    color: #475569;
+  }
+  .footer-legal a:hover {
+    color: white;
+  }
+
+  @media (max-width: 1024px) {
+    .footer-top {
+      grid-template-columns: 1fr;
+      gap: 40px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .footer-links-wrap {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .footer-bottom {
+      flex-direction: column;
+      gap: 12px;
+      text-align: center;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .footer-links-wrap {
+      grid-template-columns: 1fr;
+    }
+    .footer-legal {
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
+    }
+  }
+</style>

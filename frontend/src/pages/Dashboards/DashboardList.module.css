@@ -1,0 +1,173 @@
+.page { display: flex; flex-direction: column; gap: var(--spacing-6); }
+
+/* ─── Header ──────────────────────────────────────────────── */
+.header { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--spacing-4); }
+.title { font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); color: var(--color-gray-900); }
+.subtitle { font-size: var(--font-size-sm); color: var(--color-gray-500); margin-top: 2px; }
+.headerActions { display: flex; gap: var(--spacing-3); flex-shrink: 0; }
+
+/* ─── Content ─────────────────────────────────────────────── */
+.content { display: flex; flex-direction: column; gap: var(--spacing-5); }
+
+/* ─── Folder group ────────────────────────────────────────── */
+.folderGroup { display: flex; flex-direction: column; gap: var(--spacing-3); }
+
+.folderHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-2) var(--spacing-3);
+  border-radius: var(--border-radius-md);
+  background: var(--color-gray-50);
+  border: 1px solid var(--border-color);
+}
+
+.folderToggle {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-family);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-gray-700);
+  flex: 1;
+  text-align: left;
+}
+
+.folderName { flex: 1; }
+.folderCount {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  background: var(--color-gray-200);
+  color: var(--color-gray-600);
+  border-radius: 10px;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+}
+
+.folderActions { display: flex; gap: var(--spacing-1); flex-shrink: 0; }
+.folderBtn {
+  display: flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px; border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-sm); background: var(--color-white);
+  color: var(--color-gray-500); cursor: pointer;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+.folderBtn:hover { background: var(--color-gray-100); color: var(--color-gray-700); }
+.folderBtn.danger:hover { background: var(--color-danger-light); color: var(--color-danger); border-color: var(--color-danger); }
+
+.emptyFolder { font-size: var(--font-size-sm); color: var(--color-gray-400); padding: var(--spacing-2) var(--spacing-3); font-style: italic; }
+.unfolderedLabel { font-size: var(--font-size-sm); font-weight: var(--font-weight-semibold); color: var(--color-gray-500); margin-bottom: var(--spacing-1); }
+
+/* ─── Card grid ───────────────────────────────────────────── */
+.cardGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: var(--spacing-4); }
+
+/* ─── Dashboard card ──────────────────────────────────────── */
+.card {
+  background: var(--color-white);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-lg);
+  /* overflow: hidden removed — it clipped the actions dropdown menu */
+  position: relative;
+  transition: box-shadow var(--transition-fast), border-color var(--transition-fast);
+}
+.card:hover { box-shadow: var(--shadow-md); border-color: var(--color-gray-300); }
+
+/* Give the color bar its own top radius so overflow:hidden on .card is not needed */
+.cardColor {
+  height: 4px;
+  border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
+}
+
+.cardBody { display: flex; align-items: flex-start; gap: var(--spacing-3); padding: var(--spacing-4); }
+
+.cardIcon {
+  width: 40px; height: 40px; border-radius: var(--border-radius-md);
+  display: flex; align-items: center; justify-content: center;
+  background: var(--color-gray-50); flex-shrink: 0;
+}
+
+.cardInfo { flex: 1; min-width: 0; }
+.cardName {
+  display: block; font-size: var(--font-size-base); font-weight: var(--font-weight-semibold);
+  color: var(--color-gray-900); text-decoration: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.cardName:hover { color: var(--color-primary); }
+.cardDesc { font-size: var(--font-size-xs); color: var(--color-gray-500); margin: 2px 0 var(--spacing-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cardMeta { display: flex; align-items: center; gap: var(--spacing-3); }
+
+.accessBadge {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 10px; font-weight: var(--font-weight-medium);
+  color: var(--color-gray-500); background: var(--color-gray-100);
+  padding: 2px var(--spacing-2); border-radius: var(--border-radius-sm);
+  text-transform: capitalize;
+}
+.cardDate { font-size: var(--font-size-xs); color: var(--color-gray-400); }
+
+.cardActions { display: flex; gap: var(--spacing-1); flex-shrink: 0; }
+.cardBtn {
+  display: flex; align-items: center; justify-content: center;
+  width: 30px; height: 30px; border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-sm); background: none;
+  color: var(--color-gray-400); cursor: pointer;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+.cardBtn:hover { background: var(--color-gray-100); color: var(--color-gray-700); }
+
+.cardMenu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 4px);
+  background: var(--color-white);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-xl);
+  z-index: calc(var(--z-dropdown) + 10);
+  min-width: 160px;
+  overflow: hidden;
+}
+.cardMenuItem {
+  display: flex; align-items: center; gap: var(--spacing-2);
+  width: 100%; padding: var(--spacing-2) var(--spacing-4);
+  font-size: var(--font-size-sm); color: var(--color-gray-700);
+  background: none; border: none; cursor: pointer; text-align: left;
+  transition: background var(--transition-fast);
+}
+.cardMenuItem:hover { background: var(--color-gray-50); }
+.cardMenuItem.danger { color: var(--color-danger); }
+.cardMenuItem.danger:hover { background: var(--color-danger-light); }
+
+/* ─── Empty state ─────────────────────────────────────────── */
+.empty {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: var(--spacing-4); padding: var(--spacing-16); text-align: center;
+  color: var(--color-gray-400);
+}
+.empty h3 { font-size: var(--font-size-xl); font-weight: var(--font-weight-semibold); color: var(--color-gray-700); margin: 0; }
+.empty p { font-size: var(--font-size-sm); margin: 0; }
+
+/* ─── Form modal ──────────────────────────────────────────── */
+.formGrid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-4); }
+.formField { display: flex; flex-direction: column; gap: var(--spacing-1); }
+.formLabel { font-size: var(--font-size-sm); font-weight: var(--font-weight-medium); color: var(--color-gray-700); }
+.formInput {
+  padding: var(--spacing-2) var(--spacing-3); border: 1px solid var(--border-color);
+  border-radius: var(--border-radius); font-family: var(--font-family); font-size: var(--font-size-sm);
+  color: var(--color-gray-800); background: var(--color-gray-50); width: 100%; outline: none;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+.formInput:focus { border-color: var(--color-primary); background: var(--color-white); box-shadow: 0 0 0 3px var(--color-primary-light); }
+.colorInput { width: 60px; height: 36px; padding: 2px; border: 1px solid var(--border-color); border-radius: var(--border-radius); cursor: pointer; }
+
+/* ─── Loading ─────────────────────────────────────────────── */
+.loading { display: flex; align-items: center; justify-content: center; min-height: 300px; }
+.spinner { width: 32px; height: 32px; border: 3px solid var(--color-gray-200); border-top-color: var(--color-primary); border-radius: 50%; animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }

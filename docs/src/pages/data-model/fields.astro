@@ -1,0 +1,238 @@
+---
+import MainLayout from '../../layouts/MainLayout.astro';
+---
+
+<MainLayout title="Fields & Types | Salesdam Docs" description="Complete guide to field types in Salesdam">
+  <div class="content-wrapper">
+    <h1>Fields & Field Types</h1>
+
+    <p class="intro">Fields define the properties of objects. Each field has a type that determines how data is stored and displayed.</p>
+
+    <h2>Field Properties</h2>
+
+    <p>Every field has these properties:</p>
+    <table>
+      <tr>
+        <th>Property</th>
+        <th>Description</th>
+      </tr>
+      <tr>
+        <td>Name</td>
+        <td>Display name for the field</td>
+      </tr>
+      <tr>
+        <td>API Name</td>
+        <td>System identifier (snake_case)</td>
+      </tr>
+      <tr>
+        <td>Type</td>
+        <td>Data type of the field</td>
+      </tr>
+      <tr>
+        <td>Required</td>
+        <td>Whether the field must be filled</td>
+      </tr>
+      <tr>
+        <td>Unique</td>
+        <td>Whether values must be unique</td>
+      </tr>
+      <tr>
+        <td>Display Order</td>
+        <td>Order of fields in forms and layouts</td>
+      </tr>
+      <tr>
+        <td>Section</td>
+        <td>Logical grouping of fields</td>
+      </tr>
+      <tr>
+        <td>Help Text</td>
+        <td>Description shown to users</td>
+      </tr>
+    </table>
+
+    <h2>Field Types</h2>
+
+    <h3>Text</h3>
+    <p>Short text up to 255 characters.</p>
+    <ul>
+      <li>Use for: Names, emails, titles, codes</li>
+      <li>Max length: 255 characters</li>
+    </ul>
+
+    <h3>Long Text / Textarea</h3>
+    <p>Long text with multiple lines and formatting.</p>
+    <ul>
+      <li>Use for: Descriptions, notes, comments</li>
+      <li>Max length: 10,000 characters</li>
+    </ul>
+
+    <h3>Email</h3>
+    <p>Email addresses with validation.</p>
+    <ul>
+      <li>Use for: Email addresses</li>
+      <li>Automatically validated</li>
+    </ul>
+
+    <h3>Phone</h3>
+    <p>Phone numbers with optional formatting.</p>
+    <ul>
+      <li>Use for: Phone numbers</li>
+      <li>Supports international formats</li>
+    </ul>
+
+    <h3>URL</h3>
+    <p>Web addresses with validation.</p>
+    <ul>
+      <li>Use for: Website URLs</li>
+      <li>Automatically validated</li>
+    </ul>
+
+    <h3>Number</h3>
+    <p>Integer or decimal numbers.</p>
+    <ul>
+      <li>Use for: Quantities, counts, scores</li>
+      <li>Can set min/max values</li>
+      <li>Can set decimal places</li>
+    </ul>
+
+    <h3>Currency</h3>
+    <p>Monetary values with currency symbol.</p>
+    <ul>
+      <li>Use for: Prices, revenue, amounts</li>
+      <li>Automatically formatted</li>
+      <li>Supports multiple currencies</li>
+      <li>Default precision: 2 decimal places</li>
+    </ul>
+
+    <h3>Percent</h3>
+    <p>Percentage values 0-100.</p>
+    <ul>
+      <li>Use for: Discount rates, completion %, win rates</li>
+      <li>Automatically adds % symbol</li>
+    </ul>
+
+    <h3>Date</h3>
+    <p>Calendar dates (YYYY-MM-DD).</p>
+    <ul>
+      <li>Use for: Birthdates, deadlines, anniversaries</li>
+      <li>Date picker in UI</li>
+    </ul>
+
+    <h3>DateTime</h3>
+    <p>Date and time (YYYY-MM-DD HH:MM:SS).</p>
+    <ul>
+      <li>Use for: Event times, created timestamps</li>
+      <li>Date and time picker in UI</li>
+    </ul>
+
+    <h3>Boolean / Checkbox</h3>
+    <p>True/false or yes/no values.</p>
+    <ul>
+      <li>Use for: Flags, toggles, yes/no questions</li>
+      <li>Rendered as checkbox</li>
+    </ul>
+
+    <h3>Picklist / Dropdown</h3>
+    <p>Single selection from predefined options.</p>
+    <ul>
+      <li>Use for: Status, priority, type, category</li>
+      <li>Define picklist values</li>
+      <li>Set a default value</li>
+      <li>Max 500 options</li>
+    </ul>
+
+    <h3>Multi-Select Picklist</h3>
+    <p>Multiple selections from predefined options.</p>
+    <ul>
+      <li>Use for: Skills, tags, categories</li>
+      <li>User can select multiple values</li>
+    </ul>
+
+    <h3>Lookup / Relationship</h3>
+    <p>Reference to another object's record.</p>
+    <ul>
+      <li>Use for: Linking related data</li>
+      <li>Creates a foreign key relationship</li>
+      <li>Configure which object to link to</li>
+      <li>Set display field (what to show)</li>
+      <li>Supports filtering on related records</li>
+    </ul>
+
+    <h3>Auto Number</h3>
+    <p>Auto-generated sequential numbers.</p>
+    <ul>
+      <li>Use for: Record IDs, reference numbers</li>
+      <li>System-generated, user cannot edit</li>
+      <li>Configure prefix and starting number</li>
+      <li>Example: "ORD-000001", "CASE-001"</li>
+    </ul>
+
+    <h3>Formula</h3>
+    <p>Calculated field based on other fields.</p>
+    <ul>
+      <li>Use for: Totals, concatenations, conditionals</li>
+      <li>System-calculated, read-only</li>
+      <li>Supports mathematical operations</li>
+      <li>Can reference related object fields</li>
+    </ul>
+
+    <h3>Rollup</h3>
+    <p>Aggregate values from related records.</p>
+    <ul>
+      <li>Use for: Sum, count, average of related records</li>
+      <li>System-calculated, read-only</li>
+      <li>Examples: Total orders, average deal size</li>
+    </ul>
+
+    <h2>Field Validation</h2>
+
+    <p>Set validation rules for fields:</p>
+    <ul>
+      <li>Required: Field must have a value</li>
+      <li>Unique: Value must be unique across all records</li>
+      <li>Min/Max: Numeric range constraints</li>
+      <li>Pattern: Regular expression validation</li>
+      <li>Dependent: Show field only if condition is met</li>
+    </ul>
+
+    <h2>Creating Fields</h2>
+
+    <ol>
+      <li>In Object Builder, click "Add Field"</li>
+      <li>Enter field name and API name</li>
+      <li>Select field type</li>
+      <li>Configure field options</li>
+      <li>Set validation rules</li>
+      <li>Add help text (optional)</li>
+      <li>Click "Create Field"</li>
+    </ol>
+
+    <div class="note">
+      <strong>💡 Naming Convention:</strong> Use clear, descriptive names. API names should be lowercase with underscores (e.g., "annual_revenue", "contact_email").
+    </div>
+
+    <h2>Field Best Practices</h2>
+
+    <ul>
+      <li>✓ Use appropriate field types</li>
+      <li>✓ Set required fields for critical data</li>
+      <li>✓ Use picklists for standardized values</li>
+      <li>✓ Add help text for complex fields</li>
+      <li>✓ Group related fields into sections</li>
+      <li>✗ Don't create duplicate fields</li>
+      <li>✗ Don't store calculated values directly</li>
+      <li>✗ Don't use text for structured data</li>
+    </ul>
+
+    <div class="success">
+      <strong>✓ Ready!</strong> Next, learn about <a href="/data-model/relationships">Object Relationships</a>.
+    </div>
+  </div>
+</MainLayout>
+
+<style>
+  h3 {
+    margin-top: 24px;
+    margin-bottom: 8px;
+  }
+</style>

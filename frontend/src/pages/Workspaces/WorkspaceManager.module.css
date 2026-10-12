@@ -1,0 +1,223 @@
+/* ─── Page layout ──────────────────────────────────────── */
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-6);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.title {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+}
+
+.subtitle {
+  color: var(--color-gray-500);
+  font-size: var(--font-size-sm);
+  margin-bottom: 0;
+}
+
+/* ─── Grid layout ──────────────────────────────────────── */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-5);
+}
+
+/* ─── Card states (not used in WsCard) ─────────────────── */
+.card.suspended {
+  opacity: 0.75;
+  border-color: var(--color-warning);
+}
+
+.card.deleted {
+  opacity: 0.5;
+  border-color: var(--color-danger);
+}
+
+/* ─── Card menu wrapper (not used directly) ────────────── */
+.cardMenu {
+  position: relative;
+  flex-shrink: 0;
+}
+
+/* ─── Menu divider ─────────────────────────────────────── */
+.menuDivider {
+  border-top: 1px solid var(--border-color);
+  margin: 2px 0;
+}
+
+/* ─── Badges (not used in WsCard) ─────────────────────── */
+.badges {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+}
+
+.statusBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: var(--border-radius-full);
+  font-weight: var(--font-weight-medium);
+  text-transform: capitalize;
+}
+
+.status-active {
+  background: var(--color-success-light);
+  color: #166534;
+}
+
+.status-suspended {
+  background: var(--color-warning-light);
+  color: #92400e;
+}
+
+.status-deleted {
+  background: var(--color-danger-light);
+  color: #991b1b;
+}
+
+.planBadge {
+  font-size: 11px;
+  font-weight: var(--font-weight-semibold);
+  text-transform: capitalize;
+}
+
+/* ─── Empty state ─────────────────────────────────────── */
+.empty {
+  text-align: center;
+  padding: var(--spacing-16);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-4);
+}
+
+.emptyIcon {
+  color: var(--color-gray-300);
+}
+
+.empty h3 {
+  font-size: var(--font-size-xl);
+  color: var(--color-gray-700);
+}
+
+.empty p {
+  color: var(--color-gray-500);
+  margin-bottom: 0;
+}
+
+/* ─── Form fields ─────────────────────────────────────── */
+.formFields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1);
+}
+
+.label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-gray-700);
+}
+
+.fieldHint {
+  font-size: var(--font-size-xs);
+  color: var(--color-gray-500);
+  margin-top: 2px;
+}
+
+.input {
+  padding: var(--spacing-2) var(--spacing-3);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  font-size: var(--font-size-sm);
+  width: 100%;
+  background: var(--color-gray-50);
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  background: var(--color-white);
+  box-shadow: 0 0 0 3px var(--color-primary-light);
+}
+
+/* ─── Slug input ───────────────────────────────────────── */
+.slugRow {
+  display: flex;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  background: var(--color-gray-50);
+}
+
+.slugPrefix {
+  padding: var(--spacing-2) var(--spacing-3);
+  background: var(--color-gray-100);
+  color: var(--color-gray-500);
+  font-size: var(--font-size-sm);
+  border-right: 1px solid var(--border-color);
+  white-space: nowrap;
+}
+
+.slugInput {
+  flex: 1;
+  padding: var(--spacing-2) var(--spacing-3);
+  border: none;
+  font-size: var(--font-size-sm);
+  background: transparent;
+}
+
+.slugInput:focus {
+  outline: none;
+}
+
+/* ─── Skeleton loader ─────────────────────────────────── */
+.skeleton {
+  height: 220px;
+  background: linear-gradient(
+    90deg,
+    var(--color-gray-100) 25%,
+    var(--color-gray-200) 50%,
+    var(--color-gray-100) 75%
+  );
+  background-size: 200%;
+  border-radius: var(--border-radius-lg);
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* ─── Responsive ───────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}

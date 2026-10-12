@@ -1,0 +1,240 @@
+---
+import MainLayout from '../../layouts/MainLayout.astro';
+
+// Held as a string: a bare `{` in .astro markup opens a JS expression, so this
+// JSON was compiled as JavaScript and broke the build.
+const vscodeSettings = `{
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.rulers": [80, 100],
+  "files.exclude": {
+    "**/.DS_Store": true,
+    "**/node_modules": true
+  }
+}`;
+---
+
+<MainLayout title="Developer Setup | Salesdam Docs" description="Development environment setup guide">
+  <div class="content-wrapper">
+    <h1>Developer Setup</h1>
+
+    <p class="intro">Complete guide to setting up your development environment for Salesdam.</p>
+
+    <h2>Prerequisites</h2>
+
+    <p>Before you begin, ensure you have:</p>
+    <ul>
+      <li>Node.js 16+ (check with `node --version`)</li>
+      <li>npm 7+ or yarn 1.22+ (check with `npm --version`)</li>
+      <li>Git (check with `git --version`)</li>
+      <li>MongoDB 4.4+ running locally or Atlas account</li>
+      <li>Code editor (VS Code recommended)</li>
+      <li>Terminal/Command line experience</li>
+    </ul>
+
+    <h2>System Requirements</h2>
+
+    <table>
+      <tr>
+        <th>Component</th>
+        <th>Minimum</th>
+        <th>Recommended</th>
+      </tr>
+      <tr>
+        <td>Node.js</td>
+        <td>14.0</td>
+        <td>18.0+</td>
+      </tr>
+      <tr>
+        <td>npm</td>
+        <td>6.0</td>
+        <td>9.0+</td>
+      </tr>
+      <tr>
+        <td>RAM</td>
+        <td>4GB</td>
+        <td>8GB</td>
+      </tr>
+      <tr>
+        <td>Disk Space</td>
+        <td>2GB</td>
+        <td>5GB</td>
+      </tr>
+    </table>
+
+    <h2>Installation Steps</h2>
+
+    <h3>1. Install Node.js</h3>
+
+    <p>Download and install from <a href="https://nodejs.org">nodejs.org</a></p>
+
+    <p>Verify installation:</p>
+    <pre><code>node --version
+npm --version</code></pre>
+
+    <h3>2. Install MongoDB</h3>
+
+    <p><strong>Option A: Local Installation</strong></p>
+    <ul>
+      <li>Download from <a href="https://www.mongodb.com/try/download/community">mongodb.com</a></li>
+      <li>Follow installation guide for your OS</li>
+      <li>Start MongoDB service</li>
+    </ul>
+
+    <p><strong>Option B: MongoDB Atlas (Cloud)</strong></p>
+    <ul>
+      <li>Create account at <a href="https://www.mongodb.com/cloud/atlas">mongodb.com/cloud/atlas</a></li>
+      <li>Create a free cluster</li>
+      <li>Get connection string</li>
+    </ul>
+
+    <p>Verify MongoDB:</p>
+    <pre><code>mongosh
+# Should connect to MongoDB shell</code></pre>
+
+    <h3>3. Clone Repository</h3>
+
+    <pre><code>git clone https://github.com/your-org/salesdam-v3.git
+cd salesdam-v3</code></pre>
+
+    <h3>4. Install Dependencies</h3>
+
+    <p><strong>Backend:</strong></p>
+    <pre><code>cd backend
+npm install</code></pre>
+
+    <p><strong>Frontend:</strong></p>
+    <pre><code>cd ../frontend
+npm install</code></pre>
+
+    <p><strong>Docs:</strong></p>
+    <pre><code>cd ../docs
+npm install</code></pre>
+
+    <h2>Environment Configuration</h2>
+
+    <h3>Backend .env Setup</h3>
+
+    <p>Create `.env` file in backend folder:</p>
+
+    <pre><code># Database
+MONGO_URI=mongodb://localhost:27017/salesdam
+MONGODB_URI=mongodb+srv://user:password@cluster.mongodb.net/salesdam
+
+# Server
+PORT=5000
+NODE_ENV=development
+
+# JWT
+JWT_SECRET=your_secret_key_change_this
+JWT_EXPIRY=7d
+
+# SMTP (Email)
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=your_email@gmail.com
+SMTP_PASS=your_app_password
+SMTP_FROM_EMAIL=noreply@salesdam.com
+
+# Application
+APP_URL=http://localhost:3000
+API_URL=http://localhost:5000</code></pre>
+
+    <h3>Frontend .env Setup</h3>
+
+    <p>Create `.env` file in frontend folder:</p>
+
+    <pre><code># API Configuration
+VITE_API_BASE_URL=http://localhost:5000/api
+
+# App Settings
+VITE_APP_NAME=Salesdam
+VITE_APP_VERSION=3.0.0</code></pre>
+
+    <h2>Running Development Servers</h2>
+
+    <p>Start three terminal windows:</p>
+
+    <h3>Terminal 1: Backend</h3>
+    <pre><code>cd backend
+npm run dev</code></pre>
+    <p>Runs on http://localhost:5000</p>
+
+    <h3>Terminal 2: Frontend</h3>
+    <pre><code>cd frontend
+npm run dev</code></pre>
+    <p>Runs on http://localhost:3000</p>
+
+    <h3>Terminal 3: Docs</h3>
+    <pre><code>cd docs
+npm run dev</code></pre>
+    <p>Runs on http://localhost:3000 (or next available port)</p>
+
+    <h2>Verify Setup</h2>
+
+    <p>Check that everything is working:</p>
+
+    <ol>
+      <li>✓ MongoDB is running</li>
+      <li>✓ Backend server starts without errors</li>
+      <li>✓ Frontend loads at http://localhost:3000</li>
+      <li>✓ Can create a new account</li>
+      <li>✓ Can login and see dashboard</li>
+      <li>✓ Can access docs at http://localhost:3000/docs</li>
+    </ol>
+
+    <h2>IDE Setup (VS Code)</h2>
+
+    <p>Recommended extensions:</p>
+    <ul>
+      <li>ES7+ React/Redux/React-Native snippets</li>
+      <li>Prettier - Code formatter</li>
+      <li>ESLint</li>
+      <li>MongoDB for VS Code</li>
+      <li>Thunder Client or REST Client</li>
+    </ul>
+
+    <p>Add `.vscode/settings.json`:</p>
+    <pre><code>{vscodeSettings}</code></pre>
+
+    <h2>Common Issues</h2>
+
+    <h3>MongoDB Connection Error</h3>
+    <ul>
+      <li>Ensure MongoDB is running</li>
+      <li>Check connection string in .env</li>
+      <li>Verify database credentials</li>
+      <li>Check firewall settings</li>
+    </ul>
+
+    <h3>Port Already in Use</h3>
+    <pre><code># Find and kill process using port 5000
+lsof -i :5000
+kill -9 [PID]
+
+# Or use different port
+PORT=5001 npm run dev</code></pre>
+
+    <h3>npm Install Fails</h3>
+    <pre><code># Clear npm cache
+npm cache clean --force
+
+# Delete node_modules and package-lock.json
+rm -rf node_modules package-lock.json
+
+# Reinstall
+npm install</code></pre>
+
+    <h2>Next Steps</h2>
+
+    <ul>
+      <li><a href="/developer/backend">Backend Development Guide</a></li>
+      <li><a href="/developer/frontend">Frontend Development Guide</a></li>
+      <li><a href="/api/overview">API Documentation</a></li>
+    </ul>
+
+    <div class="success">
+      <strong>✓ Ready!</strong> Your development environment is set up. Start coding!
+    </div>
+  </div>
+</MainLayout>

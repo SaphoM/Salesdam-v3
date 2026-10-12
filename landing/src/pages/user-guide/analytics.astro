@@ -1,0 +1,403 @@
+---
+import DocsLayout from '../../layouts/DocsLayout.astro';
+---
+
+<DocsLayout
+  title="Analytics - User Guide - Mini CRM"
+  description="Learn how to use analytics and reporting in Mini CRM"
+>
+  <h1>Analytics</h1>
+
+  <p>
+    Mini CRM's analytics features help you understand your data, track trends, and make
+    informed decisions. This guide covers the Analytics page, creating reports, building
+    charts, and extracting actionable insights.
+  </p>
+
+  <h2>Analytics Overview</h2>
+
+  <p>
+    The Analytics section provides tools for ad-hoc analysis, custom reports, and
+    data visualization. Unlike dashboards (which display predefined widgets), Analytics
+    lets you explore data dynamically.
+  </p>
+
+  <h3>Key Features</h3>
+  <ul>
+    <li>Interactive report builder</li>
+    <li>Drag-and-drop chart creation</li>
+    <li>Custom calculations and formulas</li>
+    <li>Export to PDF, Excel, or CSV</li>
+    <li>Schedule automated report delivery</li>
+    <li>Share reports with team members</li>
+  </ul>
+
+  <h2>Creating Reports</h2>
+
+  <h3>Report Builder</h3>
+  <ol>
+    <li>Navigate to <strong>Analytics</strong></li>
+    <li>Click <strong>"New Report"</strong></li>
+    <li>Select data source (object)</li>
+    <li>Choose report type:
+      <ul>
+        <li><strong>Tabular:</strong> Simple list of records</li>
+        <li><strong>Summary:</strong> Grouped data with subtotals</li>
+        <li><strong>Matrix:</strong> Cross-tab with row and column grouping</li>
+      </ul>
+    </li>
+    <li>Add columns (fields to display)</li>
+    <li>Add filters to limit data</li>
+    <li>Set grouping and sorting</li>
+    <li>Preview results</li>
+    <li>Save report</li>
+  </ol>
+
+  <h3>Report Types Explained</h3>
+
+  <h4>Tabular Reports</h4>
+  <p>Simplest format - shows records in rows with selected fields in columns:</p>
+  <ul>
+    <li>Best for lists and detailed views</li>
+    <li>No grouping or subtotals</li>
+    <li>Example: List of all customers with contact details</li>
+  </ul>
+
+  <h4>Summary Reports</h4>
+  <p>Group records and show subtotals:</p>
+  <ul>
+    <li>Group by one or more fields</li>
+    <li>Show totals, averages, counts</li>
+    <li>Example: Opportunities grouped by Stage, showing total Amount</li>
+  </ul>
+
+  <h4>Matrix Reports</h4>
+  <p>Two-dimensional grouping (rows and columns):</p>
+  <ul>
+    <li>Most complex format</li>
+    <li>Perfect for pivot-table style analysis</li>
+    <li>Example: Sales by Region (rows) and Month (columns)</li>
+  </ul>
+
+  <h2>Adding Filters</h2>
+
+  <p>Filters limit which records appear in your report:</p>
+
+  <h3>Standard Filters</h3>
+  <ul>
+    <li><strong>Field equals:</strong> Status = "Active"</li>
+    <li><strong>Field contains:</strong> Name contains "Tech"</li>
+    <li><strong>Field greater than:</strong> Amount > 50000</li>
+    <li><strong>Field in range:</strong> Date between Jan 1 and Mar 31</li>
+  </ul>
+
+  <h3>Date Filters</h3>
+  <ul>
+    <li>Today, Yesterday</li>
+    <li>This Week, Last Week, Next Week</li>
+    <li>This Month, Last Month, Next Month</li>
+    <li>This Quarter, Last Quarter</li>
+    <li>This Year, Last Year</li>
+    <li>Custom date range</li>
+  </ul>
+
+  <h3>Advanced Filters</h3>
+  <p>Combine multiple conditions with AND/OR logic:</p>
+  <pre><code>(Status = "Open" OR Status = "In Progress")
+AND
+Priority = "High"
+AND
+Created Date = THIS_MONTH</code></pre>
+
+  <h2>Grouping and Aggregating</h2>
+
+  <h3>Grouping Options</h3>
+  <p>Group records by field values:</p>
+  <ul>
+    <li><strong>Picklist fields:</strong> Group by Status, Stage, Priority</li>
+    <li><strong>Lookup fields:</strong> Group by Owner, Account, Contact</li>
+    <li><strong>Date fields:</strong> Group by Day, Week, Month, Quarter, Year</li>
+  </ul>
+
+  <h3>Aggregate Functions</h3>
+  <p>Calculate values across grouped records:</p>
+  <ul>
+    <li><strong>Count:</strong> Number of records</li>
+    <li><strong>Sum:</strong> Total of numeric field</li>
+    <li><strong>Average:</strong> Mean value</li>
+    <li><strong>Min/Max:</strong> Smallest/largest value</li>
+    <li><strong>Median:</strong> Middle value</li>
+  </ul>
+
+  <h3>Example Summary Report</h3>
+  <pre><code>Report: Opportunities by Stage
+Object: Opportunity
+Group By: Stage
+Columns:
+  - Opportunity Name
+  - Amount
+  - Close Date
+Aggregates:
+  - Count of Opportunities
+  - Sum of Amount
+  - Average Amount
+Filters:
+  - Stage != "Closed Lost"
+  - Close Date = THIS_QUARTER</code></pre>
+
+  <h2>Creating Charts</h2>
+
+  <p>Visualize report data with charts:</p>
+
+  <h3>Adding a Chart to a Report</h3>
+  <ol>
+    <li>Create or open a summary/matrix report</li>
+    <li>Click <strong>"Add Chart"</strong></li>
+    <li>Select chart type</li>
+    <li>Configure chart settings</li>
+    <li>Position chart (above or below data)</li>
+    <li>Save changes</li>
+  </ol>
+
+  <h3>Chart Types</h3>
+
+  <h4>Bar Chart</h4>
+  <ul>
+    <li>Compare values across categories</li>
+    <li>Horizontal or vertical bars</li>
+    <li>Good for: Stage analysis, regional comparisons</li>
+  </ul>
+
+  <h4>Line Chart</h4>
+  <ul>
+    <li>Show trends over time</li>
+    <li>Connect data points with lines</li>
+    <li>Good for: Sales trends, growth metrics</li>
+  </ul>
+
+  <h4>Pie/Donut Chart</h4>
+  <ul>
+    <li>Show proportions of a whole</li>
+    <li>Limited to one grouping dimension</li>
+    <li>Good for: Market share, status distribution</li>
+  </ul>
+
+  <h4>Scatter Plot</h4>
+  <ul>
+    <li>Show correlation between two variables</li>
+    <li>Each point represents a record</li>
+    <li>Good for: Identifying patterns, outliers</li>
+  </ul>
+
+  <h2>Custom Formulas</h2>
+
+  <p>Create calculated fields using formulas:</p>
+
+  <h3>Formula Examples</h3>
+
+  <h4>Percentage Calculation</h4>
+  <pre><code>(Actual_Revenue / Target_Revenue) * 100</code></pre>
+
+  <h4>Days Since Created</h4>
+  <pre><code>TODAY() - Created_Date</code></pre>
+
+  <h4>Conditional Values</h4>
+  <pre><code>IF(Amount > 100000, "Large", "Standard")</code></pre>
+
+  <h4>Text Concatenation</h4>
+  <pre><code>First_Name + " " + Last_Name</code></pre>
+
+  <h3>Available Formula Functions</h3>
+  <ul>
+    <li><strong>Math:</strong> SUM, AVG, MIN, MAX, ROUND, ABS</li>
+    <li><strong>Text:</strong> UPPER, LOWER, TRIM, CONCAT, SUBSTRING</li>
+    <li><strong>Date:</strong> TODAY, NOW, YEAR, MONTH, DAY, DATEDIFF</li>
+    <li><strong>Logical:</strong> IF, AND, OR, NOT, ISBLANK</li>
+  </ul>
+
+  <h2>Report Folders</h2>
+
+  <p>Organize reports into folders:</p>
+
+  <h3>Creating Folders</h3>
+  <ol>
+    <li>Go to <strong>Analytics</strong></li>
+    <li>Click <strong>"New Folder"</strong></li>
+    <li>Enter folder name (e.g., "Sales Reports", "Executive Reports")</li>
+    <li>Set folder permissions (who can view/edit)</li>
+    <li>Save folder</li>
+  </ol>
+
+  <h3>Moving Reports</h3>
+  <ul>
+    <li>Drag reports between folders</li>
+    <li>Use "Move" action in report menu</li>
+    <li>Reports can be in only one folder</li>
+  </ul>
+
+  <h2>Sharing Reports</h2>
+
+  <h3>Share with Users</h3>
+  <ol>
+    <li>Open report</li>
+    <li>Click <strong>"Share"</strong></li>
+    <li>Select users or roles</li>
+    <li>Choose access level (View or Edit)</li>
+    <li>Save sharing settings</li>
+  </ol>
+
+  <h3>Public Reports</h3>
+  <p>Make reports available to all workspace users:</p>
+  <ul>
+    <li>Enable "Public" in report settings</li>
+    <li>Appears in everyone's report list</li>
+    <li>Users see only data they have permission to view</li>
+  </ul>
+
+  <h2>Scheduling Reports</h2>
+
+  <p>Automatically deliver reports via email:</p>
+
+  <h3>Setting Up a Schedule</h3>
+  <ol>
+    <li>Open report</li>
+    <li>Click <strong>"Schedule"</strong></li>
+    <li>Set frequency (Daily, Weekly, Monthly)</li>
+    <li>Choose day and time</li>
+    <li>Select recipients</li>
+    <li>Choose format (PDF, Excel, CSV)</li>
+    <li>Save schedule</li>
+  </ol>
+
+  <h3>Scheduling Options</h3>
+  <ul>
+    <li><strong>Daily:</strong> Monday-Friday or every day</li>
+    <li><strong>Weekly:</strong> Select specific day(s)</li>
+    <li><strong>Monthly:</strong> First/last day or specific date</li>
+    <li><strong>Time:</strong> Any hour (uses workspace timezone)</li>
+  </ul>
+
+  <h2>Exporting Data</h2>
+
+  <h3>Export Formats</h3>
+
+  <h4>PDF</h4>
+  <ul>
+    <li>Preserves formatting and charts</li>
+    <li>Good for presentations and archiving</li>
+    <li>Not editable</li>
+  </ul>
+
+  <h4>Excel (XLSX)</h4>
+  <ul>
+    <li>Editable spreadsheet format</li>
+    <li>Good for further analysis</li>
+    <li>Supports formulas</li>
+  </ul>
+
+  <h4>CSV</h4>
+  <ul>
+    <li>Plain text, comma-separated</li>
+    <li>Universal compatibility</li>
+    <li>No formatting or charts</li>
+  </ul>
+
+  <h3>Export Options</h3>
+  <ul>
+    <li><strong>All rows:</strong> Export complete dataset</li>
+    <li><strong>Filtered rows:</strong> Export only visible data</li>
+    <li><strong>Include details:</strong> Show individual records or summaries only</li>
+  </ul>
+
+  <h2>Common Report Examples</h2>
+
+  <h3>Sales Pipeline Report</h3>
+  <pre><code>Object: Opportunity
+Type: Summary
+Group By: Stage
+Columns: Name, Amount, Close Date, Owner
+Aggregates: Count, Sum of Amount
+Filters: Status = "Open"
+Chart: Bar chart of Amount by Stage</code></pre>
+
+  <h3>Customer Acquisition Report</h3>
+  <pre><code>Object: Customer
+Type: Summary
+Group By: Created Date (by Month)
+Aggregates: Count of Customers
+Filters: Created Date = THIS_YEAR
+Chart: Line chart showing growth over time</code></pre>
+
+  <h3>Top Performers Report</h3>
+  <pre><code>Object: Opportunity
+Type: Tabular
+Columns: Name, Amount, Owner, Stage
+Filters: Stage = "Closed Won", Close Date = THIS_QUARTER
+Sort By: Amount (Descending)
+Limit: Top 20</code></pre>
+
+  <h3>Support Metrics Report</h3>
+  <pre><code>Object: Case
+Type: Summary
+Group By: Status, Priority
+Columns: Case Number, Subject, Owner
+Aggregates: Count, Avg Resolution Time
+Filters: Created Date = LAST_30_DAYS
+Chart: Matrix showing Status by Priority</code></pre>
+
+  <h2>Best Practices</h2>
+
+  <h3>Report Design</h3>
+  <ul>
+    <li>Start with clear questions you want to answer</li>
+    <li>Use descriptive report names</li>
+    <li>Add descriptions explaining the report's purpose</li>
+    <li>Limit columns to essential information</li>
+    <li>Use grouping to make patterns visible</li>
+  </ul>
+
+  <h3>Performance</h3>
+  <ul>
+    <li>Add filters to reduce data volume</li>
+    <li>Limit date ranges (last 90 days vs. all time)</li>
+    <li>Avoid unnecessary columns</li>
+    <li>Use summary reports instead of tabular when possible</li>
+    <li>Schedule large reports to run off-peak</li>
+  </ul>
+
+  <h3>Data Quality</h3>
+  <ul>
+    <li>Verify data accuracy before sharing reports</li>
+    <li>Document any data caveats or limitations</li>
+    <li>Handle null/empty values appropriately</li>
+    <li>Use consistent naming conventions</li>
+    <li>Regularly review and update saved reports</li>
+  </ul>
+
+  <h2>Troubleshooting</h2>
+
+  <h3>Report Shows No Data</h3>
+  <ul>
+    <li>Check filters - may be too restrictive</li>
+    <li>Verify user has permissions to view object</li>
+    <li>Ensure records exist matching criteria</li>
+    <li>Try removing filters one by one</li>
+  </ul>
+
+  <h3>Slow Report Performance</h3>
+  <ul>
+    <li>Add more specific filters</li>
+    <li>Reduce date range</li>
+    <li>Remove unnecessary columns</li>
+    <li>Consider creating a summary report instead</li>
+    <li>Run during off-peak hours</li>
+  </ul>
+
+  <h3>Unexpected Totals</h3>
+  <ul>
+    <li>Check for duplicate records</li>
+    <li>Verify aggregate function (Sum vs. Count)</li>
+    <li>Look for null values affecting calculations</li>
+    <li>Review grouping configuration</li>
+  </ul>
+</DocsLayout>

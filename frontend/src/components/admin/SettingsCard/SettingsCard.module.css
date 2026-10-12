@@ -1,0 +1,135 @@
+.card {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  padding: var(--spacing-4);
+  background: var(--color-white);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-lg);
+  text-decoration: none;
+  color: inherit;
+  transition: all var(--transition-fast);
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.card:hover {
+  background: var(--color-gray-50);
+  border-color: var(--color-primary);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.card.dangerous {
+  border-color: #fee2e2;
+}
+
+.card.dangerous:hover {
+  background: #fef2f2;
+  border-color: #fecaca;
+  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.1);
+}
+
+.card.dangerous .cardTitle {
+  color: #dc2626;
+}
+
+.card.dangerous .cardArrow {
+  color: #dc2626;
+}
+
+.card.dangerous:hover .cardArrow {
+  color: #b91c1c;
+  transform: translateX(2px);
+}
+
+.cardIcon {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--border-radius-lg);
+}
+
+.cardBody {
+  flex: 1;
+  min-width: 0;
+}
+
+.cardTitle {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+  margin: 0 0 var(--spacing-1);
+}
+
+.cardDesc {
+  font-size: var(--font-size-xs);
+  color: var(--color-gray-500);
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.cardArrow {
+  flex-shrink: 0;
+  color: var(--color-gray-400);
+  transition: transform var(--transition-fast), color var(--transition-fast);
+}
+
+.card:hover .cardArrow {
+  transform: translateX(2px);
+  color: var(--color-primary);
+}
+
+/* Dark mode */
+:global(.dark) .card {
+  background: var(--color-gray-900);
+  border-color: var(--color-gray-700);
+}
+
+:global(.dark) .card:hover {
+  background: var(--color-gray-800);
+  border-color: #818cf8;
+}
+
+:global(.dark) .cardTitle {
+  color: var(--color-gray-100);
+}
+
+:global(.dark) .cardDesc {
+  color: var(--color-gray-400);
+}
+
+:global(.dark) .cardArrow {
+  color: var(--color-gray-500);
+}
+
+:global(.dark) .card:hover .cardArrow {
+  color: #818cf8;
+}
+
+:global(.dark) .card.dangerous {
+  border-color: rgba(220, 38, 38, 0.3);
+}
+
+:global(.dark) .card.dangerous:hover {
+  background: rgba(220, 38, 38, 0.1);
+  border-color: rgba(220, 38, 38, 0.5);
+  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.2);
+}
+
+:global(.dark) .card.dangerous .cardTitle {
+  color: #ef4444;
+}
+
+:global(.dark) .card.dangerous .cardArrow {
+  color: #ef4444;
+}
+
+:global(.dark) .card.dangerous:hover .cardArrow {
+  color: #dc2626;
+}

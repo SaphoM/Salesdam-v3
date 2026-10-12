@@ -1,0 +1,269 @@
+---
+import MainLayout from '../layouts/MainLayout.astro';
+import { Search } from 'lucide-astro';
+import { SEARCH_INDEX } from '../data/searchIndex.js';
+import { NAV } from '../data/navigation.js';
+
+/**
+ * Standalone search results page, for ?q= links and for anyone who lands here
+ * without JavaScript-driven Cmd-K.
+ *
+ * The index is derived from the nav tree and the OpenAPI description — the
+ * previous version of this page carried a hardcoded 8-entry array that covered
+ * about a third of the site and had to be hand-edited per new page.
+ */
+---
+
+<MainLayout title="Search" description="Search the Salesdam documentation.">
+  <h1>Search</h1>
+  <p class="lead">
+    {SEARCH_INDEX.length} pages and endpoints. Press
+    <kbd>⌘K</kbd> anywhere for the same search in a dialog.
+  </p>
+
+  <div class="box">
+    <Search size={18} class="box-icon" />
+    <label class="sr-only" for="q">Search</label>
+    <input
+      id="q"
+      type="text"
+      class="box-input"
+      placeholder="Search pages and endpoints…"
+      autocomplete="off"
+      spellcheck="false"
+      autofocus
+    />
+  </div>
+
+  <p id="count" class="count" hidden></p>
+  <ul id="results" class="results"></ul>
+
+  <div id="browse">
+    <h2>Browse everything</h2>
+    {NAV.map((section) => (
+      <section class="section">
+        <h3>{section.title}</h3>
+        <ul class="plain">
+          {section.items.map((item) => (
+            <li>
+              <a href={item.path}>{item.title}</a>
+              {item.description && <span class="desc"> — {item.description}</span>}
+            </li>
+          ))}
+        </ul>
+      </section>
+    ))}
+  </div>
+</MainLayout>
+
+<script is:inline define:vars={{ INDEX: SEARCH_INDEX }}>
+  (() => {
+    const field = document.getElementById('q');
+    const list = document.getElementById('results');
+    const count = document.getElementById('count');
+    const browse = document.getElementById('browse');
+
+    const score = (entry, terms) => {
+      const title = entry.title.toLowerCase();
+      const hay = `${title} ${(entry.description || '').toLowerCase()} ${(entry.keywords || []).join(' ')} ${(entry.section || '').toLowerCase()} ${entry.path.toLowerCase()}`;
+      let total = 0;
+      for (const t of terms) {
+        if (!hay.includes(t)) return 0;
+        total += title.startsWith(t) ? 60 : title.includes(t) ? 40 : 10;
+      }
+      return entry.kind === 'page' ? total + 3 : total;
+    };
+
+    const render = (q) => {
+      const terms = q.toLowerCase().split(/\s+/).filter(Boolean);
+      if (!terms.length) {
+        list.innerHTML = '';
+        count.hidden = true;
+        browse.hidden = false;
+        return;
+      }
+      browse.hidden = true;
+
+      const hits = INDEX.map((e) => ({ e, s: score(e, terms) }))
+        .filter((x) => x.s > 0)
+        .sort((a, b) => b.s - a.s)
+        .map((x) => x.e);
+
+      count.hidden = false;
+      count.textContent = hits.length
+        ? `${hits.length} result${hits.length === 1 ? '' : 's'} for “${q}”`
+        : `No results for “${q}”`;
+
+      list.innerHTML = hits
+        .map(
+          (r) => `
+        <li class="hit">
+          <a href="${r.path}">
+            <span class="hit-top">
+              ${r.kind === 'endpoint'
+                ? `<span class="method method-${r.method.toLowerCase()}">${r.method}</span>`
+                : `<span class="tag">${r.section}</span>`}
+              <span class="hit-title">${r.title}</span>
+            </span>
+            ${r.description ? `<span class="hit-desc">${r.description}</span>` : ''}
+          </a>
+        </li>`,
+        )
+        .join('');
+    };
+
+    // Support ?q= so results can be linked to.
+    const initial = new URLSearchParams(location.search).get('q') || '';
+    if (initial) field.value = initial;
+    render(initial);
+
+    field.addEventListener('input', () => {
+      render(field.value);
+      // Keep the URL shareable without adding a history entry per keystroke.
+      const url = new URL(location.href);
+      field.value ? url.searchParams.set('q', field.value) : url.searchParams.delete('q');
+      history.replaceState(null, '', url);
+    });
+  })();
+</script>
+
+<style>
+  .box {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-3);
+    padding: var(--spacing-3) var(--spacing-4);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-md);
+    background: var(--surface);
+    margin-bottom: var(--spacing-4);
+  }
+
+  .box:focus-within {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px var(--color-primary-light);
+  }
+
+  .box-icon {
+    color: var(--color-gray-400);
+    flex-shrink: 0;
+  }
+
+  .box-input {
+    flex: 1;
+    border: none;
+    background: none;
+    outline: none;
+    font-size: var(--font-size-base);
+    min-width: 0;
+  }
+
+  kbd {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    padding: 2px 5px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-sm);
+    background: var(--color-gray-100);
+  }
+
+  .count {
+    font-size: var(--font-size-sm);
+    color: var(--color-gray-500);
+  }
+
+  .results {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-2);
+  }
+
+  .results :global(.hit) {
+    margin: 0;
+  }
+
+  .results :global(.hit a) {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    padding: var(--spacing-3);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    background: var(--surface);
+    text-decoration: none;
+  }
+
+  .results :global(.hit a:hover) {
+    border-color: var(--color-primary);
+  }
+
+  .results :global(.hit-top) {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2);
+  }
+
+  .results :global(.hit-title) {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-gray-800);
+  }
+
+  .results :global(.hit-desc) {
+    font-size: var(--font-size-xs);
+    color: var(--color-gray-500);
+  }
+
+  .results :global(.tag) {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-weight: var(--font-weight-bold);
+    color: var(--color-gray-400);
+  }
+
+  .results :global(.method) {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    font-weight: var(--font-weight-bold);
+    padding: 2px 5px;
+    border-radius: var(--border-radius-sm);
+    min-width: 46px;
+    text-align: center;
+  }
+
+  .results :global(.method-get) { color: var(--method-get); background: var(--method-get-bg); }
+  .results :global(.method-post) { color: var(--method-post); background: var(--method-post-bg); }
+  .results :global(.method-put) { color: var(--method-put); background: var(--method-put-bg); }
+  .results :global(.method-patch) { color: var(--method-patch); background: var(--method-patch-bg); }
+  .results :global(.method-delete) { color: var(--method-delete); background: var(--method-delete-bg); }
+
+  .section {
+    margin-bottom: var(--spacing-5);
+  }
+
+  .plain {
+    list-style: none;
+    margin-left: 0;
+  }
+
+  .desc {
+    color: var(--color-gray-400);
+    font-size: var(--font-size-xs);
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+</style>

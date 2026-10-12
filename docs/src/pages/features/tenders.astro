@@ -1,0 +1,222 @@
+---
+import MainLayout from '../../layouts/MainLayout.astro';
+---
+
+<MainLayout title="Tenders | Salesdam Docs" description="Finding and managing tenders in Salesdam">
+  <div class="content-wrapper">
+    <h1>Finding & Managing Tenders</h1>
+
+    <p class="intro">Salesdam allows you to discover, track, and convert tenders into leads and deals for your sales pipeline.</p>
+
+    <h2>What are Tenders?</h2>
+
+    <p>Tenders are formal requests for quotation or bids on projects. They represent opportunities to win new business by responding to client or government RFQs (Request for Quotations).</p>
+
+    <h2>Tender Fields</h2>
+
+    <table>
+      <tr>
+        <th>Field</th>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+      <tr>
+        <td>Tender Number</td>
+        <td>Auto Number</td>
+        <td>Unique identifier (e.g., TEND-001234)</td>
+      </tr>
+      <tr>
+        <td>Title</td>
+        <td>Text</td>
+        <td>Tender project/RFQ title</td>
+      </tr>
+      <tr>
+        <td>Description</td>
+        <td>Textarea</td>
+        <td>Tender requirements and specifications</td>
+      </tr>
+      <tr>
+        <td>Budget</td>
+        <td>Currency</td>
+        <td>Estimated project value</td>
+      </tr>
+      <tr>
+        <td>Deadline</td>
+        <td>DateTime</td>
+        <td>Tender submission deadline</td>
+      </tr>
+      <tr>
+        <td>Status</td>
+        <td>Picklist</td>
+        <td>Open, In Progress, Won, Lost, Cancelled</td>
+      </tr>
+      <tr>
+        <td>Assigned To</td>
+        <td>Lookup (User)</td>
+        <td>Team member responsible</td>
+      </tr>
+      <tr>
+        <td>Source</td>
+        <td>Picklist</td>
+        <td>Portal, Email, Website, Referral, etc.</td>
+      </tr>
+    </table>
+
+    <h2>Finding Tenders</h2>
+
+    <h3>Method 1: Tenders Object</h3>
+    <ol>
+      <li>Navigate to "Tenders" in the left sidebar</li>
+      <li>View list of all available tenders</li>
+      <li>Click on a tender to view full details</li>
+      <li>Filter by status, deadline, or assigned user</li>
+      <li>Search by tender number or title</li>
+    </ol>
+
+    <h3>Method 2: Dashboard</h3>
+    <ol>
+      <li>Go to Home Dashboard</li>
+      <li>View "Open Tenders" widget</li>
+      <li>Click "View All" to see complete list</li>
+      <li>See tenders ending soon with visual indicators</li>
+    </ol>
+
+    <h3>Method 3: Search</h3>
+    <pre><code>Global search bar → type tender number or title
+Quick filters by status or deadline</code></pre>
+
+    <h2>Tender Statuses</h2>
+
+    <div class="status-grid">
+      <div class="status-badge" style="border-left: 4px solid #3b82f6;">
+        <strong>Open</strong> - New tender, responding period active
+      </div>
+      <div class="status-badge" style="border-left: 4px solid #f59e0b;">
+        <strong>In Progress</strong> - Response being prepared
+      </div>
+      <div class="status-badge" style="border-left: 4px solid #10b981;">
+        <strong>Won</strong> - Tender won, convert to deal
+      </div>
+      <div class="status-badge" style="border-left: 4px solid #ef4444;">
+        <strong>Lost</strong> - Tender lost to competitor
+      </div>
+      <div class="status-badge" style="border-left: 4px solid #6b7280;">
+        <strong>Cancelled</strong> - Tender cancelled or withdrawn
+      </div>
+    </div>
+
+    <h2>Saving Tender as Lead</h2>
+
+    <p>Convert a tender opportunity into a lead for follow-up.</p>
+
+    <h3>Steps to Save Tender as Lead</h3>
+
+    <ol>
+      <li>Open the tender from the Tenders list</li>
+      <li>Click "Save as Lead" button</li>
+      <li>Fill in lead details:
+        <ul>
+          <li>Lead Name (auto-filled from tender title)</li>
+          <li>Client/Company (if applicable)</li>
+          <li>Contact Person (lookup)</li>
+          <li>Email address</li>
+          <li>Phone number</li>
+          <li>Lead Source (auto-set to "Tender")</li>
+          <li>Description (tender details)</li>
+        </ul>
+      </li>
+      <li>Click "Create Lead"</li>
+      <li>Lead created and tender linked</li>
+      <li>Lead appears in Sales Hub for follow-up</li>
+    </ol>
+
+    <h3>Auto-Filled Information</h3>
+    <ul>
+      <li>Lead Name: Tender title</li>
+      <li>Budget/Expected Value: Tender budget</li>
+      <li>Description: Tender description and scope</li>
+      <li>Deadline: Converted to follow-up date</li>
+    </ul>
+
+    <h2>Tender Analytics</h2>
+
+    <p>Track tender performance metrics:</p>
+
+    <table>
+      <tr>
+        <th>Metric</th>
+        <th>Description</th>
+      </tr>
+      <tr>
+        <td>Total Tenders</td>
+        <td>All tenders this period</td>
+      </tr>
+      <tr>
+        <td>Win Rate %</td>
+        <td>Percentage of tenders won</td>
+      </tr>
+      <tr>
+        <td>Average Value</td>
+        <td>Average tender budget</td>
+      </tr>
+      <tr>
+        <td>Response Rate</td>
+        <td>Percentage responded to</td>
+      </tr>
+      <tr>
+        <td>Total Potential Value</td>
+        <td>Sum of all tender budgets</td>
+      </tr>
+    </table>
+
+    <h2>Best Practices</h2>
+
+    <ul>
+      <li>✓ Review tenders before deadline passes</li>
+      <li>✓ Save promising tenders as leads immediately</li>
+      <li>✓ Assign tenders to responsible team members</li>
+      <li>✓ Update status regularly to track progress</li>
+      <li>✓ Include detailed response requirements</li>
+      <li>✗ Don't ignore tenders approaching deadline</li>
+      <li>✗ Don't leave tenders in "Open" indefinitely</li>
+      <li>✗ Don't mix tender and deal tracking</li>
+    </ul>
+
+    <div class="note">
+      <strong>💡 Tip:</strong> Set up calendar reminders for tender deadlines. Use dashboard widgets to get a quick overview of urgent opportunities.
+    </div>
+
+    <h2>Next Steps</h2>
+
+    <ul>
+      <li><a href="/features/lead-conversion">Convert Tenders to Leads</a></li>
+      <li><a href="/features/lead-conversion">Convert Leads to Deals</a></li>
+      <li><a href="/features/quotes">Generate Quotes from Deals</a></li>
+    </ul>
+
+    <div class="success">
+      <strong>✓ Ready!</strong> Start tracking tenders and converting them to revenue. See <a href="/features/lead-conversion">Lead Conversion</a> next.
+    </div>
+  </div>
+</MainLayout>
+
+<style>
+  .status-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 12px;
+    margin: 20px 0;
+  }
+
+  .status-badge {
+    background: var(--color-gray-50);
+    padding: 16px;
+    border-radius: 6px;
+    font-size: 14px;
+  }
+
+  .status-badge strong {
+    display: block;
+    margin-bottom: 4px;
+  }
+</style>

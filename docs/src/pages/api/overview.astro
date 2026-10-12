@@ -1,0 +1,183 @@
+---
+import MainLayout from '../../layouts/MainLayout.astro';
+import { OPENAPI, UNDOCUMENTED_MOUNTS, OPERATIONS } from '../../data/openapi.js';
+
+const successEnvelope = `{
+  "success": true,
+  "message": "Success",
+  "data": { "_id": "665f1c2a9b4e7d0012a3b4c5", "name": "Acme Corp" }
+}`;
+
+const paginatedEnvelope = `{
+  "success": true,
+  "message": "Success",
+  "data": [ /* records */ ],
+  "pagination": {
+    "total": 137,
+    "page": 1,
+    "limit": 50,
+    "totalPages": 3,
+    "hasNext": true,
+    "hasPrev": false
+  }
+}`;
+
+const errorEnvelope = `{
+  "success": false,
+  "message": "Validation failed: Client Number cannot be blank",
+  "errors": ["Client Number cannot be blank"],
+  "fieldErrors": { "client_number": "Client Number cannot be blank" }
+}`;
+
+const STATUSES = [
+  ['200', 'OK', 'Request succeeded.'],
+  ['201', 'Created', 'A resource was created. Returned by POST endpoints.'],
+  ['400', 'Bad Request', 'Field validation failed, a validation rule was triggered, or the payload was malformed.'],
+  ['401', 'Unauthorized', 'No valid API key or session. Also returned when a key is revoked or expired.'],
+  ['403', 'Forbidden', 'Authenticated, but the user lacks the permission — or the API key lacks the scope — for this action.'],
+  ['404', 'Not Found', 'The object or record does not exist within your tenant. Note that a record in another tenant is a 404, never a 403.'],
+  ['409', 'Conflict', 'A uniqueness constraint was violated, e.g. creating a field whose apiName is taken.'],
+  ['429', 'Too Many Requests', 'A rate-limited route was called too often. See Rate Limits.'],
+  ['500', 'Server Error', 'Unexpected failure. The response body omits internals outside development.'],
+];
+---
+
+<MainLayout
+  title="API Overview"
+  description="Base URL, authentication, response envelope, status codes and conventions for the Salesdam REST API."
+>
+  <h1>API Overview</h1>
+  <p class="lead">
+    Salesdam exposes a REST API over the same metadata that drives the app. One
+    set of record endpoints serves every object — standard and custom — addressed
+    by its <code>apiName</code>.
+  </p>
+
+  <h2>Base URL</h2>
+  <p>
+    Every route is mounted under the <code>/api/v1</code> prefix. In development
+    the API listens on port 5000:
+  </p>
+  <pre><code>http://localhost:5000/api/v1</code></pre>
+  <p>
+    In production, use the same origin as the app. There is exactly one API
+    version today; <code>v1</code> is part of the path rather than a header, so a
+    future version can run alongside it.
+  </p>
+
+  <h2>Authentication</h2>
+  <p>
+    Two mechanisms, checked in this order. There is <strong>no bearer-token
+    scheme</strong> — an <code>Authorization: Bearer …</code> header is ignored and
+    the request is treated as unauthenticated.
+  </p>
+  <div class="table-scroll">
+    <table>
+      <thead>
+        <tr><th>Mechanism</th><th>Header / cookie</th><th>Use for</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>API key</strong></td>
+          <td><code>X-API-Key: sk_live_…</code></td>
+          <td>Server-to-server integrations, scripts, webhooks.</td>
+        </tr>
+        <tr>
+          <td><strong>Session cookie</strong></td>
+          <td><code>sid</code>, set by <code>POST /auth/login</code></td>
+          <td>The web app itself, and same-origin browser requests.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <p>
+    See <a href="/api/authentication">Authentication</a> for scopes, IP
+    allow-lists and tenant selection.
+  </p>
+
+  <h2>Response envelope</h2>
+  <p>
+    Every successful response is wrapped in the same shape, so a client can check
+    one field to know whether to read <code>data</code> or <code>message</code>:
+  </p>
+  <pre><code>{successEnvelope}</code></pre>
+
+  <p>List endpoints add a <code>pagination</code> block alongside <code>data</code>:</p>
+  <pre><code>{paginatedEnvelope}</code></pre>
+
+  <p>Failures keep <code>success: false</code> and describe what went wrong:</p>
+  <pre><code>{errorEnvelope}</code></pre>
+
+  <div class="note">
+    <strong><code>errors</code> and <code>fieldErrors</code> appear on validation
+    failures only.</strong> <code>errors</code> is a flat list suitable for a
+    summary; <code>fieldErrors</code> is keyed by field API name for highlighting
+    individual inputs. See <a href="/api/error-handling">Errors</a>.
+  </div>
+
+  <h2>Status codes</h2>
+  <div class="table-scroll">
+    <table>
+      <thead>
+        <tr><th>Code</th><th>Meaning</th><th>When</th></tr>
+      </thead>
+      <tbody>
+        {STATUSES.map(([code, name, when]) => (
+          <tr>
+            <td><code>{code}</code></td>
+            <td>{name}</td>
+            <td>{when}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+
+  <h2>Conventions</h2>
+  <ul>
+    <li>
+      <strong>Field values are top-level.</strong> A record's custom fields are
+      sent and returned as top-level keys, not nested under a <code>data</code>
+      property — the storage shape is not the wire shape.
+    </li>
+    <li>
+      <strong>Computed fields are read-only.</strong> Formula, rollup summary and
+      auto-number values are produced server-side. Sending them is ignored.
+    </li>
+    <li>
+      <strong>Tenancy is implicit.</strong> Every query is scoped to the caller's
+      tenant. A record belonging to another tenant returns <code>404</code>, not
+      <code>403</code>, so the API never confirms that an id exists elsewhere.
+    </li>
+    <li>
+      <strong>PATCH is partial, PUT is not.</strong> Both run the object's
+      validation rules against the merged result.
+    </li>
+    <li>
+      <strong>Dates are ISO 8601 in UTC.</strong> Date-only fields are stored at
+      UTC midnight.
+    </li>
+  </ul>
+
+  <h2>Coverage</h2>
+  <p>
+    The <a href="/api/reference">Endpoint Explorer</a> documents
+    <strong>{OPERATIONS.length} endpoints</strong> across {OPENAPI.tags.length}
+    resource groups — the surface an integration normally needs.
+  </p>
+  <p>
+    These routes are mounted but not yet described. They work; their request and
+    response shapes are simply not documented, so treat them as unstable:
+  </p>
+  <p class="mounts">
+    {UNDOCUMENTED_MOUNTS.map((m) => <code>{m}</code>)}
+  </p>
+</MainLayout>
+
+<style>
+  .mounts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-2);
+  }
+</style>

@@ -1,0 +1,172 @@
+---
+import '../styles/global.css';
+import BaseLayout from './BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import DocsSidebar from '../components/DocsSidebar.astro';
+
+const { title, description } = Astro.props;
+---
+
+<BaseLayout title={title} description={description}>
+  <Header />
+
+  <div class="docs-container">
+    <DocsSidebar currentPath={Astro.url.pathname} />
+
+    <main class="docs-content">
+      <div class="docs-inner">
+        <slot />
+      </div>
+    </main>
+  </div>
+
+  <Footer />
+</BaseLayout>
+
+<style>
+  :root {
+    --primary: #2563eb;
+    --primary-dark: #1d4ed8;
+    --primary-light: rgba(37, 99, 235, 0.08);
+    --text: #111827;
+    --text-secondary: #6b7280;
+    --bg: #ffffff;
+    --bg-secondary: #f9fafb;
+    --border: #e5e7eb;
+    --shadow-lg: 0 10px 32px rgba(0, 0, 0, 0.09);
+  }
+
+  .docs-container {
+    display: flex;
+    min-height: calc(100vh - 140px);
+    max-width: 1400px;
+    margin: 0 auto;
+    padding-top: 80px;
+  }
+
+  .docs-content {
+    flex: 1;
+    padding: 40px;
+    background: white;
+    margin: 24px 24px 24px 0;
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+  }
+
+  .docs-inner {
+    max-width: 900px;
+  }
+
+  .docs-inner :global(h1) {
+    font-size: 2.5rem;
+    margin-bottom: 24px;
+    color: var(--text);
+  }
+
+  .docs-inner :global(h2) {
+    font-size: 2rem;
+    margin-top: 48px;
+    margin-bottom: 16px;
+    color: var(--text);
+    border-bottom: 2px solid var(--border);
+    padding-bottom: 8px;
+  }
+
+  .docs-inner :global(h3) {
+    font-size: 1.5rem;
+    margin-top: 32px;
+    margin-bottom: 12px;
+    color: var(--text);
+  }
+
+  .docs-inner :global(p) {
+    margin-bottom: 16px;
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+  }
+
+  .docs-inner :global(ul),
+  .docs-inner :global(ol) {
+    margin-bottom: 16px;
+    padding-left: 24px;
+    color: var(--text-secondary);
+  }
+
+  .docs-inner :global(li) {
+    margin-bottom: 8px;
+  }
+
+  .docs-inner :global(code) {
+    background: var(--bg);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9em;
+    color: var(--primary);
+  }
+
+  .docs-inner :global(pre) {
+    background: var(--text);
+    color: white;
+    padding: 20px;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin-bottom: 24px;
+    font-size: 0.9rem;
+  }
+
+  .docs-inner :global(pre code) {
+    background: transparent;
+    color: white;
+    padding: 0;
+  }
+
+  .docs-inner :global(blockquote) {
+    border-left: 4px solid var(--primary);
+    padding-left: 20px;
+    margin: 24px 0;
+    color: var(--text-secondary);
+    font-style: italic;
+  }
+
+  .docs-inner :global(.note) {
+    background: #eff6ff;
+    border-left: 4px solid var(--primary);
+    padding: 16px;
+    margin: 24px 0;
+    border-radius: 4px;
+  }
+
+  .docs-inner :global(.warning) {
+    background: #fef3c7;
+    border-left: 4px solid #f59e0b;
+    padding: 16px;
+    margin: 24px 0;
+    border-radius: 4px;
+  }
+
+  @media (max-width: 968px) {
+    .docs-container {
+      flex-direction: column;
+    }
+
+    .docs-content {
+      margin: 24px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .docs-content {
+      padding: 24px;
+    }
+
+    .docs-inner :global(h1) {
+      font-size: 2rem;
+    }
+
+    .docs-inner :global(h2) {
+      font-size: 1.5rem;
+    }
+  }
+</style>

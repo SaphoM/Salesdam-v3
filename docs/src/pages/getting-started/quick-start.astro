@@ -1,0 +1,114 @@
+---
+import MainLayout from '../../layouts/MainLayout.astro';
+---
+
+<MainLayout title="Quick Start | Salesdam Docs" description="Get started with Salesdam in 5 minutes">
+  <div class="content-wrapper">
+    <h1>Quick Start Guide</h1>
+
+    <p class="intro">Get up and running with Salesdam CRM in just 5 minutes. This guide walks you through the essential setup steps.</p>
+
+    <h2>Prerequisites</h2>
+    <ul>
+      <li>Node.js 16+ installed</li>
+      <li>MongoDB 4.4+ running locally or Atlas connection string</li>
+      <li>Git and a code editor</li>
+    </ul>
+
+    <h2>1. Clone the Repository</h2>
+    <pre><code>git clone https://github.com/your-org/salesdam-v3.git
+cd salesdam-v3</code></pre>
+
+    <h2>2. Install Dependencies</h2>
+
+    <h3>Backend Setup</h3>
+    <pre><code>cd backend
+npm install</code></pre>
+
+    <h3>Frontend Setup</h3>
+    <pre><code>cd frontend
+npm install</code></pre>
+
+    <h2>3. Configure Environment Variables</h2>
+
+    <h3>Backend (.env)</h3>
+    <pre><code># Database
+MONGO_URI=mongodb://localhost:27017/salesdam
+
+# JWT
+JWT_SECRET=your_secret_key_here
+
+# SMTP (Optional)
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=your_email@gmail.com
+SMTP_PASS=your_password</code></pre>
+
+    <h3>Frontend (.env)</h3>
+    <pre><code># API Configuration
+VITE_API_BASE_URL=http://localhost:5000/api</code></pre>
+
+    <h2>4. Start Development Servers</h2>
+
+    <h3>Terminal 1 - Backend</h3>
+    <pre><code>cd backend
+npm run dev</code></pre>
+
+    <h3>Terminal 2 - Frontend</h3>
+    <pre><code>cd frontend
+npm run dev</code></pre>
+
+    <p>Backend runs at <code>http://localhost:5000</code></p>
+    <p>Frontend runs at <code>http://localhost:3000</code></p>
+
+    <h2>5. Create Your First Account</h2>
+    <ol>
+      <li>Navigate to http://localhost:3000</li>
+      <li>Click "Register" or "Sign Up"</li>
+      <li>Fill in your details:
+        <ul>
+          <li>Company Name</li>
+          <li>Email Address</li>
+          <li>Password (minimum 8 characters)</li>
+        </ul>
+      </li>
+      <li>Click "Create Account"</li>
+      <li>Verify your email (in development, check console output)</li>
+    </ol>
+
+    <h2>6. Explore the Dashboard</h2>
+    <p>After login, you'll see:</p>
+    <ul>
+      <li><strong>Home Dashboard:</strong> Overview of your data</li>
+      <li><strong>Sales Hub:</strong> Default workspace with CRM objects</li>
+      <li><strong>Objects:</strong> Clients, Contacts, Deals, Orders, etc.</li>
+      <li><strong>Settings:</strong> Configure your workspace and permissions</li>
+    </ul>
+
+    <div class="note">
+      <strong>💡 Tip:</strong> In development mode, emails are not sent. Check your backend console for email verification links.
+    </div>
+
+    <h2>7. Next Steps</h2>
+    <ul>
+      <li><a href="/user-guide/registration">Learn about Registration & Setup</a></li>
+      <li><a href="/data-model/objects">Explore Objects & Fields</a></li>
+      <li><a href="/user-guide/roles-permissions">Set Up Roles & Permissions</a></li>
+      <li><a href="/developer/backend">Backend Development Guide</a></li>
+    </ul>
+
+    <div class="success">
+      <strong>✓ Success!</strong> You now have a running Salesdam CRM instance. Happy exploring!
+    </div>
+  </div>
+</MainLayout>
+
+<style>
+  .content-wrapper h2 {
+    margin-top: 32px;
+  }
+
+  .content-wrapper h3 {
+    margin-top: 20px;
+  }
+</style>

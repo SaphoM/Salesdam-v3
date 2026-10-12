@@ -1,0 +1,147 @@
+---
+const { currentPath, isDev = false } = Astro.props;
+
+const userGuideLinks = [
+  { href: '/user-guide', label: 'Overview' },
+  { href: '/user-guide/objects', label: 'Object Settings' },
+  { href: '/user-guide/records', label: 'Records' },
+  { href: '/user-guide/automation', label: 'Automation' },
+  { href: '/user-guide/dashboards', label: 'Dashboards' },
+  { href: '/user-guide/users-roles', label: 'Users & Roles' },
+  { href: '/user-guide/integrations', label: 'Integrations' },
+  { href: '/user-guide/analytics', label: 'Analytics' },
+];
+
+const devLinks = [
+  { href: '/developer', label: 'Overview' },
+  { href: '/developer/architecture', label: 'Architecture' },
+  { href: '/developer/authentication', label: 'Authentication' },
+  { href: '/developer/data-model', label: 'Data Model' },
+  { href: '/developer/features', label: 'Features' },
+  { href: '/developer/api', label: 'API Reference' },
+  { href: '/developer/user-stories', label: 'User Stories' },
+];
+
+const links = isDev ? devLinks : userGuideLinks;
+const title = isDev ? 'Developer Guide' : 'User Guide';
+---
+
+<aside class="sidebar">
+  <div class="sidebar-header">
+    <h3>{title}</h3>
+  </div>
+
+  <nav class="sidebar-nav">
+    <ul>
+      {
+        links.map((link) => (
+          <li>
+            <a
+              href={link.href}
+              class={currentPath === link.href ? 'active' : ''}
+            >
+              {link.label}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </nav>
+
+  {
+    !isDev && (
+      <div class="sidebar-footer">
+        <a href="/getting-started" class="sidebar-cta">
+          Getting Started Guide
+        </a>
+      </div>
+    )
+  }
+</aside>
+
+<style>
+  .sidebar {
+    width: 280px;
+    background: white;
+    margin: 24px 0 24px 24px;
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    position: sticky;
+    top: 104px;
+    height: fit-content;
+    max-height: calc(100vh - 128px);
+    overflow-y: auto;
+  }
+
+  .sidebar-header {
+    padding: 24px 24px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .sidebar-header h3 {
+    font-size: 1.25rem;
+    color: var(--text);
+  }
+
+  .sidebar-nav {
+    padding: 16px 0;
+  }
+
+  .sidebar-nav ul {
+    list-style: none;
+  }
+
+  .sidebar-nav li {
+    margin-bottom: 4px;
+  }
+
+  .sidebar-nav a {
+    display: block;
+    padding: 10px 24px;
+    color: var(--text-secondary);
+    transition: all 0.2s;
+    font-weight: 500;
+  }
+
+  .sidebar-nav a:hover {
+    background: var(--bg);
+    color: var(--primary);
+  }
+
+  .sidebar-nav a.active {
+    background: #eff6ff;
+    color: var(--primary);
+    border-right: 3px solid var(--primary);
+  }
+
+  .sidebar-footer {
+    padding: 16px 24px 24px;
+    border-top: 1px solid var(--border);
+  }
+
+  .sidebar-cta {
+    display: block;
+    padding: 12px;
+    background: var(--primary);
+    color: white;
+    text-align: center;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.2s;
+  }
+
+  .sidebar-cta:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+  }
+
+  @media (max-width: 968px) {
+    .sidebar {
+      width: 100%;
+      margin: 24px;
+      position: relative;
+      top: 0;
+      max-height: none;
+    }
+  }
+</style>

@@ -1,0 +1,157 @@
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  flex-wrap: wrap;
+  background: var(--color-white);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-3) var(--spacing-4);
+  overflow: visible;
+}
+
+/* ─── Search ────────────────────────────────────────────── */
+.searchWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 180px;
+  max-width: 360px;
+}
+
+.searchIcon {
+  position: absolute;
+  left: var(--spacing-3);
+  color: var(--color-gray-400);
+  pointer-events: none;
+}
+
+.searchInput {
+  width: 100%;
+  padding: var(--spacing-2) 28px var(--spacing-2) calc(var(--spacing-3) + 22px);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  font-size: var(--font-size-sm);
+  background: var(--color-gray-50);
+  font-family: inherit;
+}
+
+.searchInput:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  background: var(--color-white);
+  box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.08);
+}
+
+.searchClear {
+  position: absolute;
+  right: var(--spacing-2);
+  background: none;
+  border: none;
+  color: var(--color-gray-400);
+  cursor: pointer;
+  display: flex;
+  padding: 2px;
+}
+
+/* ─── Column chooser ────────────────────────────────────── */
+.colChooserWrap {
+  position: relative;
+}
+
+.colBtn {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-2) var(--spacing-3);
+  background: var(--color-gray-50);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-gray-700);
+  cursor: pointer;
+  white-space: nowrap;
+  font-family: inherit;
+  transition: all var(--transition-fast);
+}
+
+.colBtn:hover {
+  background: var(--color-gray-100);
+}
+
+.colBtn.active {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.colCount {
+  background: var(--color-primary);
+  color: white;
+  font-size: 10px;
+  min-width: 18px;
+  height: 18px;
+  border-radius: 9px;
+  padding: 0 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: var(--font-weight-bold);
+}
+
+/* ─── Delete-view confirmation ──────────────────────────── */
+.confirmText {
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-700);
+  line-height: 1.6;
+}
+
+/* ─── View Mode Toggle ────────────────────────────────── */
+.viewModeToggle {
+  display: flex;
+  gap: 2px;
+  background: var(--color-gray-100);
+  padding: 2px;
+  border-radius: var(--border-radius);
+}
+
+.viewBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: transparent;
+  border-radius: calc(var(--border-radius) - 2px);
+  color: var(--color-gray-600);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  font-family: inherit;
+}
+
+.viewBtn:hover {
+  background: var(--color-gray-200);
+  color: var(--color-gray-800);
+}
+
+.viewBtn.active {
+  background: var(--color-white);
+  color: var(--color-primary);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+@media (max-width: 768px) {
+  .toolbar {
+    gap: var(--spacing-2);
+  }
+  .searchWrapper {
+    max-width: 100%;
+    flex: 1;
+  }
+  .colBtn span {
+    display: none;
+  }
+}

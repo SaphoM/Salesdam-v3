@@ -1,0 +1,188 @@
+---
+import MainLayout from '../../layouts/MainLayout.astro';
+
+const keyCurl = `curl -H "X-API-Key: $SALESDAM_API_KEY" \\
+  http://localhost:5000/api/v1/records/client`;
+
+const loginCurl = `curl -X POST http://localhost:5000/api/v1/auth/login \\
+  -H "Content-Type: application/json" \\
+  -c cookies.txt \\
+  -d '{ "email": "admin@example.com", "password": "…" }'
+
+# Later calls reuse the cookie jar
+curl -b cookies.txt http://localhost:5000/api/v1/auth/me`;
+
+const createKey = `POST /api/v1/api-keys
+{
+  "name": "Zapier integration",
+  "scopes": ["read", "write"],
+  "allowedObjects": ["client", "deal"],
+  "ipWhitelist": ["203.0.113.7"],
+  "expiresAt": "2027-01-01T00:00:00.000Z"
+}`;
+
+const createKeyResponse = `{
+  "success": true,
+  "message": "API key created",
+  "data": {
+    "_id": "665f…",
+    "name": "Zapier integration",
+    "key": "sk_live_a1b2c3d4e5f6…",   // shown once, never again
+    "keyPrefix": "sk_live_a1b2"
+  }
+}`;
+
+const SCOPES = [
+  ['read', 'GET requests — list and read records, objects, fields, views.'],
+  ['write', 'POST, PUT and PATCH — create and update records.'],
+  ['delete', 'DELETE and bulk-delete.'],
+  ['admin', 'Metadata management: creating objects and fields, editing validation rules.'],
+];
+---
+
+<MainLayout
+  title="API Authentication"
+  description="API keys, scopes, IP allow-lists, session cookies and tenant selection."
+>
+  <h1>Authentication</h1>
+  <p class="lead">
+    Two mechanisms, checked in that order by <code>requireAuth</code>: an
+    <code>X-API-Key</code> header, then the session cookie.
+  </p>
+
+  <div class="warning">
+    <strong>There is no bearer-token scheme.</strong> An
+    <code>Authorization: Bearer …</code> header is not read at all — the request
+    falls through to the session check and, finding none, returns
+    <code>401</code>. If you are getting 401s with a token that looks valid, this
+    is almost certainly why.
+  </div>
+
+  <h2>API keys</h2>
+  <p>
+    The right choice for anything non-interactive. Create one under
+    <strong>Integrations</strong> in the app, or via the API if your user has the
+    <code>canManageApiKeys</code> permission.
+  </p>
+  <pre><code>{keyCurl}</code></pre>
+
+  <h3>Creating a key</h3>
+  <pre><code>{createKey}</code></pre>
+  <pre><code>{createKeyResponse}</code></pre>
+
+  <div class="error">
+    <strong>The plaintext key is returned exactly once.</strong> Only a SHA-256
+    hash is stored, so it cannot be recovered or re-displayed — not by you, not by
+    an administrator. Capture it at creation time. If it is lost, revoke the key
+    and issue a new one.
+  </div>
+
+  <h3>Scopes</h3>
+  <p>
+    A key carries one or more scopes. A request outside the key's scopes returns
+    <code>403</code>, even if the owning user would be permitted.
+  </p>
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th>Scope</th><th>Grants</th></tr></thead>
+      <tbody>
+        {SCOPES.map(([scope, grants]) => (
+          <tr><td><code>{scope}</code></td><td>{grants}</td></tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="note">
+    <strong>Scopes narrow, they never widen.</strong> Effective access is the
+    intersection of the key's scopes and the owning user's role permissions. A key
+    with <code>admin</code> owned by a user who can't manage objects still can't
+    manage objects.
+  </div>
+
+  <h3>Restricting a key</h3>
+  <ul>
+    <li>
+      <code>allowedObjects</code> — limits the key to those object API names. Empty
+      means every object the user can reach.
+    </li>
+    <li>
+      <code>ipWhitelist</code> — rejects requests from any other address. Empty
+      means any address. Worth setting for keys used from fixed infrastructure.
+    </li>
+    <li>
+      <code>expiresAt</code> — the key stops working after this instant. Set one;
+      an unexpiring credential is one you will forget to rotate.
+    </li>
+  </ul>
+
+  <h3>Rotating and revoking</h3>
+  <ul>
+    <li>
+      <code>DELETE /api-keys/:id/revoke</code> deactivates the key but keeps the
+      record and its usage history — prefer this, so the audit trail survives.
+    </li>
+    <li>
+      <code>DELETE /api-keys/:id</code> removes it outright, history included.
+    </li>
+    <li>
+      <code>GET /api-keys/:id/usage?period=7d|30d|90d</code> reports request counts,
+      which is how you confirm a key is genuinely unused before removing it.
+    </li>
+  </ul>
+  <p>
+    To rotate without downtime: create the new key, deploy it, confirm from the
+    usage endpoint that the old key has gone quiet, then revoke it.
+  </p>
+
+  <h2>Session cookies</h2>
+  <p>
+    Used by the web app. <code>POST /auth/login</code> creates a server-side
+    session and sets the cookie:
+  </p>
+  <pre><code>{loginCurl}</code></pre>
+  <p>
+    Because sessions live in the database rather than in a signed token, they can
+    be enumerated and revoked — <code>GET /auth/sessions</code> and
+    <code>DELETE /auth/sessions/:sessionId</code>. That is the main practical
+    difference from a JWT: revocation is immediate rather than waiting for expiry.
+  </p>
+  <p>
+    Login is rate limited to 10 attempts per 15 minutes per IP. See
+    <a href="/api/rate-limits">Rate Limits</a>.
+  </p>
+
+  <h2>Tenant selection</h2>
+  <p>
+    Every request is scoped to one tenant. It normally comes from the session or
+    the key. If neither supplies one, the request fails with
+    <code>400 No active tenant</code> and you can name it explicitly:
+  </p>
+  <pre><code>X-Tenant-Id: 665f1c2a9b4e7d0012a3b4c5</code></pre>
+  <p>
+    Records outside the active tenant return <code>404</code>, never
+    <code>403</code> — the API will not confirm that an id exists somewhere else.
+  </p>
+
+  <h2>Failure modes</h2>
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th>Status</th><th>Cause</th></tr></thead>
+      <tbody>
+        <tr><td><code>401</code></td><td>No key and no session; or the key is unknown, revoked or expired.</td></tr>
+        <tr><td><code>403</code></td><td>Authenticated, but the scope, role permission, or IP allow-list denies it. Also returned for a deactivated or locked user account.</td></tr>
+        <tr><td><code>400</code></td><td>No active tenant could be determined.</td></tr>
+        <tr><td><code>429</code></td><td>Auth rate limit tripped.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>Handling keys safely</h2>
+  <ul>
+    <li>Keep keys in environment variables or a secret manager — never in source, never in a front-end bundle.</li>
+    <li>A key is a bearer credential: whoever holds it is the user. Treat it like a password.</li>
+    <li>Issue one key per integration, so revoking one doesn't break the others.</li>
+    <li>Prefer the narrowest scope set that works. <code>read</code> is enough for a reporting job.</li>
+    <li>Always over HTTPS in production. Over plain HTTP the header is readable in transit.</li>
+  </ul>
+</MainLayout>

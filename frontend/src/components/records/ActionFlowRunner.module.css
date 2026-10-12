@@ -1,0 +1,94 @@
+/* ─── Action button ───────────────────────────────────────── */
+.actionBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-1) var(--spacing-3);
+  border-radius: var(--border-radius);
+  border: 1px solid var(--border-color);
+  font-family: var(--font-family);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+.actionBtn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.v-primary   { background: var(--color-primary);  color: white; border-color: var(--color-primary); }
+.v-primary:hover:not(:disabled) { background: var(--color-primary-hover); }
+.v-secondary { background: var(--color-white); color: var(--color-gray-700); }
+.v-secondary:hover:not(:disabled) { background: var(--color-gray-50); }
+.v-ghost     { background: transparent; border-color: transparent; color: var(--color-gray-600); }
+.v-ghost:hover:not(:disabled) { background: var(--color-gray-100); }
+.v-danger    { background: var(--color-danger); color: white; border-color: var(--color-danger); }
+.v-danger:hover:not(:disabled) { background: #dc2626; }
+.v-success   { background: var(--color-success); color: white; border-color: var(--color-success); }
+.v-success:hover:not(:disabled) { background: #16a34a; }
+
+.btnIcon { display: flex; align-items: center; font-size: 12px; }
+
+@keyframes spin { to { transform: rotate(360deg); } }
+.spin { animation: spin 0.7s linear infinite; }
+
+/* ─── Confirm dialog ──────────────────────────────────────── */
+.confirmOverlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+  display: flex; align-items: center; justify-content: center;
+  z-index: calc(var(--z-modal) + 100);
+}
+.confirmBox {
+  background: var(--color-white); border-radius: var(--border-radius-lg);
+  padding: var(--spacing-6); max-width: 400px; width: 90%;
+  box-shadow: var(--shadow-2xl);
+  display: flex; flex-direction: column; gap: var(--spacing-4);
+}
+.confirmIcon { color: #d97706; flex-shrink: 0; }
+.confirmMsg  { font-size: var(--font-size-sm); color: var(--color-gray-700); margin: 0; line-height: 1.5; }
+.confirmActions { display: flex; gap: var(--spacing-3); justify-content: flex-end; }
+.confirmNo  { padding: var(--spacing-2) var(--spacing-4); border: 1px solid var(--border-color); border-radius: var(--border-radius); background: var(--color-white); font-size: var(--font-size-sm); cursor: pointer; }
+.confirmYes { padding: var(--spacing-2) var(--spacing-4); background: var(--color-primary); color: white; border: none; border-radius: var(--border-radius); font-size: var(--font-size-sm); font-weight: var(--font-weight-medium); cursor: pointer; }
+.confirmNo:hover  { background: var(--color-gray-50); }
+.confirmYes:hover { background: var(--color-primary-hover); }
+
+/* ─── Popup modal ─────────────────────────────────────────── */
+.popupOverlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+  display: flex; align-items: center; justify-content: center;
+  z-index: calc(var(--z-modal) + 50); padding: var(--spacing-4);
+}
+.popup {
+  background: var(--color-white); border-radius: var(--border-radius-xl);
+  box-shadow: var(--shadow-2xl); max-width: 700px; width: 100%;
+  max-height: calc(100vh - 80px); display: flex; flex-direction: column;
+  animation: popIn 200ms ease;
+}
+@keyframes popIn { from { opacity:0; transform:scale(0.96); } to { opacity:1; transform:scale(1); } }
+
+.popupHeader {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: var(--spacing-4) var(--spacing-6); border-bottom: 1px solid var(--border-color);
+  flex-shrink: 0;
+}
+.popupTitle { font-size: var(--font-size-lg); font-weight: var(--font-weight-semibold); color: var(--color-gray-900); }
+.popupClose { background: none; border: none; color: var(--color-gray-500); cursor: pointer; font-size: var(--font-size-lg); line-height: 1; padding: 0; }
+.popupClose:hover { color: var(--color-gray-800); }
+.popupBody  { flex: 1; overflow-y: auto; padding: var(--spacing-5) var(--spacing-6); }
+
+/* ─── Screen node display ─────────────────────────────────── */
+.emptyScreen { font-size: var(--font-size-sm); color: var(--color-gray-400); font-style: italic; text-align: center; padding: var(--spacing-8); margin: 0; }
+.screenGrid  { display: grid; grid-template-columns: repeat(12, 1fr); gap: var(--spacing-4); align-items: start; }
+.compHeading { font-size: var(--font-size-lg); font-weight: var(--font-weight-semibold); color: var(--color-gray-800); margin: 0; }
+.compText    { font-size: var(--font-size-sm); color: var(--color-gray-600); margin: 0; white-space: pre-wrap; }
+.compSep     { border: none; border-top: 1px solid var(--border-color); }
+.compField   { display: flex; flex-direction: column; gap: 2px; }
+.compLabel   { font-size: var(--font-size-xs); font-weight: var(--font-weight-medium); color: var(--color-gray-500); text-transform: uppercase; letter-spacing: 0.04em; }
+.compValue   { font-size: var(--font-size-sm); color: var(--color-gray-800); }
+.compMetric  { display: flex; flex-direction: column; gap: 2px; }
+.metricVal   { font-size: 2rem; font-weight: var(--font-weight-bold); color: var(--color-gray-900); line-height: 1; }
+.metricLabel { font-size: var(--font-size-xs); color: var(--color-gray-500); }
+.tableWrap   { overflow-x: auto; }
+.table       { width: 100%; border-collapse: collapse; font-size: var(--font-size-xs); }
+.th          { padding: var(--spacing-2) var(--spacing-3); text-align: left; font-weight: var(--font-weight-semibold); color: var(--color-gray-500); text-transform: uppercase; letter-spacing: 0.04em; background: var(--color-gray-50); border-bottom: 1px solid var(--border-color); }
+.td          { padding: var(--spacing-2) var(--spacing-3); color: var(--color-gray-700); border-bottom: 1px solid var(--color-gray-100); }
+.tdEmpty     { padding: var(--spacing-4); text-align: center; color: var(--color-gray-400); }

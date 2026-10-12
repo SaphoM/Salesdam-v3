@@ -1,0 +1,165 @@
+.panel {
+  background: var(--color-white);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+/* Header */
+.panelHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--spacing-4);
+}
+
+.sectionTitle {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-gray-500);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.helper {
+  font-size: 13px;
+  color: var(--color-gray-500);
+  margin: 4px 0 0;
+}
+
+/* Empty */
+.empty {
+  text-align: center;
+  padding: var(--spacing-8);
+  color: var(--color-gray-400);
+  font-size: var(--font-size-sm);
+}
+
+/* Grid */
+.memberGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: var(--spacing-3);
+}
+
+/* Card */
+.memberCard {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  padding: var(--spacing-3) var(--spacing-4);
+  background: var(--color-gray-50);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  transition: box-shadow var(--transition-fast);
+}
+
+.memberCard:hover {
+  box-shadow: var(--shadow-sm);
+}
+
+/* Avatar */
+.memberAvatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+/* Info */
+.memberInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.memberName {
+  display: block;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-gray-800);
+}
+
+.memberEmail {
+  font-size: 11px;
+  color: var(--color-gray-500);
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.memberRole {
+  font-size: 10px;
+  padding: 1px 5px;
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  border-radius: 10px;
+  display: inline-block;
+  margin-top: 2px;
+  text-transform: capitalize;
+}
+
+/* Actions */
+.memberActions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.statusPill {
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 10px;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+.pillActive {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.pillInactive {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+/* Remove button */
+.removeBtn {
+  background: none;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  padding: 3px 6px;
+  cursor: pointer;
+  color: var(--color-danger);
+  display: flex;
+  align-items: center;
+}
+
+.removeBtn:hover {
+  background: #fee2e2;
+  border-color: var(--color-danger);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .memberGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .panelHeader {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

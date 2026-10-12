@@ -1,0 +1,4 @@
+# Keep deploy scripts and Actions workflows LF-only (Linux VMs / runners).
+*.sh text eol=lf
+.github/workflows/* text eol=lf
+deploy.sh text eol=lf

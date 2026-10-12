@@ -1,0 +1,143 @@
+---
+import MainLayout from '../layouts/MainLayout.astro';
+---
+
+<MainLayout title="Page Not Found | Salesdam Docs" description="The page you're looking for doesn't exist">
+  <div class="content-wrapper">
+    <div class="not-found-container">
+      <div class="error-code">404</div>
+      <h1>Page Not Found</h1>
+      <p class="error-message">Sorry, we couldn't find the page you're looking for.</p>
+
+      <div class="suggestions">
+        <h2>Here are some helpful links:</h2>
+        <ul>
+          <li><a href="/">Home</a> - Back to documentation home</li>
+          <li><a href="/getting-started/quick-start">Quick Start</a> - Get started in 5 minutes</li>
+          <li><a href="/search">Search Docs</a> - Search for what you need</li>
+          <li><a href="/api/overview">API Reference</a> - REST API documentation</li>
+          <li><a href="/data-model/objects">Data Model</a> - Understanding objects</li>
+          <li><a href="/architecture/system-architecture">Architecture</a> - System design</li>
+        </ul>
+      </div>
+
+      <div class="search-container">
+        <h2>Search Documentation</h2>
+        <input
+          type="text"
+          id="search-404"
+          placeholder="What are you looking for?"
+          class="search-input-404"
+        />
+      </div>
+    </div>
+  </div>
+</MainLayout>
+
+<style>
+  .not-found-container {
+    text-align: center;
+    max-width: 500px;
+  }
+
+  .error-code {
+    font-size: 120px;
+    font-weight: 700;
+    color: var(--color-primary);
+    line-height: 1;
+    margin-bottom: 20px;
+    opacity: 0.1;
+  }
+
+  h1 {
+    font-size: 32px;
+    margin: 20px 0 10px 0;
+    border: none;
+    padding: 0;
+  }
+
+  .error-message {
+    font-size: 16px;
+    color: var(--color-gray-500);
+    margin-bottom: 40px;
+  }
+
+  .suggestions {
+    background: var(--surface);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 24px;
+    margin-bottom: 30px;
+    text-align: left;
+  }
+
+  .suggestions h2 {
+    margin-top: 0;
+    margin-bottom: 16px;
+    font-size: 18px;
+  }
+
+  .suggestions ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .suggestions li {
+    margin-bottom: 12px;
+  }
+
+  .suggestions a {
+    color: var(--color-primary);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s;
+  }
+
+  .suggestions a:hover {
+    color: var(--color-primary-hover);
+    text-decoration: underline;
+  }
+
+  .search-container {
+    background: var(--color-gray-50);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 24px;
+  }
+
+  .search-container h2 {
+    margin-top: 0;
+    margin-bottom: 16px;
+    font-size: 16px;
+  }
+
+  .search-input-404 {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid var(--color-gray-300);
+    border-radius: 6px;
+    font-size: 14px;
+    transition: border-color 0.2s;
+  }
+
+  .search-input-404:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 2px rgba(36, 76, 100, 0.1);
+  }
+</style>
+
+<script>
+  const searchInput = document.getElementById('search-404');
+  if (searchInput) {
+    searchInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        const query = searchInput.value;
+        if (query) {
+          window.location.href = `/search?q=${encodeURIComponent(query)}`;
+        }
+      }
+    });
+  }
+</script>

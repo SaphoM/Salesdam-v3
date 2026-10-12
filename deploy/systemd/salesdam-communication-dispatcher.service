@@ -1,0 +1,33 @@
+# Salesdam Insurance Workspace - Communication Dispatcher
+# Runs every 5 minutes to deliver queued communications
+
+[Unit]
+Description=Salesdam Insurance Workspace - Communication Dispatcher
+Documentation=https://salesdam.example.com/docs/communications
+After=network.target mongod.service
+Wants=mongod.service
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/salesdam/backend
+ExecStart=/usr/bin/node scripts/dispatch-communications.js
+User=salesdam
+Group=salesdam
+Environment=NODE_ENV=production
+EnvironmentFile=-/etc/salesdam/environment
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=salesdam-communication-dispatcher
+TimeoutSec=120
+
+MemoryMax=256M
+CPUQuota=100%
+
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/salesdam/backend/logs /opt/salesdam/backend/uploads
+
+[Install]
+WantedBy=multi-user.target

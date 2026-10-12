@@ -1,0 +1,15 @@
+# Salesdam Insurance Workspace - Scheduler Timer
+# Runs daily at 2:00 AM for all scheduled insurance jobs
+
+[Unit]
+Description=Daily timer for Salesdam Insurance Scheduler
+Requires=salesdam-insurance-scheduler.service
+
+[Timer]
+OnCalendar=*-*-* 02:00:00
+Persistent=true
+RandomizedDelaySec=15min
+Unit=salesdam-insurance-scheduler.service
+
+[Install]
+WantedBy=timers.target

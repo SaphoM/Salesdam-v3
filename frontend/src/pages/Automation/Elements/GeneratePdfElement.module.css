@@ -1,0 +1,119 @@
+.wrap { display: flex; flex-direction: column; gap: 2px; }
+
+.mappingsSection {
+  margin: 6px 0;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+.mappingsTitle {
+  padding: 7px 12px;
+  background: var(--color-background);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border-bottom: 1px solid var(--color-border);
+}
+.mappingsSection > div:not(.mappingsTitle) { padding: 0 12px; }
+
+.checkRow { display: flex; align-items: center; gap: 8px; }
+.checkLabel { font-size: 12px; color: var(--color-text); cursor: pointer; }
+
+.previewSection { margin-top: 10px; }
+.previewBtn {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 14px;
+  border: 1px solid var(--color-primary);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--color-primary);
+  font-size: 13px;
+  cursor: pointer;
+  width: 100%;
+  justify-content: center;
+  transition: background 0.15s;
+}
+.previewBtn:hover { background: var(--color-primary); color: #fff; }
+.previewBtn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.previewNote {
+  font-size: 11px;
+  color: var(--color-text-muted);
+  font-style: italic;
+  margin-top: 8px;
+  text-align: center;
+}
+
+/* ─── Preview modal ──────────────────────────────────── */
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.5);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+.modalBox {
+  background: var(--color-surface);
+  border-radius: 10px;
+  box-shadow: 0 8px 40px rgba(0,0,0,.25);
+  width: 780px;
+  max-width: 100%;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+.modalTitle { font-size: 15px; font-weight: 600; color: var(--color-text); }
+.modalClose {
+  padding: 5px;
+  border: none;
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.12s;
+}
+.modalClose:hover { background: var(--color-background); }
+.modalBody {
+  overflow-y: auto;
+  padding: 20px;
+  flex: 1;
+  background: var(--color-background);
+}
+.previewNote {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  margin-bottom: 16px;
+  padding: 8px 12px;
+  background: #fef3c7;
+  border-radius: 6px;
+  border: 1px solid #fcd34d;
+  color: #92400e;
+  font-style: normal;
+}
+.previewPage {
+  background: #fff;
+  box-shadow: 0 2px 12px rgba(0,0,0,.1);
+  border-radius: 4px;
+  min-height: 300px;
+}
+.headerHtml { border-bottom: 1px solid #e2e8f0; padding-bottom: 12px; margin-bottom: 16px; }
+.footerHtml { border-top: 1px solid #e2e8f0; padding-top: 12px; margin-top: 16px; }

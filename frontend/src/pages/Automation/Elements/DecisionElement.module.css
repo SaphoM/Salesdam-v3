@@ -1,0 +1,128 @@
+.wrapper { display: flex; flex-direction: column; gap: var(--spacing-3); }
+
+/* ── Outcome tabs ─────────────────────────────────────────── */
+.outcomeTabsRow {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  border-bottom: 2px solid var(--border-color);
+  padding-bottom: 0;
+}
+
+.outcomeTabs {
+  display: flex;
+  gap: 0;
+  flex: 1;
+  overflow-x: auto;
+}
+
+.outcomeTab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: var(--spacing-2) var(--spacing-4);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-gray-500);
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color var(--transition-fast);
+}
+.outcomeTab:hover { color: var(--color-gray-700); }
+
+.outcomeTabActive {
+  color: #7c3aed;
+  border-bottom-color: #7c3aed;
+}
+
+.outcomeTabDefault {
+  color: var(--color-gray-400);
+  font-style: italic;
+}
+.outcomeTabDefault.outcomeTabActive { color: #64748b; border-bottom-color: #64748b; }
+
+.outcomeTabDel {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  font-size: 12px;
+  color: var(--color-gray-400);
+  cursor: pointer;
+  margin-left: 2px;
+  line-height: 1;
+}
+.outcomeTabDel:hover { background: var(--color-danger-light); color: var(--color-danger); }
+
+.addOutcomeBtn {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: var(--spacing-1) var(--spacing-3);
+  font-size: var(--font-size-xs); font-weight: var(--font-weight-medium);
+  color: #7c3aed; background: #f5f3ff; border: 1px dashed #c4b5fd;
+  border-radius: var(--border-radius-full); cursor: pointer; white-space: nowrap;
+  transition: background var(--transition-fast);
+}
+.addOutcomeBtn:hover { background: #ede9fe; }
+
+/* ── Outcome body ─────────────────────────────────────────── */
+.outcomeBody {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+}
+
+.outcomeConfig {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1);
+  padding: var(--spacing-3);
+  background: var(--color-white);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+}
+
+.defaultNote {
+  padding: var(--spacing-2) var(--spacing-3);
+  background: var(--color-gray-50);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  font-size: var(--font-size-xs);
+  color: var(--color-gray-500);
+  font-style: italic;
+}
+
+/* ── Branch / nested steps ────────────────────────────────── */
+.outcomeBranch {
+  border: 2px dashed #c4b5fd;
+  border-radius: var(--border-radius-md);
+  padding: var(--spacing-3);
+  background: #faf5ff;
+}
+
+.branchLabel {
+  font-size: var(--font-size-xs);
+  color: #7c3aed;
+  font-weight: var(--font-weight-semibold);
+  margin-bottom: var(--spacing-3);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.nestedSteps {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.noRenderer {
+  font-size: var(--font-size-xs);
+  color: var(--color-gray-400);
+  font-style: italic;
+  margin: 0;
+}

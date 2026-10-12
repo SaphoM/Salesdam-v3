@@ -1,0 +1,319 @@
+﻿---
+import MainLayout from '../../layouts/MainLayout.astro';
+---
+
+<MainLayout title="Orders & Order Line Items | Salesdam Docs" description="Managing customer orders">
+  <div class="content-wrapper">
+    <h1>Orders & Order Line Items</h1>
+
+    <p class="intro">Create and manage customer orders from accepted quotes. Track fulfillment and generate invoices.</p>
+
+    <h2>Order Lifecycle</h2>
+
+    <div class="lifecycle">
+      <div class="state">Quote Accepted</div>
+      <div class="arrow">→</div>
+      <div class="state">Order Created</div>
+      <div class="arrow">→</div>
+      <div class="state">Order Confirmed</div>
+      <div class="arrow">→</div>
+      <div class="state">Fulfillment</div>
+      <div class="arrow">→</div>
+      <div class="state">Delivered</div>
+      <div class="arrow">→</div>
+      <div class="state">Invoice</div>
+    </div>
+
+    <h2>Order Fields</h2>
+
+    <table>
+      <tr>
+        <th>Field</th>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+      <tr>
+        <td>Order Number</td>
+        <td>Auto Number</td>
+        <td>Unique order ID (e.g., ORD-001234)</td>
+      </tr>
+      <tr>
+        <td>Order Date</td>
+        <td>Date</td>
+        <td>Date order created</td>
+      </tr>
+      <tr>
+        <td>Client</td>
+        <td>Lookup</td>
+        <td>Ordering client</td>
+      </tr>
+      <tr>
+        <td>Contact</td>
+        <td>Lookup</td>
+        <td>Primary contact at client</td>
+      </tr>
+      <tr>
+        <td>Status</td>
+        <td>Picklist</td>
+        <td>Draft, Confirmed, Shipped, Delivered, Cancelled</td>
+      </tr>
+      <tr>
+        <td>Order Value</td>
+        <td>Currency (Formula)</td>
+        <td>Total order amount</td>
+      </tr>
+      <tr>
+        <td>Delivery Date</td>
+        <td>Date</td>
+        <td>Expected delivery</td>
+      </tr>
+      <tr>
+        <td>Shipping Address</td>
+        <td>Text</td>
+        <td>Where to ship</td>
+      </tr>
+    </table>
+
+    <h2>Creating an Order</h2>
+
+    <h3>From Quote</h3>
+
+    <ol>
+      <li>Open accepted quote</li>
+      <li>Click "Convert to Order"</li>
+      <li>Review line items auto-populated from quote</li>
+      <li>Confirm client information</li>
+      <li>Enter shipping address (if different from client)</li>
+      <li>Set delivery date</li>
+      <li>Add delivery instructions (optional)</li>
+      <li>Click "Create Order"</li>
+      <li>Order created with status "Draft"</li>
+    </ol>
+
+    <h3>Manual Order Creation</h3>
+
+    <ol>
+      <li>Navigate to Orders object</li>
+      <li>Click "New Order" button</li>
+      <li>Select client</li>
+      <li>Add line items manually</li>
+      <li>Enter delivery information</li>
+      <li>Set payment terms</li>
+      <li>Click "Save"</li>
+    </ol>
+
+    <h2>Order Line Items</h2>
+
+    <h3>Line Item Structure</h3>
+
+    <table>
+      <tr>
+        <th>Field</th>
+        <th>Description</th>
+      </tr>
+      <tr>
+        <td>Product</td>
+        <td>Item being ordered</td>
+      </tr>
+      <tr>
+        <td>Quantity</td>
+        <td>Number of units</td>
+      </tr>
+      <tr>
+        <td>Unit Price</td>
+        <td>Price per unit</td>
+      </tr>
+      <tr>
+        <td>Total</td>
+        <td>Quantity × Unit Price</td>
+      </tr>
+      <tr>
+        <td>Status</td>
+        <td>Pending, Shipped, Received</td>
+      </tr>
+    </table>
+
+    <h3>Adding Line Items</h3>
+
+    <ol>
+      <li>In order, click "Add Line Item"</li>
+      <li>Select product from dropdown</li>
+      <li>Enter quantity</li>
+      <li>Unit price auto-fills from product</li>
+      <li>Adjust if needed</li>
+      <li>Click "Add"</li>
+    </ol>
+
+    <h3>Tracking Line Item Status</h3>
+
+    <ol>
+      <li>Each line item has independent status</li>
+      <li>Update when shipment occurs</li>
+      <li>Mark as "Received" when delivered</li>
+      <li>All line items marked as "Received" → Order marked as "Delivered"</li>
+    </ol>
+
+    <h2>Order Statuses</h2>
+
+    <table>
+      <tr>
+        <th>Status</th>
+        <th>Description</th>
+        <th>Next Step</th>
+      </tr>
+      <tr>
+        <td>Draft</td>
+        <td>Order being prepared</td>
+        <td>Confirm order</td>
+      </tr>
+      <tr>
+        <td>Confirmed</td>
+        <td>Order confirmed with client</td>
+        <td>Prepare shipment</td>
+      </tr>
+      <tr>
+        <td>Shipped</td>
+        <td>Items shipped to client</td>
+        <td>Track delivery</td>
+      </tr>
+      <tr>
+        <td>Delivered</td>
+        <td>Items received by client</td>
+        <td>Generate invoice</td>
+      </tr>
+      <tr>
+        <td>Cancelled</td>
+        <td>Order cancelled</td>
+        <td>Archive</td>
+      </tr>
+    </table>
+
+    <h2>Order Management</h2>
+
+    <h3>Confirming Order</h3>
+
+    <ol>
+      <li>Open order in Draft status</li>
+      <li>Review all details</li>
+      <li>Click "Confirm Order"</li>
+      <li>Status changes to "Confirmed"</li>
+      <li>Confirmation email sent to client</li>
+    </ol>
+
+    <h3>Updating Line Item Status</h3>
+
+    <ol>
+      <li>Click on line item</li>
+      <li>Update status (Shipped, Received)</li>
+      <li>Add tracking information (optional)</li>
+      <li>Save changes</li>
+    </ol>
+
+    <h3>Generating Invoice</h3>
+
+    <ol>
+      <li>Open order with status "Delivered"</li>
+      <li>Click "Generate Invoice" button</li>
+      <li>Review invoice details</li>
+      <li>Adjust payment terms if needed</li>
+      <li>Click "Create Invoice"</li>
+      <li>Invoice created and linked to order</li>
+    </ol>
+
+    <h2>Order Fulfillment</h2>
+
+    <p>Track fulfillment progress:</p>
+
+    <ul>
+      <li>Partial shipments supported</li>
+      <li>Track by line item or by shipment</li>
+      <li>Add tracking numbers</li>
+      <li>Notify client of shipment</li>
+      <li>Get delivery confirmation</li>
+    </ul>
+
+    <h2>Order Analytics</h2>
+
+    <ul>
+      <li>Total orders this period</li>
+      <li>Average order value</li>
+      <li>Orders by status</li>
+      <li>Fulfillment rate %</li>
+      <li>Average delivery time</li>
+      <li>Late deliveries</li>
+    </ul>
+
+    <h2>Best Practices</h2>
+
+    <ul>
+      <li>✓ Confirm order details with client before shipping</li>
+      <li>✓ Update line item status promptly</li>
+      <li>✓ Add tracking numbers for visibility</li>
+      <li>✓ Notify client of shipment</li>
+      <li>✓ Generate invoice after delivery</li>
+      <li>✗ Don't ship without confirmed order</li>
+      <li>✗ Don't leave line items in pending status</li>
+      <li>✗ Don't generate invoice before delivery</li>
+    </ul>
+
+    <div class="note">
+      <strong>💡 Tip:</strong> Integrate with shipping systems to auto-update delivery status and tracking information.
+    </div>
+
+    <h2>Next Steps</h2>
+
+    <ul>
+      <li><a href="/features/invoices">Generate Invoices</a></li>
+      <li><a href="/features/invoices">Invoicing an Order</a></li>
+    </ul>
+
+    <div class="success">
+      <strong>✓ Order Created!</strong> Now track fulfillment and generate invoice. See <a href="/features/invoices">Generate Invoices</a>.
+    </div>
+  </div>
+</MainLayout>
+
+<style>
+  .lifecycle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 30px 0;
+    padding: 20px;
+    background: var(--color-gray-50);
+    border-radius: 8px;
+  }
+
+  .state {
+    background: var(--surface);
+    border: 1px solid var(--border-color);
+    padding: 10px 14px;
+    border-radius: 6px;
+    font-weight: 500;
+    font-size: 13px;
+    white-space: nowrap;
+  }
+
+  .arrow {
+    color: var(--color-gray-300);
+    font-size: 18px;
+  }
+
+  @media (max-width: 768px) {
+    .lifecycle {
+      gap: 8px;
+      padding: 16px;
+    }
+
+    .state {
+      font-size: 12px;
+      padding: 8px 10px;
+    }
+
+    .arrow {
+      font-size: 14px;
+    }
+  }
+</style>

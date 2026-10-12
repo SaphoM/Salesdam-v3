@@ -1,0 +1,185 @@
+﻿---
+import MainLayout from '../../layouts/MainLayout.astro';
+
+// Held as a string: a bare `{` in .astro markup opens a JS expression, so this
+// snippet was compiled as JavaScript and broke the build.
+const recordShape = `{
+  _id: ObjectId(),
+  tenantId: ObjectId(),
+  objectId: ObjectId(),
+  objectApiName: "client",
+  ownerId: ObjectId(),
+  data: {
+    name: "Acme Corp",
+    email: "contact@acme.com",
+    phone: "+1234567890",
+    // custom fields...
+  },
+  createdBy: ObjectId(),
+  createdAt: Date,
+  updatedAt: Date,
+  isDeleted: false
+}`;
+---
+
+<MainLayout title="System Architecture | Salesdam Docs" description="Salesdam system architecture overview">
+  <div class="content-wrapper">
+    <h1>System Architecture</h1>
+
+    <p class="intro">Understand the overall structure and components of the Salesdam CRM system.</p>
+
+    <h2>Architecture Overview</h2>
+
+    <div class="ascii-diagram">
+      <pre>
+┌─────────────────────────────────────────────────────────────────┐
+│                        CLIENT LAYER                            │
+│  ┌──────────────────────────────────────────────────────────┐  │
+│  │      React Frontend (SPA)                                │  │
+│  │  • Vite bundler                                          │  │
+│  │  • React 18+ components                                  │  │
+│  │  • React Query for data management                       │  │
+│  │  • React Router for navigation                           │  │
+│  └──────────────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────────┘
+                              ↕
+                        (HTTP/REST API)
+                              ↕
+┌─────────────────────────────────────────────────────────────────┐
+│                       SERVER LAYER                             │
+│  ┌──────────────────────────────────────────────────────────┐  │
+│  │          Express.js REST API Server                      │  │
+│  │  • Route handlers & controllers                          │  │
+│  │  • Middleware (Auth, CORS, Rate Limiting)                │  │
+│  │  • Business logic services                               │  │
+│  │  • Validation & Error handling                           │  │
+│  └──────────────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────────┘
+                              ↕
+┌─────────────────────────────────────────────────────────────────┐
+│                       DATA LAYER                               │
+│  ┌──────────────────────────────────────────────────────────┐  │
+│  │       MongoDB Database                                   │  │
+│  │  • Multi-tenant architecture                             │  │
+│  │  • Collections for objects, users, roles, etc.           │  │
+│  │  • Indexes for performance                               │  │
+│  └──────────────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────────┘
+      </pre>
+    </div>
+
+    <h2>Key Components</h2>
+
+    <h3>Frontend (React)</h3>
+    <ul>
+      <li><strong>Pages:</strong> Main application pages</li>
+      <li><strong>Components:</strong> Reusable UI components</li>
+      <li><strong>Hooks:</strong> Custom React hooks</li>
+      <li><strong>Context:</strong> Global state management (auth, user)</li>
+      <li><strong>Services:</strong> API communication</li>
+      <li><strong>Utils:</strong> Helper functions</li>
+    </ul>
+
+    <h3>Backend (Node.js + Express)</h3>
+    <ul>
+      <li><strong>Routes:</strong> API endpoint definitions</li>
+      <li><strong>Controllers:</strong> Request handlers</li>
+      <li><strong>Services:</strong> Business logic</li>
+      <li><strong>Models:</strong> MongoDB Mongoose schemas</li>
+      <li><strong>Middleware:</strong> Request processing</li>
+      <li><strong>Utils:</strong> Helper functions</li>
+    </ul>
+
+    <h3>Database (MongoDB)</h3>
+    <ul>
+      <li><strong>Collections:</strong> ObjectMeta, FieldMeta, DynamicRecord, User, Role, etc.</li>
+      <li><strong>Multi-tenancy:</strong> All documents include tenantId</li>
+      <li><strong>Flexible Schema:</strong> Dynamic object structure</li>
+    </ul>
+
+    <h2>Multi-Tenant Architecture</h2>
+
+    <p>Salesdam supports multiple organizations (tenants) on a single deployment:</p>
+
+    <ul>
+      <li>Each organization has isolated data</li>
+      <li>All records tagged with tenantId</li>
+      <li>Separate workspaces per tenant</li>
+      <li>Independent object configurations</li>
+      <li>Shared infrastructure reduces costs</li>
+    </ul>
+
+    <div class="diagram-box">
+      <strong>Tenant Isolation</strong>
+      <pre>
+Tenant A          Tenant B          Tenant C
+├─ Users          ├─ Users          ├─ Users
+├─ Objects        ├─ Objects        ├─ Objects
+├─ Records        ├─ Records        ├─ Records
+├─ Workspaces     ├─ Workspaces     ├─ Workspaces
+└─ Roles          └─ Roles          └─ Roles
+
+All in MongoDB with tenantId isolation
+      </pre>
+    </div>
+
+    <h2>Authentication Flow</h2>
+
+    <ol>
+      <li>User enters credentials</li>
+      <li>Backend validates against MongoDB</li>
+      <li>JWT token generated</li>
+      <li>Token stored in browser localStorage</li>
+      <li>Token sent with each API request</li>
+      <li>Middleware verifies JWT</li>
+      <li>User context loaded from database</li>
+    </ol>
+
+    <h2>Object Model Architecture</h2>
+
+    <p>The flexible object model allows customization:</p>
+
+    <ul>
+      <li><strong>ObjectMeta:</strong> Stores object definitions (name, fields, config)</li>
+      <li><strong>FieldMeta:</strong> Stores field definitions (type, validation, relationships)</li>
+      <li><strong>DynamicRecord:</strong> Generic collection for all record types</li>
+      <li><strong>API Routes:</strong> Dynamic routing based on object apiName</li>
+    </ul>
+
+    <div class="code-block">
+      <strong>Record Structure in MongoDB</strong>
+      <pre><code>{recordShape}</code></pre>
+    </div>
+
+    <h2>Data Flow</h2>
+
+    <h3>Creating a Record</h3>
+    <ol>
+      <li>User fills form in React component</li>
+      <li>Form validation on client-side</li>
+      <li>POST request to /records/:object</li>
+      <li>Backend middleware authenticates request</li>
+      <li>Controller validates data</li>
+      <li>Service layer processes business logic</li>
+      <li>MongoDB creates new DynamicRecord</li>
+      <li>Response sent back to client</li>
+      <li>React Query invalidates cache</li>
+      <li>UI updates with new data</li>
+    </ol>
+
+    <h2>Scalability Considerations</h2>
+
+    <ul>
+      <li><strong>Horizontal Scaling:</strong> Multiple backend instances behind load balancer</li>
+      <li><strong>Database Scaling:</strong> MongoDB replication and sharding</li>
+      <li><strong>Caching:</strong> React Query client-side caching</li>
+      <li><strong>CDN:</strong> Frontend assets distributed globally</li>
+      <li><strong>Rate Limiting:</strong> Prevent abuse</li>
+      <li><strong>Pagination:</strong> Handle large datasets</li>
+    </ul>
+
+    <div class="success">
+      <strong>✓ Next:</strong> Learn about <a href="/data-model/objects">the Object Model</a> or <a href="/developer/setup">Developer Setup</a>.
+    </div>
+  </div>
+</MainLayout>

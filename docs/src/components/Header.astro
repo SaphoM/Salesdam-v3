@@ -1,0 +1,271 @@
+---
+import { Menu, Search, Sun, Moon, ExternalLink, BookOpen } from 'lucide-astro';
+
+const appUrl = import.meta.env.PUBLIC_APP_URL || 'http://localhost:5173';
+---
+
+<header class="header">
+  <!-- Drawer toggle. Only rendered as a control on small screens (see CSS), but
+       always in the DOM so the layout script can bind to it unconditionally. -->
+  <button
+    class="icon-btn nav-toggle"
+    data-nav-toggle
+    aria-label="Open navigation"
+    aria-expanded="false"
+    aria-controls="docs-sidebar"
+  >
+    <Menu size={20} />
+  </button>
+
+  <a href="/" class="brand">
+    <BookOpen size={18} class="brand-icon" />
+    <span class="brand-text">Salesdam <span class="brand-thin">Docs</span></span>
+  </a>
+
+  <!-- Desktop: a full search affordance that looks like an input but opens the
+       modal. Keeping it a <button> means it is reachable by keyboard and
+       announced as a button rather than a text field it isn't. -->
+  <button class="search-trigger" data-search-open aria-label="Search documentation">
+    <Search size={15} class="search-icon" />
+    <span class="search-text">Search docs…</span>
+    <kbd class="search-kbd">⌘K</kbd>
+  </button>
+
+  <div class="actions">
+    <button class="icon-btn search-icon-btn" data-search-open aria-label="Search documentation">
+      <Search size={19} />
+    </button>
+
+    <button class="icon-btn" id="theme-toggle" aria-label="Toggle dark mode">
+      <Sun size={18} class="icon-sun" />
+      <Moon size={18} class="icon-moon" />
+    </button>
+
+    <!-- aria-label rather than relying on the text, because the label is hidden
+         below 420px and the link would otherwise be an unnamed icon. -->
+    <a
+      class="app-link"
+      href={appUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label="Open the Salesdam app"
+    >
+      <span class="app-link-text">Open app</span>
+      <ExternalLink size={13} aria-hidden="true" />
+    </a>
+  </div>
+</header>
+
+<script is:inline>
+  // Theme is applied in MainLayout's <head> to avoid a flash; this only toggles.
+  (() => {
+    const btn = document.getElementById('theme-toggle');
+    if (!btn) return;
+    btn.addEventListener('click', () => {
+      const next =
+        document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+      document.documentElement.dataset.theme = next;
+      try {
+        localStorage.setItem('salesdam.docs.theme', next);
+      } catch {
+        // Private browsing — the choice just won't persist.
+      }
+    });
+  })();
+</script>
+
+<style>
+  .header {
+    position: sticky;
+    top: 0;
+    z-index: var(--z-header);
+    height: var(--docs-header-height);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-3);
+    padding: 0 var(--spacing-4);
+    background: var(--surface);
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2);
+    text-decoration: none;
+    color: var(--color-gray-900);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-bold);
+    flex-shrink: 0;
+    letter-spacing: -0.01em;
+  }
+
+  .brand-icon {
+    color: var(--color-primary);
+  }
+
+  .brand-thin {
+    font-weight: var(--font-weight-normal);
+    color: var(--color-gray-500);
+  }
+
+  /* ── Search ─────────────────────────────────────────────────────────────── */
+  .search-trigger {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2);
+    margin-left: var(--spacing-6);
+    padding: 0 var(--spacing-3);
+    height: 34px;
+    width: 100%;
+    max-width: 340px;
+    background: var(--color-gray-50);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    color: var(--color-gray-400);
+    font-family: var(--font-family);
+    font-size: var(--font-size-sm);
+    transition:
+      border-color var(--transition-fast),
+      background var(--transition-fast);
+  }
+
+  .search-trigger:hover {
+    border-color: var(--color-gray-300);
+    background: var(--surface);
+  }
+
+  .search-trigger:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 1px;
+  }
+
+  .search-text {
+    flex: 1;
+    text-align: left;
+  }
+
+  .search-kbd {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    padding: 2px 5px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-sm);
+    background: var(--surface);
+  }
+
+  /* ── Actions ────────────────────────────────────────────────────────────── */
+  .actions {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2);
+    flex-shrink: 0;
+  }
+
+  .icon-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border: 1px solid transparent;
+    border-radius: var(--border-radius);
+    background: none;
+    color: var(--color-gray-500);
+    cursor: pointer;
+    transition:
+      color var(--transition-fast),
+      background var(--transition-fast);
+  }
+
+  .icon-btn:hover {
+    color: var(--color-gray-800);
+    background: var(--color-gray-100);
+  }
+
+  .icon-btn:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 1px;
+  }
+
+  /* One button, two glyphs — whichever matches the active theme is shown. */
+  .icon-moon { display: none; }
+  :global([data-theme='dark']) .icon-sun { display: none; }
+  :global([data-theme='dark']) .icon-moon { display: block; }
+
+  .app-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 0 var(--spacing-3);
+    height: 34px;
+    border-radius: var(--border-radius);
+    background: var(--color-primary);
+    color: #ffffff;
+    text-decoration: none;
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    white-space: nowrap;
+    transition: background var(--transition-fast);
+  }
+
+  .app-link:hover {
+    background: var(--color-primary-hover);
+  }
+
+  /* ── Responsive ─────────────────────────────────────────────────────────── */
+  /* Desktop: the drawer toggle and the compact search icon are unnecessary. */
+  .nav-toggle,
+  .search-icon-btn {
+    display: none;
+  }
+
+  @media (max-width: 1024px) {
+    .nav-toggle {
+      display: flex;
+    }
+  }
+
+  @media (max-width: 720px) {
+    .header {
+      padding: 0 var(--spacing-3);
+      gap: var(--spacing-2);
+    }
+
+    /* Below 720px the full search box would crowd out the brand, so it collapses
+       to an icon that opens the same modal. */
+    .search-trigger {
+      display: none;
+    }
+
+    .search-icon-btn {
+      display: flex;
+    }
+
+    .app-link {
+      padding: 0 var(--spacing-2);
+    }
+  }
+
+  @media (max-width: 420px) {
+    /* Keep the icon row usable on the narrowest screens: the brand's second word
+       and the "Open app" label are the least load-bearing things here. The link
+       keeps its accessible name from the icon's surrounding anchor text being
+       replaced by an explicit title. */
+    .brand-thin {
+      display: none;
+    }
+
+    .app-link-text {
+      display: none;
+    }
+
+    .app-link {
+      width: 34px;
+      padding: 0;
+      justify-content: center;
+    }
+  }
+</style>

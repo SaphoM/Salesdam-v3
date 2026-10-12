@@ -1,0 +1,306 @@
+---
+import MainLayout from '../../layouts/MainLayout.astro';
+---
+
+<MainLayout title="Lead Conversion | Salesdam Docs" description="Converting leads to deals in your sales pipeline">
+  <div class="content-wrapper">
+    <h1>Lead Conversion & Deal Creation</h1>
+
+    <p class="intro">Convert qualified leads into deals to track sales opportunities through the pipeline to close.</p>
+
+    <h2>Lead to Deal Conversion Workflow</h2>
+
+    <div class="workflow-diagram">
+      <div class="workflow-step">
+        <div class="step-number">1</div>
+        <div>Tender/Lead Created</div>
+      </div>
+      <div class="arrow">→</div>
+      <div class="workflow-step">
+        <div class="step-number">2</div>
+        <div>Lead Qualified</div>
+      </div>
+      <div class="arrow">→</div>
+      <div class="workflow-step">
+        <div class="step-number">3</div>
+        <div>Convert to Deal</div>
+      </div>
+      <div class="arrow">→</div>
+      <div class="workflow-step">
+        <div class="step-number">4</div>
+        <div>Deal Stages</div>
+      </div>
+      <div class="arrow">→</div>
+      <div class="workflow-step">
+        <div class="step-number">5</div>
+        <div>Win/Close</div>
+      </div>
+    </div>
+
+    <h2>Lead Status Tracking</h2>
+
+    <table>
+      <tr>
+        <th>Status</th>
+        <th>Description</th>
+        <th>Action</th>
+      </tr>
+      <tr>
+        <td>New</td>
+        <td>Recently added lead</td>
+        <td>Qualify or disqualify</td>
+      </tr>
+      <tr>
+        <td>Contacted</td>
+        <td>Initial contact made</td>
+        <td>Schedule follow-up</td>
+      </tr>
+      <tr>
+        <td>Qualified</td>
+        <td>Meets qualification criteria</td>
+        <td>Convert to deal</td>
+      </tr>
+      <tr>
+        <td>Unqualified</td>
+        <td>Does not meet criteria</td>
+        <td>Archive or nurture</td>
+      </tr>
+      <tr>
+        <td>Converted</td>
+        <td>Successfully converted to deal</td>
+        <td>Track in deal pipeline</td>
+      </tr>
+    </table>
+
+    <h2>Converting Lead to Deal</h2>
+
+    <h3>Method 1: Direct Conversion</h3>
+
+    <ol>
+      <li>Open the lead record from Leads object</li>
+      <li>Click "Convert to Deal" button</li>
+      <li>Fill conversion form:
+        <ul>
+          <li><strong>Client:</strong> Select or create client</li>
+          <li><strong>Deal Name:</strong> Auto-populated from lead title</li>
+          <li><strong>Deal Stage:</strong> Select starting stage (Prospecting, Qualification, Proposal, etc.)</li>
+          <li><strong>Expected Value:</strong> Estimated deal amount</li>
+          <li><strong>Close Date:</strong> Expected close date</li>
+          <li><strong>Sales Rep:</strong> Assigned sales representative</li>
+          <li><strong>Description:</strong> Deal details</li>
+        </ul>
+      </li>
+      <li>Click "Create Deal"</li>
+      <li>Deal created and linked to lead</li>
+      <li>Lead marked as "Converted"</li>
+    </ol>
+
+    <h3>Method 2: Bulk Conversion</h3>
+
+    <ol>
+      <li>Go to Leads list</li>
+      <li>Select multiple "Qualified" leads</li>
+      <li>Click "Bulk Convert" button</li>
+      <li>Set default client and stage</li>
+      <li>Review conversion summary</li>
+      <li>Click "Convert All"</li>
+    </ol>
+
+    <h2>Deal Creation Options</h2>
+
+    <h3>Create Client During Conversion</h3>
+    <ol>
+      <li>During conversion, if client doesn't exist</li>
+      <li>Click "Create New Client"</li>
+      <li>Fill client details (company name, email, phone)</li>
+      <li>Click "Create & Link"</li>
+      <li>Client created and automatically linked</li>
+    </ol>
+
+    <h3>Link Existing Client</h3>
+    <ol>
+      <li>During conversion, click on "Client" field</li>
+      <li>Search for existing client</li>
+      <li>Select from dropdown</li>
+      <li>Proceed with conversion</li>
+    </ol>
+
+    <h2>Deal Stages</h2>
+
+    <p>Track deals through your sales process:</p>
+
+    <table>
+      <tr>
+        <th>Stage</th>
+        <th>Description</th>
+        <th>% of Sales Cycle</th>
+      </tr>
+      <tr>
+        <td>Prospecting</td>
+        <td>Initial research and identification</td>
+        <td>0-10%</td>
+      </tr>
+      <tr>
+        <td>Qualification</td>
+        <td>Verify fit and decision-makers</td>
+        <td>10-25%</td>
+      </tr>
+      <tr>
+        <td>Proposal</td>
+        <td>Quote sent, awaiting response</td>
+        <td>25-60%</td>
+      </tr>
+      <tr>
+        <td>Negotiation</td>
+        <td>Terms and pricing discussion</td>
+        <td>60-85%</td>
+      </tr>
+      <tr>
+        <td>Closing</td>
+        <td>Final approval and contract</td>
+        <td>85-99%</td>
+      </tr>
+      <tr>
+        <td>Won</td>
+        <td>Deal closed successfully</td>
+        <td>100%</td>
+      </tr>
+      <tr>
+        <td>Lost</td>
+        <td>Deal lost to competitor</td>
+        <td>0%</td>
+      </tr>
+    </table>
+
+    <h2>Post-Conversion Workflow</h2>
+
+    <h3>After Deal Created</h3>
+    <ol>
+      <li>Deal appears in Sales Hub deals list</li>
+      <li>Visible in Kanban board by stage</li>
+      <li>Add line items (products/services)</li>
+      <li>Generate quote from deal</li>
+      <li>Track through pipeline stages</li>
+      <li>Update progress and close date</li>
+      <li>Mark as Won when closed</li>
+    </ol>
+
+    <h2>Lead Approval Workflow (Optional)</h2>
+
+    <p>Some organizations require manager approval before conversion:</p>
+
+    <ol>
+      <li>Lead ready for conversion</li>
+      <li>Submit for approval</li>
+      <li>Manager reviews lead quality</li>
+      <li>Manager approves or rejects</li>
+      <li>If approved, auto-convert to deal</li>
+      <li>If rejected, returns to lead queue</li>
+    </ol>
+
+    <div class="note">
+      <strong>💡 Tip:</strong> Set up conversion rules to automatically move leads based on criteria (email opened, page viewed, etc.).
+    </div>
+
+    <h2>Best Practices</h2>
+
+    <ul>
+      <li>✓ Qualify leads thoroughly before conversion</li>
+      <li>✓ Create client if it's a new company</li>
+      <li>✓ Set realistic close dates</li>
+      <li>✓ Assign to responsible sales rep</li>
+      <li>✓ Add context and history in deal notes</li>
+      <li>✓ Use proper deal stage progression</li>
+      <li>✗ Don't convert unqualified leads</li>
+      <li>✗ Don't skip setting close dates</li>
+      <li>✗ Don't leave deals in same stage indefinitely</li>
+    </ul>
+
+    <h2>Next Steps</h2>
+
+    <ul>
+      <li><a href="/features/deal-line-items">Add Deal Line Items</a></li>
+      <li><a href="/features/quotes">Generate Quotes</a></li>
+      <li><a href="/features/orders">Create Orders</a></li>
+    </ul>
+
+    <div class="success">
+      <strong>✓ Conversion Ready!</strong> Qualified leads are now deals in your pipeline. Next: <a href="/features/deal-line-items">Add Line Items</a>.
+    </div>
+  </div>
+</MainLayout>
+
+<style>
+  .workflow-diagram {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin: 30px 0;
+    padding: 20px;
+    background: var(--color-gray-50);
+    border-radius: 8px;
+    overflow-x: auto;
+  }
+
+  .workflow-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 120px;
+    text-align: center;
+  }
+
+  .step-number {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--color-primary);
+    color: var(--surface);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    margin-bottom: 8px;
+    font-size: 18px;
+  }
+
+  .workflow-step div:last-child {
+    font-size: 13px;
+    color: var(--color-gray-700);
+    font-weight: 500;
+  }
+
+  .arrow {
+    font-size: 24px;
+    color: var(--color-gray-300);
+    margin: 0 4px;
+  }
+
+  @media (max-width: 768px) {
+    .workflow-diagram {
+      gap: 8px;
+      padding: 16px;
+    }
+
+    .workflow-step {
+      min-width: 100px;
+    }
+
+    .step-number {
+      width: 36px;
+      height: 36px;
+      font-size: 16px;
+    }
+
+    .workflow-step div:last-child {
+      font-size: 12px;
+    }
+
+    .arrow {
+      font-size: 20px;
+      margin: 0 2px;
+    }
+  }
+</style>

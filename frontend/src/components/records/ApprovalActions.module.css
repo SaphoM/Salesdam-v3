@@ -1,0 +1,52 @@
+.modalContent {
+  padding: 20px;
+}
+
+.modalContent p {
+  margin: 0 0 15px 0;
+  color: #333;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.modalContent p:first-child {
+  margin-bottom: 10px;
+}
+
+.note {
+  background: #f5f5f5;
+  padding: 10px;
+  border-left: 3px solid #6366f1;
+  margin: 15px 0 !important;
+  font-size: 13px;
+  color: #666;
+}
+
+.reasonInput {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: 13px;
+  resize: vertical;
+  margin: 15px 0;
+  box-sizing: border-box;
+}
+
+.reasonInput:focus {
+  outline: none;
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.modalActions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+.modalActions > * {
+  flex: 0 0 auto;
+}

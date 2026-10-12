@@ -1,0 +1,131 @@
+---
+import MainLayout from '../../layouts/MainLayout.astro';
+
+const tree = `Salesdam-v3/
+├── backend/              Express + Mongoose API
+│   ├── app.js            Middleware and every route mount
+│   ├── server.js         Bootstrap only
+│   ├── config/
+│   │   ├── db.js
+│   │   └── objects/      Seed definitions for standard objects
+│   ├── controllers/      Request handling, one per resource
+│   ├── services/         Domain logic (formulaParser, rollupService, …)
+│   ├── models/           Mongoose schemas
+│   ├── middleware/       auth, tenant, permissions, rateLimiter
+│   ├── routes/           Routers, mounted under /api/v1
+│   ├── utils/            errors, validators, logger
+│   └── scripts/          Seeds and one-off migrations
+│
+├── frontend/             React + Vite app
+│   └── src/
+│       ├── layout/       Sidebar, Topbar, Layout shell
+│       ├── pages/        One folder per route
+│       ├── components/   Reusable UI, common/ and feature folders
+│       ├── context/      Auth, Tenant, App providers
+│       ├── services/api/ Typed API wrappers
+│       ├── hooks/
+│       ├── utils/
+│       └── styles/       variables.css (design tokens) + global.css
+│
+├── docs/                 This site (Astro, static)
+│   └── src/
+│       ├── data/         navigation.js, openapi.js, searchIndex.js
+│       ├── components/   Header, Sidebar, SearchModal, ApiExplorer, AccessGate
+│       ├── layouts/      MainLayout.astro
+│       ├── pages/        One .astro file per documentation page
+│       ├── utils/        schema.js — OpenAPI helpers
+│       └── styles/       tokens.css + global.css
+│
+└── landing/              Marketing site (Astro)`;
+
+const LAYERS = [
+  ['routes/', 'Declare paths and attach middleware. No logic.'],
+  ['controllers/', 'Read the request, call services, shape the response. Own the HTTP concerns.'],
+  ['services/', 'Domain logic, independent of HTTP. Unit-testable in isolation.'],
+  ['models/', 'Mongoose schemas and their hooks.'],
+  ['middleware/', 'Cross-cutting concerns: authentication, tenancy, permissions, rate limiting.'],
+];
+---
+
+<MainLayout
+  title="Project Structure"
+  description="How the repository is laid out and which layer owns what."
+>
+  <h1>Project Structure</h1>
+  <p class="lead">
+    One repository, four deployable applications. They share no code — the
+    boundary between them is the HTTP API.
+  </p>
+
+  <pre><code>{tree}</code></pre>
+
+  <h2>Backend layers</h2>
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th>Directory</th><th>Responsibility</th></tr></thead>
+      <tbody>
+        {LAYERS.map(([dir, role]) => (
+          <tr><td><code>{dir}</code></td><td>{role}</td></tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="note">
+    <strong>Every route mount lives in <code>backend/app.js</code>.</strong>
+    <code>server.js</code> is a 14-line bootstrap. If you're looking for the base
+    path a router is served under, <code>app.js</code> is the only place to check.
+  </div>
+
+  <h2>Where the interesting logic lives</h2>
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th>Concern</th><th>File</th></tr></thead>
+      <tbody>
+        <tr><td>Formula parsing and evaluation</td><td><code>services/formulaParser.js</code></td></tr>
+        <tr><td>Formula values on records</td><td><code>services/formulaService.js</code></td></tr>
+        <tr><td>Rollup aggregation</td><td><code>services/rollupService.js</code></td></tr>
+        <tr><td>Field validation</td><td><code>services/validationService.js</code></td></tr>
+        <tr><td>Structured validation engine</td><td><code>services/validationEngine.js</code></td></tr>
+        <tr><td>List-view filters and operators</td><td><code>services/listViewService.js</code></td></tr>
+        <tr><td>Auth and API keys</td><td><code>middleware/auth.js</code></td></tr>
+        <tr><td>Object and field metadata</td><td><code>models/ObjectMeta.js</code>, <code>models/FieldMeta.js</code></td></tr>
+        <tr><td>Record storage</td><td><code>models/DynamicRecord.js</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>Frontend conventions</h2>
+  <ul>
+    <li>
+      One folder per component or page, containing <code>X.jsx</code> and
+      <code>X.module.css</code>, imported as
+      <code>import styles from './X.module.css'</code>.
+    </li>
+    <li>
+      All colours, spacing and radii come from tokens in
+      <code>src/styles/variables.css</code>. Using a raw hex loses dark mode, which
+      is defined as a token override on <code>[data-theme='dark']</code>.
+    </li>
+    <li>
+      API calls go through <code>src/services/api/</code> rather than calling
+      <code>fetch</code> from a component.
+    </li>
+    <li>Server state is React Query; UI state is context or local state.</li>
+  </ul>
+
+  <h2>The metadata model</h2>
+  <p>
+    Records are not stored in per-object collections. <code>ObjectMeta</code> and
+    <code>FieldMeta</code> describe what an object <em>is</em>, and every record of
+    every object lives in <code>DynamicRecord</code> with its values in a
+    <code>data</code> map. That is why one set of endpoints serves custom and
+    standard objects alike, and why adding a field requires no migration.
+  </p>
+
+  <div class="note">
+    <strong>The storage shape is not the wire shape.</strong> Values live under
+    <code>data</code> in MongoDB but are flattened to top-level keys in API
+    responses. Don't send <code>{'{ data: { … } }'}</code> to the record endpoints.
+  </div>
+</MainLayout>

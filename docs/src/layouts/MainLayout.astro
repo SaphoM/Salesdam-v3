@@ -1,0 +1,280 @@
+---
+import { ArrowLeft, ArrowRight } from 'lucide-astro';
+import Header from '../components/Header.astro';
+import Sidebar from '../components/Sidebar.astro';
+import SearchModal from '../components/SearchModal.astro';
+import AccessGate from '../components/AccessGate.astro';
+import { siblings } from '../data/navigation.js';
+import '../styles/tokens.css';
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description } = Astro.props;
+
+const current =
+  Astro.url.pathname !== '/' ? Astro.url.pathname.replace(/\/$/, '') : '/';
+const { prev, next } = siblings(current);
+
+// A key-gated build is private, so keep it out of search indexes too. Read here
+// rather than in AccessGate because a child component can't inject into <head>.
+const isGated = (import.meta.env.DOCS_ACCESS_KEY || '').trim().length > 0;
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description || 'Salesdam CRM developer documentation'} />
+    <title>{title} | Salesdam Docs</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    {isGated && <meta name="robots" content="noindex, nofollow" />}
+
+    <script is:inline>
+      // Applied before first paint so a dark-mode reader never sees a white
+      // flash. Inline and synchronous on purpose — deferring this is what causes
+      // the flash it exists to prevent.
+      (() => {
+        try {
+          const saved = localStorage.getItem('salesdam.docs.theme');
+          const theme =
+            saved ||
+            (window.matchMedia('(prefers-color-scheme: dark)').matches
+              ? 'dark'
+              : 'light');
+          document.documentElement.dataset.theme = theme;
+        } catch {
+          document.documentElement.dataset.theme = 'light';
+        }
+      })();
+    </script>
+  </head>
+
+  <body>
+    <AccessGate />
+
+    <a href="#docs-content" class="skip-link">Skip to content</a>
+
+    <Header />
+
+    <div class="shell">
+      <Sidebar />
+
+      <!-- Scrim: closes the drawer on tap and dims the page behind it. Not
+           focusable, since Escape and the close button already handle keyboards. -->
+      <div class="scrim" data-nav-close aria-hidden="true"></div>
+
+      <main id="docs-content" class="content">
+        <slot />
+
+        {(prev || next) && (
+          <nav class="pager" aria-label="Previous and next page">
+            {prev ? (
+              <a href={prev.path} class="pager-link pager-prev">
+                <ArrowLeft size={14} />
+                <span>
+                  <span class="pager-label">Previous</span>
+                  <span class="pager-title">{prev.title}</span>
+                </span>
+              </a>
+            ) : <span />}
+            {next && (
+              <a href={next.path} class="pager-link pager-next">
+                <span>
+                  <span class="pager-label">Next</span>
+                  <span class="pager-title">{next.title}</span>
+                </span>
+                <ArrowRight size={14} />
+              </a>
+            )}
+          </nav>
+        )}
+      </main>
+    </div>
+
+    <SearchModal />
+
+    <script is:inline>
+      // Drawer control. Kept in the layout so Header and Sidebar stay presentational
+      // and neither needs to know the other exists.
+      (() => {
+        const body = document.body;
+        const toggles = document.querySelectorAll('[data-nav-toggle]');
+        const closers = document.querySelectorAll('[data-nav-close]');
+        const sidebar = document.getElementById('docs-sidebar');
+
+        const setOpen = (open) => {
+          body.classList.toggle('nav-open', open);
+          // Lock the page behind the drawer, or a scroll gesture drags the
+          // content instead of the nav.
+          body.style.overflow = open ? 'hidden' : '';
+          toggles.forEach((t) => t.setAttribute('aria-expanded', String(open)));
+          if (open) sidebar?.querySelector('a, button')?.focus();
+        };
+
+        toggles.forEach((t) =>
+          t.addEventListener('click', () =>
+            setOpen(!body.classList.contains('nav-open')),
+          ),
+        );
+        closers.forEach((c) => c.addEventListener('click', () => setOpen(false)));
+
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape' && body.classList.contains('nav-open')) {
+            setOpen(false);
+            document.querySelector('[data-nav-toggle]')?.focus();
+          }
+        });
+
+        // Following a link inside the drawer should dismiss it, otherwise the new
+        // page loads with the nav still covering it.
+        sidebar?.addEventListener('click', (e) => {
+          if (e.target.closest('a')) setOpen(false);
+        });
+
+        // Returning to a desktop width must clear the locked scroll, or the page
+        // is left unscrollable with no visible drawer to close.
+        const wide = window.matchMedia('(min-width: 1025px)');
+        wide.addEventListener('change', (e) => {
+          if (e.matches) setOpen(false);
+        });
+      })();
+    </script>
+  </body>
+</html>
+
+<style>
+  .skip-link {
+    position: absolute;
+    left: -9999px;
+    top: 0;
+    z-index: var(--z-modal);
+    padding: var(--spacing-2) var(--spacing-4);
+    background: var(--color-primary);
+    color: #fff;
+    border-radius: 0 0 var(--border-radius) 0;
+    font-size: var(--font-size-sm);
+  }
+
+  .skip-link:focus {
+    left: 0;
+  }
+
+  .shell {
+    display: flex;
+    align-items: flex-start;
+    min-height: calc(100vh - var(--docs-header-height));
+  }
+
+  /* Fills the space left of the sidebar. Deliberately uncapped: a max-width here
+     left an empty gutter down the right-hand side on wide screens, because the
+     column is flex-start aligned rather than centred. */
+  .content {
+    flex: 1;
+    min-width: 0;
+    padding: var(--spacing-8) var(--spacing-8) var(--spacing-16);
+    width: 100%;
+  }
+
+  .scrim {
+    display: none;
+  }
+
+  /* ── Pager ──────────────────────────────────────────────────────────────── */
+  .pager {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--spacing-3);
+    margin-top: var(--spacing-12);
+    padding-top: var(--spacing-5);
+    border-top: 1px solid var(--border-color);
+  }
+
+  .pager-link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-3);
+    padding: var(--spacing-3) var(--spacing-4);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-md);
+    text-decoration: none;
+    color: var(--color-gray-700);
+    background: var(--surface);
+    max-width: 48%;
+    transition:
+      border-color var(--transition-fast),
+      box-shadow var(--transition-fast);
+  }
+
+  .pager-link:hover {
+    border-color: var(--color-primary);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .pager-next {
+    margin-left: auto;
+    text-align: right;
+  }
+
+  .pager-label {
+    display: block;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-gray-400);
+  }
+
+  .pager-title {
+    display: block;
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-gray-800);
+  }
+
+  /* ── Responsive ─────────────────────────────────────────────────────────── */
+  @media (max-width: 1024px) {
+    .content {
+      padding: var(--spacing-6) var(--spacing-5) var(--spacing-12);
+    }
+
+    .scrim {
+      display: block;
+      position: fixed;
+      inset: 0;
+      z-index: calc(var(--z-drawer) - 1);
+      background: rgba(15, 23, 42, 0.45);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity var(--transition-base);
+    }
+
+    :global(body.nav-open) .scrim {
+      opacity: 1;
+      pointer-events: auto;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .content {
+      padding: var(--spacing-5) var(--spacing-4) var(--spacing-10);
+    }
+
+    /* Two side-by-side pager cards don't fit; stack them and let each be full
+       width so the titles stay readable. */
+    .pager {
+      flex-direction: column;
+    }
+
+    .pager-link {
+      max-width: none;
+    }
+
+    .pager-next {
+      margin-left: 0;
+    }
+  }
+</style>

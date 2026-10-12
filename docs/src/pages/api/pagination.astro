@@ -1,0 +1,210 @@
+---
+import MainLayout from '../../layouts/MainLayout.astro';
+
+// Operator list mirrors OPERATORS in backend/services/listViewService.js, which
+// rejects anything not on it. RANGE_NAMES likewise.
+const OPERATORS = [
+  ['eq', 'Equals', 'Any'],
+  ['ne', 'Not equal', 'Any'],
+  ['contains', 'Substring match, case-insensitive', 'Text'],
+  ['not_contains', 'Does not contain the substring', 'Text'],
+  ['starts_with', 'Begins with', 'Text'],
+  ['ends_with', 'Ends with', 'Text'],
+  ['gt', 'Greater than', 'Number, date'],
+  ['gte', 'Greater than or equal', 'Number, date'],
+  ['lt', 'Less than', 'Number, date'],
+  ['lte', 'Less than or equal', 'Number, date'],
+  ['in', 'Matches any value in the list', 'Picklist, text'],
+  ['not_in', 'Matches none of the values', 'Picklist, text'],
+  ['is_empty', 'Null, missing or empty string — takes no value', 'Any'],
+  ['is_not_empty', 'Has a value — takes no value', 'Any'],
+  ['is_true', 'Checkbox is ticked — takes no value', 'Boolean'],
+  ['is_false', 'Checkbox is not ticked — takes no value', 'Boolean'],
+  ['date_is', 'Falls on the date, or within a named range', 'Date'],
+  ['date_before', 'Before the date or range', 'Date'],
+  ['date_after', 'After the date or range', 'Date'],
+];
+
+const RANGES = [
+  'today', 'yesterday', 'tomorrow', 'this_week',
+  'next_7_days', 'last_7_days', 'this_month', 'this_year',
+];
+
+const basic = `GET /api/v1/records/deal?page=2&limit=25&sort=-amount`;
+
+const paginationBlock = `{
+  "success": true,
+  "message": "Success",
+  "data": [ /* 25 records */ ],
+  "pagination": {
+    "total": 137,
+    "page": 2,
+    "limit": 25,
+    "totalPages": 6,
+    "hasNext": true,
+    "hasPrev": true
+  }
+}`;
+
+const filterExample = `[
+  { "field": "stage",       "operator": "in",         "value": ["won", "closed"] },
+  { "field": "amount",      "operator": "gte",        "value": 100000 },
+  { "field": "close_date",  "operator": "date_after", "value": "this_month" },
+  { "field": "description", "operator": "is_not_empty" }
+]`;
+
+const filterCall = `const filter = [
+  { field: 'stage',  operator: 'in',  value: ['won', 'closed'] },
+  { field: 'amount', operator: 'gte', value: 100000 },
+];
+
+const url = \`/api/v1/records/deal?filter=\${encodeURIComponent(JSON.stringify(filter))}\`;`;
+
+const pageLoop = `async function* allRecords(objectApiName, limit = 200) {
+  let page = 1;
+  while (true) {
+    const res = await fetch(
+      \`/api/v1/records/\${objectApiName}?page=\${page}&limit=\${limit}&sort=_id\`,
+      { headers: { 'X-API-Key': key } },
+    );
+    const { data, pagination } = await res.json();
+    yield* data;
+    // Trust hasNext rather than comparing lengths — a page can be short if
+    // records are filtered out by access rules.
+    if (!pagination?.hasNext) return;
+    page += 1;
+  }
+}`;
+---
+
+<MainLayout
+  title="Pagination & Filtering"
+  description="page, limit, sort, search, filter and saved views on list endpoints."
+>
+  <h1>Pagination &amp; Filtering</h1>
+  <p class="lead">
+    List endpoints take the same five query parameters:
+    <code>page</code>, <code>limit</code>, <code>sort</code>,
+    <code>search</code> and <code>filter</code> — plus <code>view</code> to apply a
+    saved view.
+  </p>
+
+  <h2>Paging</h2>
+  <pre><code>{basic}</code></pre>
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th>Parameter</th><th>Default</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td><code>page</code></td><td><code>1</code></td><td>1-based.</td></tr>
+        <tr><td><code>limit</code></td><td><code>50</code></td><td>Records per page.</td></tr>
+        <tr>
+          <td><code>sort</code></td>
+          <td><code>-createdAt</code></td>
+          <td>Field API name. Prefix with <code>-</code> for descending.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>Every list response carries a <code>pagination</code> block:</p>
+  <pre><code>{paginationBlock}</code></pre>
+
+  <div class="note">
+    <strong>Loop on <code>hasNext</code>, not on page count or array length.</strong>
+    Results are filtered by what the caller may see, so a page can come back
+    shorter than <code>limit</code> while more pages remain.
+  </div>
+
+  <h2>Search</h2>
+  <p>
+    <code>search</code> does a free-text match across the object's searchable
+    fields. It is the same matching the app's list-view search box uses. For
+    cross-object search, use <code>GET /search</code> instead.
+  </p>
+  <pre><code>GET /api/v1/records/client?search=acme</code></pre>
+
+  <h2>Filtering</h2>
+  <p>
+    <code>filter</code> is a URL-encoded JSON <strong>array of conditions</strong>,
+    combined with AND. Each condition is
+    <code>{'{ field, operator, value }'}</code>:
+  </p>
+  <pre><code>{filterExample}</code></pre>
+  <pre><code>{filterCall}</code></pre>
+
+  <div class="warning">
+    <strong>Operators are a whitelist.</strong> An unrecognised operator makes the
+    condition invalid, and invalid conditions are <em>skipped</em> rather than
+    erroring — so a typo silently widens your result set instead of failing. Check
+    the operator names below if a filter returns more than you expect.
+  </div>
+
+  <h3>Operators</h3>
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th>Operator</th><th>Matches</th><th>Field types</th></tr></thead>
+      <tbody>
+        {OPERATORS.map(([op, meaning, types]) => (
+          <tr>
+            <td><code>{op}</code></td>
+            <td>{meaning}</td>
+            <td>{types}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Relative date ranges</h3>
+  <p>
+    The date operators accept a named range in place of a literal date, which
+    avoids computing boundaries client-side and getting the timezone wrong:
+  </p>
+  <p class="ranges">{RANGES.map((r) => <code>{r}</code>)}</p>
+  <pre><code>{'{ "field": "close_date", "operator": "date_is", "value": "this_week" }'}</code></pre>
+
+  <h3>Root fields</h3>
+  <p>
+    Filters can target the record's own columns as well as its field values:
+    <code>_id</code>, <code>createdAt</code>, <code>updatedAt</code> and
+    <code>ownerId</code>. Use them unprefixed, exactly like a field API name.
+  </p>
+
+  <div class="note">
+    <strong>Operands are coerced to the field's stored type.</strong> A filter of
+    <code>"100"</code> against a currency field is compared as the number
+    <code>100</code>, and a date string as a Date — otherwise a string would never
+    match a stored number and numeric filters would silently return nothing.
+  </div>
+
+  <h2>Saved views</h2>
+  <p>
+    <code>view</code> applies a saved view's columns, filter and sort in one go:
+  </p>
+  <pre><code>GET /api/v1/records/deal?view=open-deals-over-100k</code></pre>
+  <p>
+    Manage views through <code>/list-views/:objectApiName</code>. A view is the
+    better home for a filter your integration uses repeatedly — it keeps the
+    definition in one place instead of in every caller.
+  </p>
+
+  <h2>Reading everything</h2>
+  <p>
+    Page with a large <code>limit</code> and a stable <code>sort</code>. Sorting on
+    a mutable field lets records shift between pages while you iterate, so you may
+    see one twice or miss one entirely; <code>_id</code> is stable:
+  </p>
+  <pre><code>{pageLoop}</code></pre>
+  <p>
+    For a genuine bulk export, <code>GET /records/:objectApiName/export</code>
+    streams CSV in one request and costs one unit of rate limit.
+  </p>
+</MainLayout>
+
+<style>
+  .ranges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-2);
+  }
+</style>

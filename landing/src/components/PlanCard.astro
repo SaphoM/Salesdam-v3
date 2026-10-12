@@ -1,0 +1,130 @@
+---
+const { name, price, users, features, popular = false, featured = false } = Astro.props;
+const isHighlighted = popular || featured;
+---
+
+<div class={`plan-card ${isHighlighted ? 'popular' : ''}`}>
+  {isHighlighted && <div class="popular-badge">Most Popular</div>}
+
+  <h3 class="plan-name">{name}</h3>
+  <div class="plan-price">
+    <span class="currency">R</span>
+    <span class="amount">{price}</span>
+    <span class="period">/month</span>
+  </div>
+  <p class="plan-users">{users}</p>
+
+  <ul class="plan-features">
+    {features.map(feature => (
+      <li>
+        <svg class="check-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <path d="M16.6667 5L7.50004 14.1667L3.33337 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        {feature}
+      </li>
+    ))}
+  </ul>
+
+  <a href="http://localhost:3000/register" class={`btn ${isHighlighted ? 'btn-primary' : 'btn-secondary'}`}>
+    Get Started
+  </a>
+</div>
+
+<style>
+  .plan-card {
+    background: var(--card-bg);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s;
+    position: relative;
+  }
+
+  .plan-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .plan-card.popular {
+    border-color: var(--primary);
+    box-shadow: var(--shadow-lg);
+    transform: scale(1.02);
+  }
+
+  .popular-badge {
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--primary);
+    color: white;
+    padding: 4px 16px;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+
+  .plan-name {
+    font-size: 1.5rem;
+    margin-bottom: 16px;
+    color: var(--text);
+  }
+
+  .plan-price {
+    display: flex;
+    align-items: baseline;
+    margin-bottom: 8px;
+  }
+
+  .currency {
+    font-size: 1.5rem;
+    color: var(--text-secondary);
+    margin-right: 4px;
+  }
+
+  .amount {
+    font-size: 3rem;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .period {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    margin-left: 4px;
+  }
+
+  .plan-users {
+    color: var(--text-secondary);
+    margin-bottom: 24px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .plan-features {
+    list-style: none;
+    margin-bottom: 32px;
+    flex: 1;
+  }
+
+  .plan-features li {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 12px;
+    color: var(--text-secondary);
+  }
+
+  .check-icon {
+    color: var(--primary);
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .btn {
+    width: 100%;
+    text-align: center;
+  }
+</style>

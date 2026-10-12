@@ -1,0 +1,210 @@
+/* ── Shimmer keyframe ── */
+@keyframes shimmer {
+  0% {
+    background-position: -600px 0;
+  }
+  100% {
+    background-position: 600px 0;
+  }
+}
+
+/* ── Base shimmer class ── */
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--color-gray-200) 25%,
+    var(--color-gray-100) 50%,
+    var(--color-gray-200) 75%
+  );
+  background-size: 1200px 100%;
+  animation: shimmer 1.6s infinite linear;
+  border-radius: var(--border-radius);
+}
+
+/* ── Wrapper ── */
+.skeleton {
+  width: 100%;
+  padding: var(--spacing-8);
+  box-sizing: border-box;
+}
+
+/* ── Page header ── */
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--spacing-4);
+  margin-bottom: var(--spacing-8);
+}
+
+.titleBlock {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.titleLine {
+  width: 220px;
+  height: 28px;
+  border-radius: var(--border-radius-md);
+}
+
+.subtitleLine {
+  width: 140px;
+  height: 16px;
+  border-radius: var(--border-radius);
+}
+
+.headerAction {
+  width: 110px;
+  height: 36px;
+  border-radius: var(--border-radius-md);
+  flex-shrink: 0;
+}
+
+/* ── 2×2 grid ── */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(2, auto);
+  gap: var(--spacing-6);
+}
+
+/* ── Card ── */
+.card {
+  background: var(--color-white);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: var(--spacing-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-5);
+  overflow: hidden;
+}
+
+/* ── Card header ── */
+.cardHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-4);
+}
+
+.cardIcon {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--border-radius-md);
+  flex-shrink: 0;
+}
+
+.cardMeta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+  flex: 1;
+}
+
+.cardLabel {
+  width: 80px;
+  height: 12px;
+  border-radius: var(--border-radius);
+}
+
+.cardValue {
+  width: 120px;
+  height: 22px;
+  border-radius: var(--border-radius);
+}
+
+/* ── Card body ── */
+.cardBody {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+.chartBar {
+  width: 100%;
+  border-radius: var(--border-radius-md);
+}
+
+.chartRows {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+}
+
+.chartRow {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+}
+
+.chartLabel {
+  width: 56px;
+  height: 10px;
+  flex-shrink: 0;
+  border-radius: var(--border-radius);
+}
+
+.chartLine {
+  height: 10px;
+  border-radius: var(--border-radius-full);
+  min-width: 24px;
+}
+
+/* ── Card footer ── */
+.cardFooter {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  padding-top: var(--spacing-3);
+  border-top: 1px solid var(--border-color);
+}
+
+.footerBadge {
+  width: 52px;
+  height: 20px;
+  border-radius: var(--border-radius-full);
+}
+
+.footerText {
+  width: 100px;
+  height: 12px;
+  border-radius: var(--border-radius);
+}
+
+/* ── Responsive: single column on small screens ── */
+@media (max-width: 640px) {
+  .skeleton {
+    padding: var(--spacing-4);
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-4);
+  }
+
+  .header {
+    flex-direction: column;
+    gap: var(--spacing-3);
+  }
+
+  .headerAction {
+    width: 90px;
+    height: 32px;
+  }
+
+  .titleLine {
+    width: 180px;
+  }
+
+  .cardIcon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .cardValue {
+    width: 90px;
+  }
+}

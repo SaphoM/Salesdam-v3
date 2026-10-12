@@ -1,0 +1,304 @@
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px;
+  background: var(--color-white, #ffffff);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: var(--border-radius-lg, 12px);
+}
+
+/* Feature toggle */
+
+.featureToggleCard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 16px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.featureToggleInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.featureToggleLabel {
+  display: block;
+  margin: 0 0 6px;
+  color: #1e293b;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.featureToggleDesc {
+  margin: 0;
+  color: #64748b;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* Toggle switch */
+
+.toggle {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  width: 44px;
+  height: 24px;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.toggle input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.toggleSlider {
+  position: relative;
+  display: block;
+  width: 44px;
+  height: 24px;
+  border-radius: 24px;
+  background: #cbd5e1;
+  transition:
+    background-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.toggleSlider::before {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s ease;
+}
+
+.toggle input:checked + .toggleSlider {
+  background: #10b981;
+}
+
+.toggle input:checked + .toggleSlider::before {
+  transform: translateX(20px);
+}
+
+.toggle input:focus-visible + .toggleSlider {
+  outline: 2px solid #10b981;
+  outline-offset: 2px;
+}
+
+/* Approvers section */
+
+.approversSection {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.approversHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+  color: #1e293b;
+  font-size: 14px;
+}
+
+.approversHeader svg {
+  flex-shrink: 0;
+}
+
+.addApproverRow {
+  max-width: 420px;
+  margin: 12px 0 16px;
+}
+
+.approversList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 420px;
+}
+
+.emptyApprovers {
+  margin: 0;
+  padding: 12px;
+  border: 1px dashed #e2e8f0;
+  border-radius: 8px;
+  color: #94a3b8;
+  font-size: 13px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+/* Approver item */
+
+.approverItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #f9fafb;
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.approverItem:hover {
+  border-color: #cbd5e1;
+  background: #f8fafc;
+}
+
+.approverInfo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.approverAvatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: #244c64;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.approverName {
+  overflow: hidden;
+  color: #1e293b;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.4;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.approverEmail {
+  overflow: hidden;
+  color: #64748b;
+  font-size: 12px;
+  line-height: 1.4;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Remove approver button */
+
+.removeApproverBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  flex-shrink: 0;
+  padding: 0;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: #94a3b8;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.removeApproverBtn:hover:not(:disabled) {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.removeApproverBtn:focus-visible {
+  outline: 2px solid #94a3b8;
+  outline-offset: 2px;
+}
+
+.removeApproverBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Responsive */
+
+@media (max-width: 640px) {
+  .panel {
+    padding: 16px;
+  }
+
+  .featureToggleCard {
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .featureToggleLabel {
+    font-size: 13px;
+  }
+
+  .featureToggleDesc {
+    font-size: 12px;
+  }
+
+  .approversSection {
+    margin-top: 20px;
+    padding-top: 16px;
+  }
+
+  .addApproverRow {
+    max-width: none;
+  }
+
+  .approverItem {
+    padding: 10px 12px;
+  }
+
+  .approverInfo {
+    min-width: 0;
+  }
+
+  .approverName,
+  .approverEmail {
+    max-width: 200px;
+  }
+}
+
+@media (max-width: 400px) {
+  .featureToggleCard {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .toggle {
+    align-self: flex-end;
+  }
+
+  .approverName,
+  .approverEmail {
+    max-width: 160px;
+  }
+}

@@ -1,0 +1,568 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import FeatureCard from '../components/FeatureCard.astro';
+import PlanCard from '../components/PlanCard.astro';
+import { Target, Zap, BarChart3, Users, Shield, RefreshCw, Mail, Sparkles } from 'lucide-astro';
+---
+
+<BaseLayout
+  title="Mini CRM — The CRM Built for Growth"
+  description="Build powerful customer relationships with Mini CRM. Custom objects, automation, analytics, and AI onboarding. Start building in minutes."
+>
+  <Header />
+
+  <main>
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="container">
+        <div class="hero-content">
+          <h1 class="hero-title">The CRM Platform Built for Growth</h1>
+          <p class="hero-subtitle">
+            Mini CRM delivers enterprise-grade customer relationship management with custom objects,
+            automation workflows, analytics dashboards, and multi-tenant architecture. Built for teams
+            that need flexibility without complexity.
+          </p>
+          <div class="hero-buttons">
+            <a href="http://localhost:3000/register" class="btn btn-primary btn-large">Get Started Free</a>
+            <a href="#features" class="btn btn-secondary btn-large">View Demo</a>
+          </div>
+          <p class="hero-note">No credit card required. Start building in minutes.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Social Proof Section -->
+    <section class="section social-proof">
+      <div class="container">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-value">500+</div>
+            <div class="stat-label">Companies</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">50K+</div>
+            <div class="stat-label">Records Managed</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">99.9%</div>
+            <div class="stat-label">Uptime</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">R695</div>
+            <div class="stat-label">Starting Price/mo</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="section features" id="features">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-label">Platform Features</span>
+          <h2 class="section-title">Everything You Need to Manage Customer Relationships</h2>
+          <p class="section-subtitle">
+            Mini CRM combines powerful features with intuitive design, giving you the tools
+            to customize your CRM exactly how you need it.
+          </p>
+        </div>
+
+        <div class="features-grid">
+          <FeatureCard
+            title="Custom Objects & Fields"
+            description="Build your data model with custom objects, fields, and relationships. Support for text, number, date, lookup, master-detail, and more field types."
+            iconColor="#0066FF"
+          >
+            <Target slot="icon" size={28} strokeWidth={2} />
+          </FeatureCard>
+          <FeatureCard
+            title="Automation Flows"
+            description="Design visual automation workflows with triggers, conditions, and actions. Automate record creation, updates, emails, and webhooks."
+            iconColor="#f59e0b"
+          >
+            <Zap slot="icon" size={28} strokeWidth={2} />
+          </FeatureCard>
+          <FeatureCard
+            title="Analytics & Dashboards"
+            description="Create interactive dashboards with charts, metrics, and tables. Real-time insights into your business with customizable widgets."
+            iconColor="#6366f1"
+          >
+            <BarChart3 slot="icon" size={28} strokeWidth={2} />
+          </FeatureCard>
+          <FeatureCard
+            title="Multi-Tenant Workspaces"
+            description="Isolated workspaces for each customer with complete data separation. Perfect for SaaS applications and agencies."
+            iconColor="#10b981"
+          >
+            <Users slot="icon" size={28} strokeWidth={2} />
+          </FeatureCard>
+          <FeatureCard
+            title="Role-Based Access Control"
+            description="Define custom roles with granular permissions. Control who can view, create, edit, and delete records at the field level."
+            iconColor="#9333ea"
+          >
+            <Shield slot="icon" size={28} strokeWidth={2} />
+          </FeatureCard>
+          <FeatureCard
+            title="API & Integrations"
+            description="RESTful API with authentication tokens. Connect to external systems with webhooks, API calls, and custom integrations."
+            iconColor="#0891b2"
+          >
+            <RefreshCw slot="icon" size={28} strokeWidth={2} />
+          </FeatureCard>
+          <FeatureCard
+            title="Email Templates"
+            description="Design beautiful email templates with dynamic field merging. Send automated emails based on workflow triggers."
+            iconColor="#ec4899"
+          >
+            <Mail slot="icon" size={28} strokeWidth={2} />
+          </FeatureCard>
+          <FeatureCard
+            title="AI-Powered Onboarding"
+            description="Get started quickly with AI-assisted workspace setup. Generate sample data, objects, and workflows automatically."
+            iconColor="#f97316"
+          >
+            <Sparkles slot="icon" size={28} strokeWidth={2} />
+          </FeatureCard>
+        </div>
+      </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section class="section how-it-works">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-label">Simple Setup</span>
+          <h2 class="section-title">How It Works</h2>
+          <p class="section-subtitle">Get up and running in minutes with our intuitive setup process</p>
+        </div>
+
+        <div class="steps-grid">
+          <div class="step">
+            <div class="step-number">1</div>
+            <h3>Create Your Workspace</h3>
+            <p>Sign up and create your multi-tenant workspace. Set your workspace name and configure basic settings.</p>
+          </div>
+          <div class="step">
+            <div class="step-number">2</div>
+            <h3>Build Your Objects</h3>
+            <p>Use the visual schema builder to create custom objects and fields. Define relationships and validation rules.</p>
+          </div>
+          <div class="step">
+            <div class="step-number">3</div>
+            <h3>Add Your Team</h3>
+            <p>Invite users and assign roles. Configure permissions to control access to objects and records.</p>
+          </div>
+          <div class="step">
+            <div class="step-number">4</div>
+            <h3>Automate & Analyze</h3>
+            <p>Build automation flows and create dashboards. Let Mini CRM work for you while you focus on customers.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section class="section pricing" id="pricing">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-label">Pricing</span>
+          <h2 class="section-title">Simple, Transparent Pricing</h2>
+          <p class="section-subtitle">
+            Choose the plan that fits your team size and needs. All plans include core features.
+          </p>
+        </div>
+
+        <div class="pricing-grid">
+          <PlanCard
+            name="Starter"
+            price="495"
+            users="1 user included"
+            features={[
+              'Up to 5 custom objects',
+              '1,000 records',
+              'Basic automation flows',
+              '3 dashboards',
+              'Email support',
+              'API access'
+            ]}
+          />
+          <PlanCard
+            name="Basic"
+            price="695"
+            users="3 users included"
+            features={[
+              'Up to 15 custom objects',
+              '10,000 records',
+              'Advanced automation',
+              'Unlimited dashboards',
+              'Priority email support',
+              'API access',
+              'Custom roles'
+            ]}
+          />
+          <PlanCard
+            name="Standard"
+            price="1485"
+            users="10 users included"
+            featured={true}
+            features={[
+              'Unlimited custom objects',
+              '100,000 records',
+              'Advanced automation',
+              'Unlimited dashboards',
+              'Priority support',
+              'API access',
+              'Custom roles & permissions',
+              'Email templates'
+            ]}
+          />
+          <PlanCard
+            name="Enterprise"
+            price="2805"
+            users="20 users included"
+            features={[
+              'Everything in Standard',
+              'Unlimited records',
+              'AI onboarding assistant',
+              'Dedicated support',
+              'Custom integrations',
+              'SLA guarantees',
+              'Advanced security',
+              'White-label options'
+            ]}
+          />
+        </div>
+      </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="section testimonials">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-label">Testimonials</span>
+          <h2 class="section-title">Trusted by Growing Teams</h2>
+          <p class="section-subtitle">See what our customers are saying about Mini CRM</p>
+        </div>
+
+        <div class="testimonials-grid">
+          <div class="testimonial">
+            <p class="testimonial-text">
+              "Mini CRM transformed how we manage customer data. The custom object builder is incredibly
+              powerful, and automation flows save us hours every week."
+            </p>
+            <div class="testimonial-author">
+              <strong>Sarah Johnson</strong>
+              <span>Operations Manager, TechStart Inc</span>
+            </div>
+          </div>
+          <div class="testimonial">
+            <p class="testimonial-text">
+              "We switched from Salesforce to Mini CRM and haven't looked back. It's more affordable,
+              easier to customize, and the multi-tenant architecture is perfect for our agency."
+            </p>
+            <div class="testimonial-author">
+              <strong>Michael Chen</strong>
+              <span>Founder, Digital Solutions Agency</span>
+            </div>
+          </div>
+          <div class="testimonial">
+            <p class="testimonial-text">
+              "The role-based access control is exactly what we needed. We can give clients access to
+              their data without worrying about security. Outstanding platform."
+            </p>
+            <div class="testimonial-author">
+              <strong>Emma Williams</strong>
+              <span>CTO, CloudServe</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="section cta-section">
+      <div class="container">
+        <div class="cta-content">
+          <h2>Ready to Transform Your Customer Management?</h2>
+          <p>Join hundreds of teams using Mini CRM to build better customer relationships.</p>
+          <div class="cta-buttons">
+            <a href="http://localhost:3000/register" class="btn btn-primary btn-large">Start Free Trial</a>
+            <a href="/getting-started" class="btn btn-secondary btn-large">View Getting Started Guide</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <Footer />
+</BaseLayout>
+
+<style>
+  /* Hero Section */
+  .hero {
+    padding: 140px 0 100px;
+    background: linear-gradient(135deg, #0066FF 0%, #0052CC 100%);
+    color: white;
+    position: relative;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at 20% 50%, rgba(255,255,255,0.1) 0%, transparent 50%),
+      radial-gradient(circle at 80% 80%, rgba(255,255,255,0.08) 0%, transparent 50%);
+    pointer-events: none;
+  }
+
+  .hero-content {
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+  }
+
+  .hero-title {
+    font-size: clamp(2.25rem, 6vw, 3.75rem);
+    margin-bottom: 24px;
+    line-height: 1.1;
+    font-weight: 800;
+  }
+
+  .hero-subtitle {
+    font-size: clamp(1rem, 2.5vw, 1.25rem);
+    margin-bottom: 40px;
+    opacity: 0.95;
+    line-height: 1.7;
+  }
+
+  .hero-buttons {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    margin-bottom: 16px;
+  }
+
+  .btn-large {
+    padding: 16px 32px;
+    font-size: 1.1rem;
+  }
+
+  .hero-note {
+    font-size: 0.9rem;
+    opacity: 0.8;
+  }
+
+  /* Social Proof Section */
+  .social-proof {
+    background: white;
+    padding: 60px 0;
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 32px;
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+
+  .stat-card {
+    text-align: center;
+    padding: 24px;
+    background: var(--bg);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    transition: all 0.25s ease;
+  }
+
+  .stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+  }
+
+  .stat-value {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--primary);
+    margin-bottom: 8px;
+  }
+
+  .stat-label {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+  }
+
+  /* Features Section */
+  .features {
+    background: white;
+  }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 32px;
+  }
+
+  /* How It Works */
+  .how-it-works {
+    background: var(--bg);
+  }
+
+  .steps-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 40px;
+  }
+
+  .step {
+    text-align: center;
+  }
+
+  .step-number {
+    width: 64px;
+    height: 64px;
+    background: var(--primary);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0 auto 24px;
+  }
+
+  .step h3 {
+    font-size: 1.5rem;
+    margin-bottom: 12px;
+    color: var(--text);
+  }
+
+  .step p {
+    color: var(--text-secondary);
+  }
+
+  /* Pricing Section */
+  .pricing {
+    background: white;
+  }
+
+  .pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 32px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  /* Testimonials */
+  .testimonials {
+    background: var(--bg);
+  }
+
+  .testimonials-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 32px;
+  }
+
+  .testimonial {
+    background: white;
+    padding: 32px;
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+  }
+
+  .testimonial-text {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    line-height: 1.7;
+    margin-bottom: 24px;
+    font-style: italic;
+  }
+
+  .testimonial-author {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .testimonial-author strong {
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+
+  .testimonial-author span {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+  }
+
+  /* CTA Section */
+  .cta-section {
+    background: linear-gradient(135deg, #0066FF 0%, #0052CC 100%);
+    color: white;
+  }
+
+  .cta-content {
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .cta-content h2 {
+    font-size: 2.5rem;
+    margin-bottom: 16px;
+  }
+
+  .cta-content p {
+    font-size: 1.25rem;
+    margin-bottom: 32px;
+    opacity: 0.95;
+  }
+
+  .cta-buttons {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .hero {
+      padding: 120px 0 80px;
+    }
+
+    .hero-buttons,
+    .cta-buttons {
+      flex-direction: column;
+    }
+
+    .stats-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+
+    .features-grid,
+    .pricing-grid,
+    .testimonials-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .steps-grid {
+      grid-template-columns: 1fr;
+      gap: 32px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .stats-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

@@ -1,0 +1,194 @@
+---
+import MainLayout from '../../layouts/MainLayout.astro';
+
+// Held as a string rather than written inline in the markup: a bare `{` in an
+// .astro template opens a JS expression, so this JSON was being compiled as
+// JavaScript and failed the build on the first `"key": value` colon.
+const objectExample = `{
+  "name": "Client",
+  "label": "Client",
+  "pluralLabel": "Clients",
+  "apiName": "client",
+  "description": "Organizations and companies",
+  "icon": "Building2",
+  "color": "#06b6d4",
+  "isSystem": true,
+  "isCustom": false,
+  "nameFieldApiName": "name",
+  "fields": [/* field definitions */],
+  "relationships": [/* relationship definitions */]
+}`;
+---
+
+<MainLayout title="Objects Overview | Salesdam Docs" description="Understanding CRM objects in Salesdam">
+  <div class="content-wrapper">
+    <h1>Objects Overview</h1>
+
+    <p class="intro">Objects are the core building blocks of Salesdam. They represent different types of business entities like clients, contacts, deals, and more.</p>
+
+    <h2>What is an Object?</h2>
+
+    <p>An object is a data structure that represents a specific type of business entity. Each object has:</p>
+    <ul>
+      <li><strong>Name:</strong> Singular name (e.g., "Client")</li>
+      <li><strong>Plural Label:</strong> Plural form (e.g., "Clients")</li>
+      <li><strong>API Name:</strong> System identifier (e.g., "client")</li>
+      <li><strong>Fields:</strong> Properties or attributes</li>
+      <li><strong>Relationships:</strong> Links to other objects</li>
+      <li><strong>Layouts:</strong> User interface configurations</li>
+    </ul>
+
+    <h2>Object Types</h2>
+
+    <h3>System Objects</h3>
+    <p>Pre-built objects provided by Salesdam. Cannot be deleted but can be customized:</p>
+    <table>
+      <tr>
+        <th>Object</th>
+        <th>API Name</th>
+        <th>Purpose</th>
+      </tr>
+      <tr>
+        <td>Client</td>
+        <td>client</td>
+        <td>Organizations and companies you do business with</td>
+      </tr>
+      <tr>
+        <td>Contact</td>
+        <td>contact</td>
+        <td>Individuals associated with clients</td>
+      </tr>
+      <tr>
+        <td>Deal</td>
+        <td>deal</td>
+        <td>Sales opportunities and potential revenue</td>
+      </tr>
+      <tr>
+        <td>Order</td>
+        <td>order</td>
+        <td>Customer purchases and transactions</td>
+      </tr>
+      <tr>
+        <td>Task</td>
+        <td>task</td>
+        <td>Activities and follow-ups</td>
+      </tr>
+      <tr>
+        <td>Case</td>
+        <td>case</td>
+        <td>Customer support and issues</td>
+      </tr>
+      <tr>
+        <td>Quote</td>
+        <td>quote</td>
+        <td>Sales quotations and proposals</td>
+      </tr>
+      <tr>
+        <td>Invoice</td>
+        <td>invoice</td>
+        <td>Customer invoices and billing</td>
+      </tr>
+    </table>
+
+    <h3>Custom Objects</h3>
+    <p>Objects you create to extend Salesdam for your business needs. Can be fully customized and deleted.</p>
+
+    <h2>Object Structure</h2>
+
+    <p>Every object contains:</p>
+
+    <pre><code>{objectExample}</code></pre>
+
+    <h2>Object Configuration</h2>
+
+    <h3>Name & Label</h3>
+    <ul>
+      <li><strong>Name:</strong> Singular form displayed in UI</li>
+      <li><strong>Plural Label:</strong> Used in lists and navigation</li>
+      <li><strong>API Name:</strong> Snake_case, used in API endpoints</li>
+    </ul>
+
+    <h3>Icon & Color</h3>
+    <p>Customize the object's appearance in the interface:</p>
+    <ul>
+      <li><strong>Icon:</strong> Choose from 50+ icons (Building2, Users, TrendingUp, etc.)</li>
+      <li><strong>Color:</strong> Hex color code for object identification</li>
+    </ul>
+
+    <h3>Display Settings</h3>
+    <ul>
+      <li><strong>Name Field:</strong> The field used to identify records (usually "name")</li>
+      <li><strong>Search Fields:</strong> Fields indexed for search</li>
+      <li><strong>Kanban Config:</strong> Enable kanban board and select grouping field</li>
+    </ul>
+
+    <h2>Creating Custom Objects</h2>
+
+    <p>Click "+" in Object Builder to create a custom object:</p>
+
+    <ol>
+      <li>Enter object name (singular)</li>
+      <li>Set plural label</li>
+      <li>Choose icon and color</li>
+      <li>Add fields</li>
+      <li>Configure relationships</li>
+      <li>Publish the object</li>
+    </ol>
+
+    <div class="note">
+      <strong>💡 Tip:</strong> Start with a simple structure and add fields as needed. You can always modify later.
+    </div>
+
+    <h2>Object Permissions</h2>
+
+    <p>Control user access to objects through roles:</p>
+    <ul>
+      <li>Create records</li>
+      <li>Read/View records</li>
+      <li>Update/Edit records</li>
+      <li>Delete records</li>
+      <li>Import records</li>
+      <li>Export records</li>
+    </ul>
+
+    <h2>Standard Objects in Detail</h2>
+
+    <h3>Client Object</h3>
+    <p>Represents organizations and companies. Key fields:</p>
+    <ul>
+      <li>Client Name (required)</li>
+      <li>Client Number</li>
+      <li>Client Owner (lookup to users)</li>
+      <li>Industry</li>
+      <li>Annual Revenue</li>
+      <li>Billing Address</li>
+    </ul>
+
+    <h3>Contact Object</h3>
+    <p>Represents individuals at organizations. Key fields:</p>
+    <ul>
+      <li>First Name (required)</li>
+      <li>Last Name (required)</li>
+      <li>Email (required)</li>
+      <li>Phone</li>
+      <li>Client Name (lookup to client)</li>
+      <li>Job Title</li>
+      <li>Department</li>
+    </ul>
+
+    <h3>Deal Object</h3>
+    <p>Represents sales opportunities. Key fields:</p>
+    <ul>
+      <li>Deal Name (required)</li>
+      <li>Client (lookup)</li>
+      <li>Stage (picklist)</li>
+      <li>Amount</li>
+      <li>Close Date</li>
+      <li>Sales Rep (lookup to user)</li>
+    </ul>
+
+    <div class="success">
+      <strong>✓ Ready!</strong> Next, learn about <a href="/data-model/fields">Fields and Field Types</a>.
+    </div>
+  </div>
+</MainLayout>

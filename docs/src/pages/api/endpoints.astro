@@ -1,0 +1,38 @@
+---
+import MainLayout from '../../layouts/MainLayout.astro';
+import { ArrowRight } from 'lucide-astro';
+
+/**
+ * Superseded by /api/reference, which is generated from the OpenAPI description
+ * in src/data/openapi.js rather than maintained by hand.
+ *
+ * Kept as a stub rather than deleted so existing links and bookmarks don't 404.
+ * The hand-written endpoint list that used to live here had drifted from the
+ * real routers, which is the problem the spec-driven page solves.
+ */
+---
+
+<MainLayout
+  title="Endpoints"
+  description="The endpoint list has moved to the Endpoint Explorer."
+>
+  <h1>Endpoints</h1>
+  <p class="lead">
+    This page has moved. The endpoint list is now generated from the API
+    description, so it stays in step with the routes that are actually mounted.
+  </p>
+
+  <p>
+    <a class="btn btn-primary" href="/api/reference">
+      Open the Endpoint Explorer
+      <ArrowRight size={14} />
+    </a>
+  </p>
+
+  <div class="note">
+    <strong>Why it moved.</strong> The list here was written by hand and had
+    fallen out of step with the API — it documented paths and an authentication
+    scheme the server no longer accepts. The explorer reads a single source of
+    truth and lets you send real requests against each endpoint.
+  </div>
+</MainLayout>

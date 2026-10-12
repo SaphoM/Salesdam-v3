@@ -1,0 +1,139 @@
+---
+import MainLayout from '../../layouts/MainLayout.astro';
+
+const addRoute = `// 1. routes/projects.js — declare the path, attach middleware
+router.get('/:id', checkObjectPermission('read'), getProject);
+
+// 2. app.js — mount it under the version prefix
+app.use(\`\${API_V1_PREFIX}/projects\`, projectRoutes);
+
+// 3. controllers/projectController.js — HTTP in, HTTP out
+const getProject = asyncHandler(async (req, res) => {
+  const project = await projectService.byId(req.tenantId, req.params.id);
+  if (!project) throw new AppError('Project not found.', 404);
+  sendSuccess(res, { data: project });
+});`;
+---
+
+<MainLayout
+  title="API Design"
+  description="The conventions behind the REST surface, and how to add an endpoint that matches them."
+>
+  <h1>API Design</h1>
+  <p class="lead">
+    The API is metadata-driven: rather than generating an endpoint per object, one
+    set of record endpoints is parameterised by <code>objectApiName</code>.
+  </p>
+
+  <h2>Metadata-driven, not generated</h2>
+  <p>
+    A new custom object gets a full CRUD surface the moment it exists — no code
+    generation, no deployment, no migration. The cost is that request and response
+    bodies are open shapes: what keys a record has depends on metadata the server
+    holds, so a static schema can only describe the envelope, not the payload.
+  </p>
+
+  <div class="note">
+    <strong>This is why the OpenAPI description marks records as
+    <code>additionalProperties: true</code>.</strong> To discover a specific
+    object's fields, call <code>GET /objects/:apiName</code>, which returns its
+    <code>fields</code> array.
+  </div>
+
+  <h2>Conventions</h2>
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th>Convention</th><th>Rationale</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>Version in the path (<code>/api/v1</code>)</td>
+          <td>A future version can run beside the current one; no header negotiation.</td>
+        </tr>
+        <tr>
+          <td>One envelope for every response</td>
+          <td>A client checks <code>success</code> once, rather than inferring from shape.</td>
+        </tr>
+        <tr>
+          <td>Plural, kebab-case resources</td>
+          <td><code>/list-views</code>, <code>/api-keys</code>, <code>/email-templates</code>.</td>
+        </tr>
+        <tr>
+          <td>Nesting only for genuine ownership</td>
+          <td>Fields nest under objects (<code>/objects/:apiName/fields</code>) because they cannot exist alone. Records don't nest under objects.</td>
+        </tr>
+        <tr>
+          <td>Tenancy from the credential, never the path</td>
+          <td>No caller can address another tenant by constructing a URL.</td>
+        </tr>
+        <tr>
+          <td>404 rather than 403 across tenants</td>
+          <td>A 403 would confirm the id exists somewhere.</td>
+        </tr>
+        <tr>
+          <td>PATCH partial, PUT full</td>
+          <td>Both validate against the merged record, so neither can bypass a rule.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>Layering</h2>
+  <p>Each request passes through the same layers, in order:</p>
+  <ol>
+    <li><strong>Rate limiter</strong> — per IP for auth, per tenant+user otherwise.</li>
+    <li><strong><code>requireAuth</code></strong> — API key, then session.</li>
+    <li><strong><code>enforceTenant</code></strong> — resolves and pins the active tenant.</li>
+    <li><strong>Permission check</strong> — <code>checkObjectPermission</code> or <code>checkAppPermission</code>.</li>
+    <li><strong>Joi validation</strong> — where a schema is declared.</li>
+    <li><strong>Controller</strong> — orchestrates services and shapes the response.</li>
+  </ol>
+
+  <div class="warning">
+    <strong>Joi runs with <code>stripUnknown: true</code>.</strong> A key not declared
+    in the schema is silently removed before the controller sees it. If a field
+    you're sending vanishes, the schema is the first place to look — this has caused
+    real bugs where values appeared to save and didn't. Note that
+    <code>PUT /objects/:apiName</code> has no Joi schema, so it does not strip.
+  </div>
+
+  <h2>Error handling</h2>
+  <p>
+    Controllers throw <code>AppError(message, status)</code> and are wrapped in
+    <code>asyncHandler</code>, so a rejected promise reaches the central error
+    middleware rather than hanging the request. Validation collects every problem
+    before responding instead of failing on the first.
+  </p>
+
+  <h2>Adding an endpoint</h2>
+  <pre><code>{addRoute}</code></pre>
+  <ul>
+    <li>Return through <code>sendSuccess</code> so the envelope stays uniform.</li>
+    <li>Use <code>paginate()</code> for any list.</li>
+    <li>Scope every query by <code>req.tenantId</code> — it is the only thing keeping tenants apart.</li>
+    <li>Put domain logic in a service, so it can be tested without an HTTP layer.</li>
+    <li>Declare a Joi schema for any body you accept, remembering <code>stripUnknown</code>.</li>
+    <li>Document it in <code>docs/src/data/openapi.js</code>, or it won't appear in the explorer.</li>
+  </ul>
+
+  <h2>Known rough edges</h2>
+  <ul>
+    <li>
+      Most mounts have no Joi schema, so validation lives in controllers instead —
+      inconsistent, and the reason a couple of fields were historically dropped
+      silently.
+    </li>
+    <li>
+      There is no cross-object query syntax. Denormalise with a rollup, or make two
+      requests.
+    </li>
+    <li>
+      <code>routes/tenants.js</code> exists but is never mounted in
+      <code>app.js</code> — dead code rather than a hidden endpoint.
+    </li>
+    <li>
+      Roughly three quarters of mounted routes are undocumented. They work; their
+      shapes just aren't described. See the list on
+      <a href="/api/overview">API Overview</a>.
+    </li>
+  </ul>
+</MainLayout>

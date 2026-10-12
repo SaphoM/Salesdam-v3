@@ -1,0 +1,56 @@
+.trigger {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--color-gray-400);
+  border-radius: 4px;
+  transition: all 0.2s;
+  padding: 0;
+}
+
+.trigger:hover {
+  background: var(--color-gray-100);
+  color: var(--color-gray-600);
+}
+
+.dropdown {
+  background: white;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 9999;
+  min-width: 120px;
+  overflow: hidden;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-gray-700);
+  font-size: 13px;
+  text-align: left;
+  transition: background 0.2s;
+}
+
+.item:hover {
+  background: var(--color-gray-50);
+}
+
+.item.danger {
+  color: var(--color-red-600);
+}
+
+.item.danger:hover {
+  background: rgba(220, 38, 38, 0.05);
+}

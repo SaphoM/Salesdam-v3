@@ -1,0 +1,142 @@
+---
+import MainLayout from '../../layouts/MainLayout.astro';
+
+// Values read from backend/middleware/rateLimiter.js — keep them in step if the
+// limiter changes.
+const LIMITS = [
+  {
+    name: 'Auth',
+    limit: '10 requests / 15 minutes',
+    scope: 'Per IP address',
+    routes: '/auth/login, /auth/register*, /auth/forgot-password, /auth/reset-password, /auth/verify-payment',
+    why: 'Slows credential stuffing and password-reset abuse.',
+  },
+  {
+    name: 'General API',
+    limit: '300 requests / minute',
+    scope: 'Per tenant + user (falls back to IP when unauthenticated)',
+    routes: 'The rest of the API',
+    why: 'Headroom for normal use; catches runaway loops.',
+  },
+  {
+    name: 'Webhooks',
+    limit: '100 requests / minute',
+    scope: 'Per IP address',
+    routes: 'Inbound webhook receivers',
+    why: 'Caps the cost of a misconfigured or hostile sender.',
+  },
+];
+
+const retryExample = `async function requestWithRetry(url, init, attempt = 0) {
+  const res = await fetch(url, init);
+  if (res.status !== 429 || attempt >= 4) return res;
+
+  // Prefer the server's own advice; fall back to exponential backoff.
+  const retryAfter = Number(res.headers.get('Retry-After'));
+  const waitMs = Number.isFinite(retryAfter) && retryAfter > 0
+    ? retryAfter * 1000
+    : Math.min(2 ** attempt * 1000, 30_000);
+
+  await new Promise((r) => setTimeout(r, waitMs));
+  return requestWithRetry(url, init, attempt + 1);
+}`;
+---
+
+<MainLayout
+  title="Rate Limits"
+  description="Request limits, the headers that report them, and how to back off correctly."
+>
+  <h1>Rate Limits</h1>
+  <p class="lead">
+    Three limiters protect the API. Each returns <code>429 Too Many Requests</code>
+    with a JSON body when tripped.
+  </p>
+
+  <h2>The limits</h2>
+  <div class="table-scroll">
+    <table>
+      <thead>
+        <tr>
+          <th>Limiter</th><th>Limit</th><th>Counted per</th><th>Applies to</th><th>Why</th>
+        </tr>
+      </thead>
+      <tbody>
+        {LIMITS.map((l) => (
+          <tr>
+            <td><strong>{l.name}</strong></td>
+            <td><code>{l.limit}</code></td>
+            <td>{l.scope}</td>
+            <td class="routes">{l.routes}</td>
+            <td>{l.why}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="note">
+    <strong>The general limit is per user, not per key.</strong> It is keyed on
+    tenant plus user id, so two integrations running as the same user share one
+    budget of 300/min. If you need isolated budgets, run them as separate users.
+  </div>
+
+  <h2>Headers</h2>
+  <p>
+    The limiters emit the standard <code>RateLimit-*</code> headers
+    (<code>standardHeaders: true</code>), not the legacy
+    <code>X-RateLimit-*</code> ones:
+  </p>
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th>Header</th><th>Meaning</th></tr></thead>
+      <tbody>
+        <tr><td><code>RateLimit-Limit</code></td><td>Requests permitted in the window.</td></tr>
+        <tr><td><code>RateLimit-Remaining</code></td><td>Requests left in the current window.</td></tr>
+        <tr><td><code>RateLimit-Reset</code></td><td>Seconds until the window resets.</td></tr>
+        <tr><td><code>Retry-After</code></td><td>Sent with a <code>429</code>. Seconds to wait.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>Backing off</h2>
+  <p>
+    Honour <code>Retry-After</code> when it is present rather than retrying on a
+    fixed timer — a fixed timer under load turns one throttled client into a
+    thundering herd:
+  </p>
+  <pre><code>{retryExample}</code></pre>
+
+  <div class="warning">
+    <strong>Don't retry a <code>4xx</code> that isn't a <code>429</code>.</strong>
+    A <code>400</code> or <code>403</code> will fail identically every time; retrying
+    it burns your budget and delays the error reaching whoever can fix it.
+  </div>
+
+  <h2>Staying under the limit</h2>
+  <ul>
+    <li>
+      <strong>Page with <code>limit</code>, don't loop single reads.</strong> One
+      request for 200 records costs one unit; 200 requests cost 200.
+    </li>
+    <li>
+      <strong>Use <code>filter</code> server-side.</strong> Fetching everything and
+      filtering client-side wastes both your budget and the response time.
+    </li>
+    <li>
+      <strong>Prefer <code>POST /records/:object/bulk-delete</code></strong> over a
+      delete per id.
+    </li>
+    <li>
+      <strong>Cache metadata.</strong> Objects and fields change rarely — there is
+      no need to re-fetch them per operation.
+    </li>
+  </ul>
+</MainLayout>
+
+<style>
+  .routes {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    line-height: 1.5;
+  }
+</style>

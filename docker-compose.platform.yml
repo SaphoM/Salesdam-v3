@@ -1,0 +1,47 @@
+# platform.salesdam.com (deployed from main) on the same VM as test.salesdam.com.
+# Uses different container names, host ports, and a separate Mongo volume.
+services:
+  mongo:
+    image: mongo:8.2.11
+    container_name: salesdam-platform-mongo
+    command: ["--replSet", "rs0", "--bind_ip_all", "--auth", "--keyFile", "/etc/mongo-keyfile"]
+    ports:
+      - "127.0.0.1:27018:27017"
+    volumes:
+      - salesdam_platform_mongo_data:/data/db
+      - ./mongo-keyfile:/etc/mongo-keyfile:ro
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 10s
+    restart: unless-stopped
+
+  backend:
+    build: ./backend
+    container_name: salesdam-platform-backend
+    ports:
+      - "127.0.0.1:5001:5000"
+    env_file:
+      - ./backend/.env
+    depends_on:
+      mongo:
+        condition: service_healthy
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.prod
+      args:
+        VITE_API_URL: ""
+    container_name: salesdam-platform-frontend
+    ports:
+      - "127.0.0.1:5174:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  salesdam_platform_mongo_data:

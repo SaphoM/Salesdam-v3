@@ -1,0 +1,200 @@
+import styles from './RecordHeader.module.css';
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import * as LucideIcons from 'lucide-react';
+import { Plus, Trash2, RefreshCw, Calendar, LayoutGrid } from 'lucide-react';
+import toast from 'react-hot-toast';
+import api from '../../../../services/api';
+import Button from '../../../../components/common/Button/Button';
+import ActionFlowRunner from '../../../../components/records/ActionFlowRunner';
+import RecurringTaskModal from '../../../../components/tasks/RecurringTaskModal';
+import DeleteConfirmationModal from '../../../../components/records/DeleteConfirmationModal/DeleteConfirmationModal';
+
+const RecordHeader = ({
+  objectApiName,
+  objMeta,
+  pagination,
+  activeView,
+  selected,
+  setSelected,
+  allFields,
+  perms,
+  refetch,
+}) => {
+  const navigate = useNavigate();
+  const [deleting, setDeleting] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [recurringModalOpen, setRecurringModalOpen] = useState(false);
+
+  const objectLabel = objMeta?.pluralLabel || objectApiName;
+  const objectColor = objMeta?.color || 'var(--color-primary)';
+  const Icon = LucideIcons[objMeta?.icon] || LucideIcons.Box;
+
+  const handleBulkDelete = () => {
+    if (!perms.canDelete) {
+      toast.error('You do not have permission to delete records.');
+      return;
+    }
+
+    setDeleteModalOpen(true);
+  };
+
+  const confirmBulkDelete = async () => {
+    setDeleting(true);
+    try {
+      const response = await api.post(`/records/${objectApiName}/bulk-delete`, {
+        ids: selected,
+      });
+
+      const { deleted, failed } = response.data?.data || {};
+
+      if (deleted > 0) {
+        toast.success(
+          failed > 0
+            ? `${deleted} deleted, ${failed} failed.`
+            : `${deleted} record(s) deleted successfully.`
+        );
+      }
+
+      if (failed > 0) {
+        toast.error(`Failed to delete ${failed} record(s).`);
+      }
+
+      setSelected([]);
+      setDeleteModalOpen(false);
+      refetch();
+    } catch (err) {
+      console.error('Bulk delete error:', err);
+      const errorMsg = err.response?.data?.message || err.message || 'Bulk delete failed.';
+      toast.error(errorMsg);
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+
+  return (
+    <div className={styles.header}>
+      <div className={styles.titleRow}>
+        <div
+          className={styles.objectIcon}
+          style={{ background: `${objectColor}20`, color: objectColor }}
+        >
+          <Icon size={20} />
+        </div>
+        <div>
+          <h1 className={styles.title}>{objectLabel}</h1>
+          <p className={styles.count}>
+            {pagination.total?.toLocaleString() || 0} records
+            {activeView && activeView.key !== 'all' && (
+              <span className={styles.viewBadge}> · {activeView.name}</span>
+            )}
+          </p>
+        </div>
+      </div>
+
+      <div className={styles.actions}>
+        {(objMeta?.actionButtons || [])
+          .filter(
+            (btn) =>
+              btn.automationId &&
+              (btn.location === 'record_list' || btn.location === 'both'),
+          )
+          .sort((a, b) => (a.order || 0) - (b.order || 0))
+          .map((btn) => (
+            <ActionFlowRunner
+              key={btn.id || btn.label}
+              button={btn}
+              record={null}
+              selectedRecords={selected}
+              objectApiName={objectApiName}
+              fields={allFields}
+              onDone={() => {
+                setSelected([]);
+                refetch();
+              }}
+            />
+          ))}
+
+        {selected.length > 0 && (
+          <span className={styles.selectionBadge}>
+            {selected.length} selected
+          </span>
+        )}
+
+        {perms.canDelete && (
+          <Button
+            variant="danger"
+            size="sm"
+            icon={<Trash2 size={14} />}
+            loading={deleting}
+            disabled={selected.length === 0}
+            onClick={handleBulkDelete}
+            title={selected.length === 0 ? 'Select records to delete' : `Delete ${selected.length} record(s)`}
+          >
+            Delete {selected.length > 0 ? `(${selected.length})` : ''}
+          </Button>
+        )}
+
+        <Button
+          variant="secondary"
+          size="sm"
+          icon={<RefreshCw size={14} />}
+          onClick={refetch}
+        >
+          Refresh
+        </Button>
+
+        {perms.canCreate && objectApiName === 'task' && (
+          <Button
+            size="sm"
+            icon={<Calendar size={14} />}
+            onClick={() => setRecurringModalOpen(true)}
+          >
+            Recurring Task
+          </Button>
+        )}
+
+        {objectApiName === 'task' && (
+          <Button
+            size="sm"
+            variant="secondary"
+            icon={<LayoutGrid size={14} />}
+            onClick={() => navigate('/o/task/calendar')}
+          >
+            Calendar
+          </Button>
+        )}
+
+        {perms.canCreate && !['quote', 'invoice'].includes(objectApiName) && (
+          <Link to={`/o/${objectApiName}/new`}>
+            <Button size="sm" icon={<Plus size={14} />}>
+              New {objMeta?.label || objectApiName}
+            </Button>
+          </Link>
+        )}
+      </div>
+
+      <DeleteConfirmationModal
+        isOpen={deleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)}
+        onConfirm={confirmBulkDelete}
+        isDeleting={deleting}
+        recordCount={selected.length}
+      />
+
+      {objectApiName === 'task' && (
+        <RecurringTaskModal
+          isOpen={recurringModalOpen}
+          onClose={() => setRecurringModalOpen(false)}
+          onCreated={() => {
+            refetch();
+            setRecurringModalOpen(false);
+          }}
+        />
+      )}
+    </div>
+  );
+};
+
+export default RecordHeader;

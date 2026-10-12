@@ -1,0 +1,372 @@
+---
+import DocsLayout from '../../layouts/DocsLayout.astro';
+---
+
+<DocsLayout
+  title="Users & Roles - User Guide - Mini CRM"
+  description="Manage team members and configure role-based permissions"
+>
+  <h1>Users & Roles</h1>
+
+  <p>
+    Mini CRM's user and role management system gives you complete control over who can
+    access your workspace and what they can do. This guide covers adding users, creating
+    roles, and configuring permissions.
+  </p>
+
+  <h2>User Management</h2>
+
+  <h3>Adding Users</h3>
+  <ol>
+    <li>Navigate to <strong>Settings</strong> → <strong>Users</strong></li>
+    <li>Click <strong>"New User"</strong></li>
+    <li>Enter user information:
+      <ul>
+        <li><strong>Email:</strong> Must be unique</li>
+        <li><strong>Name:</strong> Full name</li>
+        <li><strong>Password:</strong> Initial password (user can change later)</li>
+        <li><strong>Role:</strong> Select from available roles</li>
+      </ul>
+    </li>
+    <li>Click <strong>Save</strong></li>
+    <li>User receives welcome email with login instructions</li>
+  </ol>
+
+  <h3>Editing Users</h3>
+  <ul>
+    <li>Click on a user to edit their details</li>
+    <li>Change role assignment</li>
+    <li>Reset password if needed</li>
+    <li>Update contact information</li>
+    <li>Deactivate user accounts</li>
+  </ul>
+
+  <h3>Deactivating Users</h3>
+  <p>When someone leaves your organization:</p>
+  <ol>
+    <li>Open their user record</li>
+    <li>Uncheck <strong>"Active"</strong></li>
+    <li>Save changes</li>
+    <li>User can no longer log in</li>
+    <li>Records they own remain intact</li>
+    <li>Can be reactivated later if needed</li>
+  </ol>
+
+  <div class="note">
+    <strong>Note:</strong> Deactivating is preferred over deleting. It preserves audit history
+    and record ownership while preventing access.
+  </div>
+
+  <h2>Role-Based Access Control</h2>
+
+  <p>
+    Roles define what users can do in Mini CRM. Each user is assigned one role that
+    determines their permissions across objects and features.
+  </p>
+
+  <h3>Default Roles</h3>
+  <ul>
+    <li><strong>Administrator:</strong> Full access to everything</li>
+    <li><strong>Manager:</strong> View and edit all records, limited settings access</li>
+    <li><strong>User:</strong> Standard access to assigned records</li>
+    <li><strong>Read Only:</strong> View access only, cannot edit</li>
+  </ul>
+
+  <h2>Creating Custom Roles</h2>
+
+  <ol>
+    <li>Go to <strong>Settings</strong> → <strong>Roles</strong></li>
+    <li>Click <strong>"New Role"</strong></li>
+    <li>Enter role name (e.g., "Sales Rep", "Support Agent")</li>
+    <li>Add description explaining the role's purpose</li>
+    <li>Configure object permissions (see below)</li>
+    <li>Set field-level security if needed</li>
+    <li>Click <strong>Save</strong></li>
+  </ol>
+
+  <h2>Object Permissions</h2>
+
+  <p>Configure what actions users in this role can perform on each object:</p>
+
+  <h3>Permission Levels</h3>
+
+  <h4>View All</h4>
+  <ul>
+    <li>Can see all records in the object</li>
+    <li>View record details and related lists</li>
+    <li>Export data</li>
+    <li>Cannot edit or delete</li>
+  </ul>
+
+  <h4>Create</h4>
+  <ul>
+    <li>Can create new records</li>
+    <li>Automatically own records they create</li>
+    <li>May be limited to viewing only their own records</li>
+  </ul>
+
+  <h4>Edit All</h4>
+  <ul>
+    <li>Can modify any record in the object</li>
+    <li>Change field values</li>
+    <li>Update owned and unowned records</li>
+  </ul>
+
+  <h4>Delete All</h4>
+  <ul>
+    <li>Can delete any record</li>
+    <li>Most restrictive permission - use carefully</li>
+    <li>Consider only for administrators</li>
+  </ul>
+
+  <h3>Permission Combinations</h3>
+
+  <p>Common permission patterns:</p>
+
+  <h4>Full Access</h4>
+  <pre><code>View All: ✓
+Create: ✓
+Edit All: ✓
+Delete All: ✓</code></pre>
+
+  <h4>Read/Write (No Delete)</h4>
+  <pre><code>View All: ✓
+Create: ✓
+Edit All: ✓
+Delete All: ✗</code></pre>
+
+  <h4>Create and Edit Own</h4>
+  <pre><code>View All: ✗
+Create: ✓
+Edit All: ✗ (Edit Own: ✓)
+Delete All: ✗</code></pre>
+
+  <h4>Read Only</h4>
+  <pre><code>View All: ✓
+Create: ✗
+Edit All: ✗
+Delete All: ✗</code></pre>
+
+  <h2>Field-Level Security</h2>
+
+  <p>
+    Control access to specific fields within an object. Useful for sensitive data
+    like salaries, SSNs, or confidential notes.
+  </p>
+
+  <h3>Configuring Field Security</h3>
+  <ol>
+    <li>In the role configuration, expand an object</li>
+    <li>Click <strong>"Field Security"</strong></li>
+    <li>For each field, set:
+      <ul>
+        <li><strong>Visible:</strong> User can see the field</li>
+        <li><strong>Editable:</strong> User can modify the field</li>
+        <li><strong>Hidden:</strong> Field doesn't appear at all</li>
+      </ul>
+    </li>
+    <li>Save changes</li>
+  </ol>
+
+  <h3>Example Field Security</h3>
+  <p>Sales Rep role on Opportunity object:</p>
+  <ul>
+    <li><strong>Amount:</strong> Visible, Editable</li>
+    <li><strong>Commission:</strong> Visible, Read-Only</li>
+    <li><strong>Manager Notes:</strong> Hidden</li>
+    <li><strong>Close Date:</strong> Visible, Editable</li>
+  </ul>
+
+  <h2>Record Ownership</h2>
+
+  <p>
+    Every record has an owner. Ownership affects what users can do based on their
+    role permissions.
+  </p>
+
+  <h3>Owner Permissions</h3>
+  <ul>
+    <li>Record creators automatically become the owner</li>
+    <li>"Edit Own" permission allows editing only owned records</li>
+    <li>"Delete Own" permission allows deleting only owned records</li>
+    <li>Owners can always view their own records</li>
+  </ul>
+
+  <h3>Transferring Ownership</h3>
+  <ol>
+    <li>Open the record</li>
+    <li>Click <strong>"Change Owner"</strong></li>
+    <li>Select new owner</li>
+    <li>Optionally transfer related records</li>
+    <li>Save changes</li>
+  </ol>
+
+  <h2>Role Hierarchy</h2>
+
+  <p>
+    Role hierarchies give managers access to records owned by their subordinates,
+    even without "View All" permission.
+  </p>
+
+  <h3>Setting Up Hierarchy</h3>
+  <ol>
+    <li>Go to <strong>Settings</strong> → <strong>Role Hierarchy</strong></li>
+    <li>Drag roles to create parent-child relationships</li>
+    <li>Example structure:
+      <pre><code>CEO
+  ├── VP Sales
+  │   ├── Sales Manager
+  │   │   └── Sales Rep
+  └── VP Support
+      └── Support Manager
+          └── Support Agent</code></pre>
+    </li>
+    <li>Managers automatically see subordinates' records</li>
+  </ol>
+
+  <h2>Sharing Rules</h2>
+
+  <p>
+    Extend access beyond role permissions for specific scenarios. Useful when
+    you need cross-department collaboration.
+  </p>
+
+  <h3>Creating Sharing Rules</h3>
+  <ol>
+    <li>Go to <strong>Settings</strong> → <strong>Sharing Rules</strong></li>
+    <li>Click <strong>"New Rule"</strong></li>
+    <li>Select object</li>
+    <li>Define criteria (e.g., "Share Opportunities where Region = 'West'")</li>
+    <li>Choose who to share with (roles, users, or groups)</li>
+    <li>Set access level (Read Only or Read/Write)</li>
+    <li>Save rule</li>
+  </ol>
+
+  <h3>Example Sharing Rules</h3>
+
+  <h4>Regional Access</h4>
+  <p>Share West Coast accounts with West Coast team:</p>
+  <pre><code>Object: Account
+Criteria: Region = "West Coast"
+Share with: West Coast Team
+Access: Read/Write</code></pre>
+
+  <h4>Product Specialist Access</h4>
+  <p>Share enterprise deals with enterprise specialists:</p>
+  <pre><code>Object: Opportunity
+Criteria: Amount > 100000
+Share with: Enterprise Specialists Role
+Access: Read Only</code></pre>
+
+  <h2>Permission Sets</h2>
+
+  <p>
+    Grant additional permissions to specific users without changing their role.
+    Useful for temporary access or special responsibilities.
+  </p>
+
+  <h3>Creating Permission Sets</h3>
+  <ol>
+    <li>Go to <strong>Settings</strong> → <strong>Permission Sets</strong></li>
+    <li>Click <strong>"New Permission Set"</strong></li>
+    <li>Name the set (e.g., "Report Builder")</li>
+    <li>Select additional permissions to grant</li>
+    <li>Assign to specific users</li>
+  </ol>
+
+  <h2>System Permissions</h2>
+
+  <p>Beyond object permissions, roles can have system-wide permissions:</p>
+
+  <ul>
+    <li><strong>Manage Users:</strong> Add, edit, deactivate users</li>
+    <li><strong>Manage Roles:</strong> Create and edit roles</li>
+    <li><strong>Customize Objects:</strong> Create objects and fields</li>
+    <li><strong>Manage Dashboards:</strong> Create and share dashboards</li>
+    <li><strong>View Setup:</strong> Access Settings area</li>
+    <li><strong>Modify All Data:</strong> Override all restrictions (admins only)</li>
+    <li><strong>API Access:</strong> Use API keys and integrations</li>
+    <li><strong>Export Data:</strong> Download records in bulk</li>
+  </ul>
+
+  <h2>Best Practices</h2>
+
+  <h3>Role Design</h3>
+  <ul>
+    <li>Create roles based on job function, not individual people</li>
+    <li>Use descriptive role names (Sales Rep, Support Manager)</li>
+    <li>Start restrictive and add permissions as needed</li>
+    <li>Document each role's purpose</li>
+    <li>Limit the number of roles (typically 5-15 is sufficient)</li>
+  </ul>
+
+  <h3>Security</h3>
+  <ul>
+    <li>Follow principle of least privilege</li>
+    <li>Regularly audit user access</li>
+    <li>Deactivate users promptly when they leave</li>
+    <li>Use field-level security for sensitive data</li>
+    <li>Limit "Modify All Data" to administrators only</li>
+    <li>Review sharing rules periodically</li>
+  </ul>
+
+  <h3>User Management</h3>
+  <ul>
+    <li>Keep user information up to date</li>
+    <li>Use consistent email format (@company.com)</li>
+    <li>Enforce strong password policies</li>
+    <li>Enable two-factor authentication for sensitive roles</li>
+    <li>Monitor login activity for suspicious behavior</li>
+  </ul>
+
+  <h2>Common Scenarios</h2>
+
+  <h3>Sales Team Setup</h3>
+  <pre><code>Roles:
+- Sales VP: Full access to all Accounts, Opportunities
+- Sales Manager: View all team records, edit own
+- Sales Rep: Create and edit own records only
+
+Hierarchy:
+Sales VP → Sales Manager → Sales Rep</code></pre>
+
+  <h3>Support Team Setup</h3>
+  <pre><code>Roles:
+- Support Manager: Full access to Cases, view customers
+- Support Agent: Create/edit own Cases, view all Customers
+
+Sharing Rule:
+Share high-priority Cases with all Support Agents</code></pre>
+
+  <h3>Cross-Functional Access</h3>
+  <pre><code>Base Role: Sales Rep (limited to own records)
+Permission Set: Product Catalog Access
+  - View All permission on Product object
+  - Read-only access to pricing information</code></pre>
+
+  <h2>Troubleshooting</h2>
+
+  <h3>User Can't See Records</h3>
+  <ul>
+    <li>Verify role has "View All" permission on object</li>
+    <li>Check if records are owned by the user</li>
+    <li>Review sharing rules</li>
+    <li>Ensure user account is active</li>
+  </ul>
+
+  <h3>User Can't Edit Field</h3>
+  <ul>
+    <li>Check field-level security settings</li>
+    <li>Verify "Edit All" or "Edit Own" permission</li>
+    <li>Field might be read-only for all users</li>
+    <li>Check page layout configuration</li>
+  </ul>
+
+  <h3>Unexpected Access</h3>
+  <ul>
+    <li>Review role hierarchy (managers see subordinate records)</li>
+    <li>Check sharing rules that might grant access</li>
+    <li>Look for permission sets on the user</li>
+    <li>Verify manual record sharing</li>
+  </ul>
+</DocsLayout>

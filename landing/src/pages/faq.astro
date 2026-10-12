@@ -1,0 +1,388 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+
+const faqs = [
+  {
+    category: "Getting Started",
+    items: [
+      {
+        q: "How do I create my workspace?",
+        a: "Click 'Get Started Free' and fill in your company name, phone number, and choose a plan. Your workspace is created instantly — no waiting required. The AI onboarding assistant then helps you set up your first objects."
+      },
+      {
+        q: "Do I need a credit card to sign up?",
+        a: "No credit card is required during the trial period. You only need to provide billing details when you're ready to continue after your trial ends."
+      },
+      {
+        q: "How long does setup take?",
+        a: "Most users are up and running in under 10 minutes. If you choose AI onboarding, we automatically create standard objects (Contacts, Leads, Accounts, etc.) for your industry so you can start using Mini CRM immediately."
+      },
+      {
+        q: "Can I import data from another CRM?",
+        a: "Yes. You can import records via CSV upload. Go to any object list, click 'Import', map your columns to Mini CRM fields, and your data will be imported in seconds."
+      },
+    ]
+  },
+  {
+    category: "Objects & Data",
+    items: [
+      {
+        q: "What is an 'Object' in Mini CRM?",
+        a: "An object is a type of record — for example, Contact, Lead, Account, Deal, or any custom entity your business needs. You define the object's fields, layout, and relationships through Object Settings."
+      },
+      {
+        q: "How many custom objects can I create?",
+        a: "The number of objects depends on your plan. Starter: 10 objects, Basic: 15, Standard: 30, Enterprise: 100+. Standard objects (Contact, Lead, Account, Opportunity, etc.) don't count against your limit."
+      },
+      {
+        q: "What field types are supported?",
+        a: "Mini CRM supports 20+ field types: Text, Textarea, Rich Text, Number, Currency, Percent, Date, DateTime, Boolean (checkbox), Picklist, Multi-Select Picklist, Lookup, Master-Detail, Email, Phone, URL, Address, Formula, and Auto-Number."
+      },
+      {
+        q: "Can objects reference each other?",
+        a: "Yes. Use Lookup fields to create many-to-one relationships, or Master-Detail for parent-child relationships where child records are deleted with the parent. You can visualise all relationships in the Schema Builder."
+      },
+      {
+        q: "What is the Schema Builder?",
+        a: "The Schema Builder is a visual canvas (similar to Salesforce Schema Builder) showing all your objects as cards with relationship lines drawn between them. You can drag cards, zoom in/out, and click any card to see its details and navigate to edit it."
+      },
+    ]
+  },
+  {
+    category: "Automation",
+    items: [
+      {
+        q: "What can I automate?",
+        a: "You can automate almost any workflow: send emails, update field values, create related records, trigger HTTP webhooks, and chain multiple actions together. Flows are triggered by record changes, schedules, or incoming webhooks."
+      },
+      {
+        q: "Is there a limit on automation runs?",
+        a: "Starter plan: 5 active flows, 500 runs/month. Basic: 10 flows, 2,000 runs/month. Standard: 25 flows, 10,000 runs/month. Enterprise: unlimited flows and runs."
+      },
+      {
+        q: "Can I test an automation before going live?",
+        a: "Yes. You can toggle any flow between Active and Inactive. While inactive, the flow won't run even if its trigger condition is met, allowing you to safely configure and review it first."
+      },
+    ]
+  },
+  {
+    category: "Users & Permissions",
+    items: [
+      {
+        q: "How does the role-based access control work?",
+        a: "Each user is assigned a role. Roles define app-level permissions (manage objects, users, automations) and object-level permissions (create, read, update, delete records on each object). You can also restrict individual fields to read-only per role."
+      },
+      {
+        q: "Can I limit which fields a user can see?",
+        a: "Yes. Field-level security lets you hide or make fields read-only for specific roles. For example, a Sales Rep role can view Deal Value but not edit it."
+      },
+      {
+        q: "How many users can I have?",
+        a: "User limits are per plan: Starter (1 user), Basic (3 users), Standard (10 users), Enterprise (20 users). Need more? Contact us to discuss a custom Enterprise arrangement."
+      },
+      {
+        q: "Can I invite someone without giving them full access?",
+        a: "Yes. Create a role with limited permissions and assign it to the new user. You can restrict which objects they can see, which fields they can edit, and which admin functions they can access."
+      },
+    ]
+  },
+  {
+    category: "Integrations & API",
+    items: [
+      {
+        q: "Does Mini CRM have an API?",
+        a: "Yes. Every object and record is accessible via a REST API. You can generate API keys under Settings → API Keys, scope them to specific objects, and use them from any external application."
+      },
+      {
+        q: "What are webhooks used for?",
+        a: "Webhooks let Mini CRM push data to external systems when events happen (record created, updated, deleted). You configure a URL, choose the events, and Mini CRM will POST a JSON payload to your endpoint in real time."
+      },
+      {
+        q: "Can I connect Mini CRM to Zapier or Make?",
+        a: "Yes, using the API key integration. You can call Mini CRM's REST API from Zapier, Make (formerly Integromat), or any other automation platform that supports custom HTTP requests."
+      },
+    ]
+  },
+  {
+    category: "Billing & Plans",
+    items: [
+      {
+        q: "What are the plan differences?",
+        a: "Starter (R495/mo): 1 user, ideal for solo operators. Basic (R695/mo): 3 users, for small teams. Standard (R1,485/mo): 10 users, for growing businesses. Enterprise (R2,805/mo): 20 users, for larger organisations with higher limits."
+      },
+      {
+        q: "How does the debit order work?",
+        a: "You choose a debit order day (1st–28th of the month) when registering. Your subscription fee is deducted on that date each month from your registered bank account."
+      },
+      {
+        q: "Can I upgrade or downgrade my plan?",
+        a: "Yes. You can change your plan at any time from Settings → Billing. Upgrades take effect immediately. Downgrades take effect at the start of the next billing period."
+      },
+      {
+        q: "What happens if I exceed my user or record limit?",
+        a: "You'll receive a notification when you approach 80% of any limit. If you exceed a limit, you'll be prompted to upgrade. Existing data is never deleted — you simply need to upgrade to continue adding more."
+      },
+    ]
+  },
+  {
+    category: "Security & Data",
+    items: [
+      {
+        q: "How is my data kept secure?",
+        a: "Each workspace is completely isolated (multi-tenant architecture). All data is stored in MongoDB with tenant-level filtering on every query. Sessions are managed server-side with HTTP-only cookies. Passwords are hashed with bcrypt."
+      },
+      {
+        q: "Where is my data stored?",
+        a: "Data is stored on servers within your selected region. We apply encryption at rest and in transit (HTTPS/TLS)."
+      },
+      {
+        q: "Can I export my data?",
+        a: "Yes. You can export records from any object list as CSV. You can also use the API to programmatically export your entire dataset."
+      },
+    ]
+  },
+];
+---
+
+<BaseLayout
+  title="FAQ — Mini CRM"
+  description="Answers to the most common questions about Mini CRM — plans, objects, automation, users, and more."
+>
+  <Header />
+
+  <main class="main">
+
+    <section class="faq-hero">
+      <div class="container">
+        <div class="hero-content">
+          <div class="hero-label">Help Centre</div>
+          <h1>Frequently Asked Questions</h1>
+          <p>Can't find what you're looking for? <a href="/contact">Get in touch</a> — we're happy to help.</p>
+          <div class="search-hint">
+            <span>Browse by category below ↓</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="faq-body section">
+      <div class="container">
+
+        <div class="faq-layout">
+          <!-- Sidebar TOC -->
+          <aside class="faq-toc">
+            <div class="toc-inner">
+              <div class="toc-title">Categories</div>
+              {faqs.map((group, i) => (
+                <a href={`#cat-${i}`} class="toc-link">{group.category}</a>
+              ))}
+              <div class="toc-cta">
+                <p>Still have questions?</p>
+                <a href="/contact" class="btn btn-primary btn-sm">Contact Support</a>
+              </div>
+            </div>
+          </aside>
+
+          <!-- FAQ content -->
+          <div class="faq-content">
+            {faqs.map((group, gi) => (
+              <div class="faq-group" id={`cat-${gi}`}>
+                <h2 class="group-title">{group.category}</h2>
+                <div class="faq-list">
+                  {group.items.map((item, ii) => (
+                    <details class="faq-item" id={`faq-${gi}-${ii}`}>
+                      <summary class="faq-q">
+                        <span>{item.q}</span>
+                        <svg class="faq-chevron" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                          <path d="M19 9l-7 7-7-7"/>
+                        </svg>
+                      </summary>
+                      <div class="faq-a">
+                        <p>{item.a}</p>
+                      </div>
+                    </details>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Still need help -->
+    <section class="faq-bottom section-alt">
+      <div class="container">
+        <div class="bottom-card">
+          <div class="bc-left">
+            <h3>Still have questions?</h3>
+            <p>Our team is here to help you get the most out of Mini CRM.</p>
+          </div>
+          <div class="bc-right">
+            <a href="/contact" class="btn btn-primary">Contact Support</a>
+            <a href="/user-guide" class="btn btn-secondary">Browse User Guide</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <Footer />
+</BaseLayout>
+
+<style>
+  .main { padding-top: 72px; }
+
+  .faq-hero {
+    background: linear-gradient(135deg, #f8faff 0%, #eef3ff 100%);
+    padding: 72px 0 60px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .hero-content {
+    text-align: center;
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  .hero-label {
+    display: inline-block;
+    font-size: 0.8125rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--primary); background: var(--primary-subtle);
+    padding: 5px 14px; border-radius: 999px; margin-bottom: 16px;
+  }
+  .faq-hero h1 { font-size: clamp(2rem, 5vw, 2.75rem); font-weight: 800; margin-bottom: 16px; }
+  .faq-hero p { font-size: clamp(1rem, 2vw, 1.125rem); color: var(--text-secondary); }
+  .faq-hero p a { color: var(--primary); font-weight: 600; }
+  .search-hint { margin-top: 20px; color: var(--text-muted); font-size: 0.9rem; }
+
+  /* Layout */
+  .faq-layout {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 56px;
+    align-items: start;
+  }
+
+  /* TOC */
+  .faq-toc { position: sticky; top: 100px; }
+  .toc-inner {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+  }
+  .toc-title {
+    font-size: 0.7rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--text-muted); margin-bottom: 12px;
+  }
+  .toc-link {
+    display: block;
+    padding: 7px 10px;
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    border-radius: 6px;
+    transition: all 0.15s;
+  }
+  .toc-link:hover { background: var(--primary-subtle); color: var(--primary); }
+  .toc-cta {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    text-align: center;
+  }
+  .toc-cta p { font-size: 0.8125rem; color: var(--text-secondary); margin-bottom: 10px; }
+
+  /* Groups */
+  .faq-group { margin-bottom: 48px; }
+  .group-title {
+    font-size: 1.5rem; font-weight: 800;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--border);
+    color: var(--text);
+  }
+
+  .faq-list { display: flex; flex-direction: column; gap: 10px; }
+
+  /* Item */
+  .faq-item {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    transition: box-shadow 0.2s;
+  }
+  .faq-item[open] { box-shadow: var(--shadow-md); border-color: #c7d7f8; }
+  .faq-item[open] .faq-chevron { transform: rotate(180deg); }
+
+  .faq-q {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 18px 20px;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text);
+    cursor: pointer;
+    list-style: none;
+    user-select: none;
+  }
+  .faq-q::-webkit-details-marker { display: none; }
+  .faq-q:hover { color: var(--primary); }
+
+  .faq-chevron {
+    flex-shrink: 0;
+    color: var(--text-secondary);
+    transition: transform 0.2s;
+  }
+
+  .faq-a {
+    padding: 0 20px 20px;
+    border-top: 1px solid var(--border);
+    padding-top: 16px;
+  }
+  .faq-a p {
+    color: var(--text-secondary);
+    font-size: 0.9375rem;
+    line-height: 1.7;
+  }
+
+  /* Bottom CTA */
+  .bottom-card {
+    background: white; border: 1px solid var(--border); border-radius: 16px;
+    padding: 40px 48px;
+    display: flex; align-items: center; justify-content: space-between; gap: 24px;
+    box-shadow: var(--shadow);
+  }
+  .bc-left h3 { font-size: 1.5rem; margin-bottom: 8px; }
+  .bc-left p { color: var(--text-secondary); }
+  .bc-right { display: flex; gap: 12px; flex-shrink: 0; }
+
+  @media (max-width: 900px) {
+    .faq-layout { grid-template-columns: 1fr; }
+    .faq-toc { display: none; }
+    .bottom-card { flex-direction: column; padding: 32px 24px; }
+    .bc-right { flex-direction: column; width: 100%; }
+    .bc-right .btn { text-align: center; }
+  }
+</style>
+
+<script>
+  // Smooth scroll for TOC links
+  document.querySelectorAll('.toc-link').forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      const id = link.getAttribute('href').slice(1);
+      const el = document.getElementById(id);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+</script>

@@ -1,0 +1,39 @@
+---
+import MainLayout from '../../layouts/MainLayout.astro';
+import { ArrowRight } from 'lucide-astro';
+
+/**
+ * Superseded by /api/reference, which has the request runner built into each
+ * endpoint alongside its schema.
+ *
+ * Kept as a stub so existing links don't 404. The explorer that used to live here
+ * authenticated with a bearer token, which this API has never accepted —
+ * requireAuth takes an X-API-Key header or the session cookie, nothing else — so
+ * every request it sent would have failed with a 401.
+ */
+---
+
+<MainLayout
+  title="API Explorer"
+  description="The API explorer has moved into the Endpoint Explorer."
+>
+  <h1>API Explorer</h1>
+  <p class="lead">
+    This page has moved. Each endpoint in the Endpoint Explorer now has its own
+    request runner, pre-filled from the endpoint's schema.
+  </p>
+
+  <p>
+    <a class="btn btn-primary" href="/api/reference">
+      Open the Endpoint Explorer
+      <ArrowRight size={14} />
+    </a>
+  </p>
+
+  <div class="warning">
+    <strong>If you used this page and got 401s, that's why.</strong> It sent an
+    <code>Authorization: Bearer …</code> header, which this API does not accept.
+    Authenticate with an <code>X-API-Key</code> header or your session cookie —
+    see <a href="/api/authentication">Authentication</a>.
+  </div>
+</MainLayout>

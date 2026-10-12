@@ -1,0 +1,215 @@
+﻿---
+import MainLayout from '../../layouts/MainLayout.astro';
+---
+
+<MainLayout title="Registration & Setup | Salesdam Docs" description="Learn how to register and set up your Salesdam account">
+  <div class="content-wrapper">
+    <h1>Registration & Setup</h1>
+
+    <p class="intro">Complete guide to registering a new account and setting up your Salesdam workspace.</p>
+
+    <h2>Registration Process</h2>
+
+    <h3>Step 1: Access Registration Page</h3>
+    <p>Navigate to the Salesdam login page and click "Register" or "Create Account".</p>
+
+    <h3>Step 2: Fill Registration Form</h3>
+    <p>Provide the following information:</p>
+    <table>
+      <tr>
+        <th>Field</th>
+        <th>Description</th>
+        <th>Requirements</th>
+      </tr>
+      <tr>
+        <td>Company Name</td>
+        <td>Name of your organization</td>
+        <td>Required, 2-100 characters</td>
+      </tr>
+      <tr>
+        <td>Email Address</td>
+        <td>Your work email</td>
+        <td>Required, valid email format</td>
+      </tr>
+      <tr>
+        <td>First Name</td>
+        <td>Your first name</td>
+        <td>Required, 1-50 characters</td>
+      </tr>
+      <tr>
+        <td>Last Name</td>
+        <td>Your last name</td>
+        <td>Required, 1-50 characters</td>
+      </tr>
+      <tr>
+        <td>Password</td>
+        <td>Account password</td>
+        <td>Required, minimum 8 characters, mix of cases and numbers recommended</td>
+      </tr>
+    </table>
+
+    <h3>Step 3: Email Verification</h3>
+    <p>After submitting the registration form:</p>
+    <ol>
+      <li>You'll see a confirmation message</li>
+      <li>A verification email will be sent to your address</li>
+      <li>Click the verification link in the email</li>
+      <li>Your account will be activated</li>
+    </ol>
+
+    <div class="note">
+      <strong>📧 Note:</strong> Check your spam folder if you don't see the verification email within 5 minutes.
+    </div>
+
+    <h2>Initial Workspace Setup</h2>
+
+    <p>Upon first login, Salesdam automatically sets up your workspace with:</p>
+
+    <h3>Default Objects</h3>
+    <ul>
+      <li><strong>Client:</strong> Organizations you work with</li>
+      <li><strong>Contact:</strong> Individuals at organizations</li>
+      <li><strong>Deal:</strong> Sales opportunities</li>
+      <li><strong>Order:</strong> Customer orders</li>
+      <li><strong>Task:</strong> Activities and follow-ups</li>
+      <li><strong>Case:</strong> Support tickets</li>
+      <li><strong>Quote:</strong> Sales quotations</li>
+      <li><strong>Invoice:</strong> Customer invoices</li>
+    </ul>
+
+    <h3>Default Roles</h3>
+    <ul>
+      <li><strong>Superuser:</strong> Full system access (you are assigned this)</li>
+      <li><strong>Admin:</strong> Administrative functions</li>
+      <li><strong>Standard User:</strong> Regular CRM usage</li>
+      <li><strong>Read Only:</strong> View-only access</li>
+    </ul>
+
+    <h3>Default Workspace</h3>
+    <p>A "Sales Hub" workspace is created with all standard objects included.</p>
+
+    <h2>First Login Checklist</h2>
+
+    <div class="checklist">
+      <label>
+        <input type="checkbox" disabled /> Verify your email address
+      </label>
+      <label>
+        <input type="checkbox" disabled /> Set your profile picture (optional)
+      </label>
+      <label>
+        <input type="checkbox" disabled /> Configure workspace settings
+      </label>
+      <label>
+        <input type="checkbox" disabled /> Invite team members
+      </label>
+      <label>
+        <input type="checkbox" disabled /> Set up email settings (optional)
+      </label>
+      <label>
+        <input type="checkbox" disabled /> Explore default CRM objects
+      </label>
+    </div>
+
+    <h2>Inviting Team Members</h2>
+
+    <ol>
+      <li>Go to Settings → User Management</li>
+      <li>Click "Invite Users"</li>
+      <li>Enter team members' email addresses</li>
+      <li>Assign them a role (Admin, Standard User, or Read Only)</li>
+      <li>Click "Send Invitations"</li>
+      <li>They'll receive an email with setup instructions</li>
+    </ol>
+
+    <h2>Plan Tiers</h2>
+
+    <table>
+      <tr>
+        <th>Feature</th>
+        <th>Free</th>
+        <th>Pro</th>
+        <th>Enterprise</th>
+      </tr>
+      <tr>
+        <td>Users</td>
+        <td>3</td>
+        <td>10</td>
+        <td>Unlimited</td>
+      </tr>
+      <tr>
+        <td>Records</td>
+        <td>5,000</td>
+        <td>50,000</td>
+        <td>Unlimited</td>
+      </tr>
+      <tr>
+        <td>Custom Objects</td>
+        <td>5</td>
+        <td>20</td>
+        <td>Unlimited</td>
+      </tr>
+      <tr>
+        <td>Automations</td>
+        <td>5</td>
+        <td>50</td>
+        <td>Unlimited</td>
+      </tr>
+      <tr>
+        <td>API Access</td>
+        <td>Yes</td>
+        <td>Yes</td>
+        <td>Yes</td>
+      </tr>
+    </table>
+
+    <h2>Troubleshooting</h2>
+
+    <h3>Email Not Received</h3>
+    <ul>
+      <li>Check spam/junk folder</li>
+      <li>Wait 5-10 minutes, emails can be slow</li>
+      <li>Request a new verification email</li>
+      <li>Ensure email address was entered correctly</li>
+    </ul>
+
+    <h3>Registration Failed</h3>
+    <ul>
+      <li>Ensure all required fields are filled</li>
+      <li>Password must be at least 8 characters</li>
+      <li>Email must be valid and unique</li>
+      <li>Company name must be 2-100 characters</li>
+    </ul>
+
+    <h3>Can't Login After Registration</h3>
+    <ul>
+      <li>Verify your email first</li>
+      <li>Check that Caps Lock is off</li>
+      <li>Use "Forgot Password" to reset if needed</li>
+    </ul>
+
+    <div class="success">
+      <strong>✓ Ready!</strong> Your Salesdam account is set up. Head to the <a href="/user-guide/roles-permissions">Roles &amp; Permissions guide</a> to start using the system.
+    </div>
+  </div>
+</MainLayout>
+
+<style>
+  .checklist {
+    background: var(--color-gray-50);
+    padding: 20px;
+    border-radius: 6px;
+    margin: 20px 0;
+  }
+
+  .checklist label {
+    display: block;
+    margin-bottom: 12px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+
+  .checklist input {
+    margin-right: 8px;
+  }
+</style>

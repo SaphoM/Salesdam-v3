@@ -1,0 +1,62 @@
+---
+import DevLayout from '../../layouts/DevLayout.astro';
+---
+
+<DevLayout
+  title="Data Model - Developer Guide - Mini CRM"
+  description="Database schemas and entity relationships"
+>
+  <h1>Data Model</h1>
+
+  <p>
+    This document describes the MongoDB database schemas, model relationships,
+    and data structures used throughout Mini CRM.
+  </p>
+
+  <h2>Entity Relationships</h2>
+
+  <pre><code>Tenant (1) → (N) User
+Tenant (1) → (N) ObjectMeta
+Tenant (1) → (N) Session
+Tenant (1) → (N) Role
+Tenant (1) → (N) Automation
+Tenant (1) → (N) Dashboard
+
+ObjectMeta (1) → (N) FieldMeta
+ObjectMeta (1) → (N) DynamicRecord
+
+User (N) → (1) Role
+User (N) → (1) Tenant
+
+FieldMeta (lookup) → ObjectMeta (reference to other objects)</code></pre>
+
+  <h2>Session Model Fields</h2>
+  <pre><code>sessionId: String (unique, indexed)
+userId: ObjectId → User
+tenantId: ObjectId → Tenant
+data: Map (session data)
+expiresAt: Date (TTL indexed)
+lastAccessedAt: Date
+createdAt: Date
+ipAddress: String
+userAgent: String</code></pre>
+
+  <h2>Key Models Summary</h2>
+
+  <p>See the Architecture and Authentication pages for complete schema definitions.</p>
+
+  <h3>Tenant</h3>
+  <p>Workspace container. All data scoped to tenantId.</p>
+
+  <h3>User</h3>
+  <p>User accounts with email, password (hashed), roleId.</p>
+
+  <h3>ObjectMeta</h3>
+  <p>Custom object definitions (label, apiName, fields).</p>
+
+  <h3>FieldMeta</h3>
+  <p>Field definitions (type, required, unique, validation).</p>
+
+  <h3>DynamicRecord</h3>
+  <p>Flexible record storage with Map-based data field.</p>
+</DevLayout>

@@ -1,0 +1,14 @@
+{
+  "name": "mini-crm-landing",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview"
+  },
+  "dependencies": {
+    "astro": "^4.3.0",
+    "lucide-astro": "^0.556.0"
+  }
+}

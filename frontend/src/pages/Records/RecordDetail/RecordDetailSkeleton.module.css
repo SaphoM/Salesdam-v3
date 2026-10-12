@@ -1,0 +1,39 @@
+.tabsContainer {
+  display: flex;
+  gap: 24px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--border-color);
+  margin-bottom: 0;
+}
+
+.tabsContainer > :nth-child(1) {
+  flex: 0 0 auto;
+}
+
+.tabsContainer > :nth-child(2) {
+  flex: 0 0 auto;
+}
+
+.tabsContainer > :nth-child(3) {
+  flex: 0 0 auto;
+}
+
+/* Responsive Adjustments */
+
+@media (max-width: 1024px) {
+  .tabsContainer {
+    gap: 16px;
+  }
+}
+
+@media (max-width: 768px) {
+  .tabsContainer {
+    gap: 12px;
+  }
+}
+
+@media (max-width: 640px) {
+  .tabsContainer {
+    gap: 16px;
+  }
+}

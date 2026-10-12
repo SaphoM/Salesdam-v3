@@ -1,0 +1,596 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { Database, FileText, Zap, BarChart3, Shield, Mail, Link2, Sparkles, Search, Network, Key } from 'lucide-astro';
+---
+
+<BaseLayout
+  title="Features — Mini CRM"
+  description="Discover everything Mini CRM can do. From custom objects and automation to AI onboarding and analytics."
+>
+  <Header />
+
+  <main class="main">
+
+    <!-- Hero -->
+    <section class="features-hero">
+      <div class="container">
+        <div class="hero-content">
+          <div class="hero-label">Platform Features</div>
+          <h1>Everything your team needs to <span class="accent">close more deals</span></h1>
+          <p>Mini CRM is a fully configurable platform. Build the exact CRM your business needs — no code required.</p>
+          <div class="hero-cta">
+            <a href="http://localhost:3000/register" class="btn btn-primary btn-lg">Start Free Trial</a>
+            <a href="/getting-started" class="btn btn-secondary btn-lg">See How It Works</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Feature categories -->
+    <section class="section">
+      <div class="container">
+
+        <!-- 1. Custom Objects -->
+        <div class="feature-block">
+          <div class="feature-block-content">
+            <div class="feature-icon" style="background:#EBF2FF; color:#0066FF">
+              <Database size={28} strokeWidth={1.8} />
+            </div>
+            <div class="feature-block-label">Object Settings</div>
+            <h2 class="feature-block-title">Build your own data model</h2>
+            <p class="feature-block-desc">Create any object — Accounts, Contacts, Leads, Projects, Properties, Cases — whatever your business needs. Add custom fields of any type, configure layouts, and set sharing rules.</p>
+            <ul class="feature-list">
+              <li>20+ field types: text, number, currency, date, picklist, formula, lookup, and more</li>
+              <li>Master-detail and lookup relationships between objects</li>
+              <li>Visual Schema Builder to explore object relationships</li>
+              <li>Page layout customization per object</li>
+              <li>Required, unique, read-only, and formula field validation</li>
+              <li>Auto-number fields with configurable format</li>
+            </ul>
+            <a href="/user-guide/objects" class="feature-learn">Learn more about Object Settings →</a>
+          </div>
+          <div class="feature-block-visual">
+            <div class="visual-card">
+              <div class="visual-card-header" style="background:#0066FF">
+                <span class="visual-card-title">Contact</span>
+                <span class="visual-card-badge">Custom Object</span>
+              </div>
+              <div class="visual-card-body">
+                <div class="visual-field"><span class="vf-dot" style="background:#64748b"></span><span class="vf-name">Full Name</span><span class="vf-type">text</span></div>
+                <div class="visual-field"><span class="vf-dot" style="background:#0891b2"></span><span class="vf-name">Email</span><span class="vf-type">email</span></div>
+                <div class="visual-field"><span class="vf-dot" style="background:#0891b2"></span><span class="vf-name">Phone</span><span class="vf-type">phone</span></div>
+                <div class="visual-field"><span class="vf-dot" style="background:#6366f1"></span><span class="vf-name">Account</span><span class="vf-type">lookup → Account</span></div>
+                <div class="visual-field"><span class="vf-dot" style="background:#10b981"></span><span class="vf-name">Deal Value</span><span class="vf-type">currency</span></div>
+                <div class="visual-field"><span class="vf-dot" style="background:#ec4899"></span><span class="vf-name">Stage</span><span class="vf-type">picklist</span></div>
+                <div class="visual-field"><span class="vf-dot" style="background:#7c3aed"></span><span class="vf-name">Score</span><span class="vf-type">formula</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <!-- 2. Record Management -->
+        <div class="feature-block feature-block-reverse">
+          <div class="feature-block-content">
+            <div class="feature-icon" style="background:#f0fdf4; color:#10b981">
+              <FileText size={28} strokeWidth={1.8} />
+            </div>
+            <div class="feature-block-label">Records</div>
+            <h2 class="feature-block-title">Manage every record effortlessly</h2>
+            <p class="feature-block-desc">Create, view, edit, and delete records with a powerful interface. See related records inline, attach files, and track every change with field history.</p>
+            <ul class="feature-list">
+              <li>Rich list view with sorting, filtering, and search</li>
+              <li>Inline related lists — see related records on the detail page</li>
+              <li>File and image attachments</li>
+              <li>Notes and activity tracking</li>
+              <li>Record cloning and bulk operations</li>
+              <li>Full audit trail of field changes</li>
+            </ul>
+            <a href="/user-guide/records" class="feature-learn">Learn more about Records →</a>
+          </div>
+          <div class="feature-block-visual">
+            <div class="record-preview">
+              <div class="record-header">
+                <div class="record-icon">JD</div>
+                <div>
+                  <div class="record-name">Jane Doe</div>
+                  <div class="record-sub">Senior Buyer · Acme Corp</div>
+                </div>
+                <span class="record-stage">Qualified</span>
+              </div>
+              <div class="record-fields">
+                <div class="rf"><span class="rf-label">Email</span><span>jane@acme.com</span></div>
+                <div class="rf"><span class="rf-label">Phone</span><span>+27 11 000 0000</span></div>
+                <div class="rf"><span class="rf-label">Deal Value</span><span>R 125,000</span></div>
+                <div class="rf"><span class="rf-label">Close Date</span><span>30 Apr 2026</span></div>
+              </div>
+              <div class="record-related">
+                <div class="related-title">Related Activities <span class="related-count">3</span></div>
+                <div class="related-item">📞 Call scheduled — Apr 10</div>
+                <div class="related-item">✉️ Proposal sent — Apr 6</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <!-- 3. Automation -->
+        <div class="feature-block">
+          <div class="feature-block-content">
+            <div class="feature-icon" style="background:#fef3c7; color:#d97706">
+              <Zap size={28} strokeWidth={1.8} />
+            </div>
+            <div class="feature-block-label">Automation</div>
+            <h2 class="feature-block-title">Automate repetitive work</h2>
+            <p class="feature-block-desc">Build powerful automation flows with a visual drag-and-drop builder. Trigger on record changes, schedules, or webhooks — then chain conditions and actions.</p>
+            <ul class="feature-list">
+              <li>Trigger types: Record Changed, Scheduled, Webhook Received, Record Created</li>
+              <li>Conditions: field equals, greater than, contains, formula-based</li>
+              <li>Actions: Send Email, Update Field, Create Record, HTTP Webhook, Wait/Delay</li>
+              <li>Visual flow canvas with drag-and-drop nodes</li>
+              <li>Execution history and error logging</li>
+              <li>Active/inactive toggle per flow</li>
+            </ul>
+            <a href="/user-guide/automation" class="feature-learn">Learn more about Automation →</a>
+          </div>
+          <div class="feature-block-visual">
+            <div class="flow-preview">
+              <div class="flow-node flow-trigger">
+                <span class="fn-icon">⚡</span>
+                <div><div class="fn-label">Trigger</div><div class="fn-val">Record Changed — Stage = Closed Won</div></div>
+              </div>
+              <div class="flow-arrow">↓</div>
+              <div class="flow-node flow-condition">
+                <span class="fn-icon">🔀</span>
+                <div><div class="fn-label">Condition</div><div class="fn-val">Deal Value &gt; R 50,000</div></div>
+              </div>
+              <div class="flow-arrow">↓</div>
+              <div class="flow-node flow-action">
+                <span class="fn-icon">✉️</span>
+                <div><div class="fn-label">Action</div><div class="fn-val">Send Email — "High Value Win" template</div></div>
+              </div>
+              <div class="flow-arrow">↓</div>
+              <div class="flow-node flow-action">
+                <span class="fn-icon">🔗</span>
+                <div><div class="fn-label">Action</div><div class="fn-val">Webhook → Slack notification</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <!-- 4. Dashboards & Analytics -->
+        <div class="feature-block feature-block-reverse">
+          <div class="feature-block-content">
+            <div class="feature-icon" style="background:#f0f4ff; color:#6366f1">
+              <BarChart3 size={28} strokeWidth={1.8} />
+            </div>
+            <div class="feature-block-label">Dashboards &amp; Analytics</div>
+            <h2 class="feature-block-title">Turn data into decisions</h2>
+            <p class="feature-block-desc">Build rich dashboards with drag-and-drop widgets. Visualise record counts, trends, and custom metrics. Share dashboards with your team or keep them private.</p>
+            <ul class="feature-list">
+              <li>4 widget types: Metric, Chart (bar/line/pie), Table, Text/HTML</li>
+              <li>Filter widgets by date range, user, and custom field values</li>
+              <li>Real-time data from any object</li>
+              <li>Dashboard sharing and access control</li>
+              <li>Dashboard folders for organisation</li>
+              <li>Built-in analytics: record counts, activity trends, user stats</li>
+            </ul>
+            <a href="/user-guide/dashboards" class="feature-learn">Learn more about Dashboards →</a>
+          </div>
+          <div class="feature-block-visual">
+            <div class="dashboard-preview">
+              <div class="dash-row">
+                <div class="dash-metric"><div class="dm-val">248</div><div class="dm-label">Total Contacts</div></div>
+                <div class="dash-metric"><div class="dm-val" style="color:#10b981">R 1.4M</div><div class="dm-label">Pipeline Value</div></div>
+                <div class="dash-metric"><div class="dm-val" style="color:#f59e0b">34%</div><div class="dm-label">Win Rate</div></div>
+              </div>
+              <div class="dash-chart">
+                <div class="chart-label">Deals by Stage</div>
+                <div class="chart-bars">
+                  <div class="cb-wrap"><div class="cb" style="height:40px; background:#0066FF"></div><div class="cb-l">Prospect</div></div>
+                  <div class="cb-wrap"><div class="cb" style="height:65px; background:#6366f1"></div><div class="cb-l">Qualified</div></div>
+                  <div class="cb-wrap"><div class="cb" style="height:50px; background:#f59e0b"></div><div class="cb-l">Proposal</div></div>
+                  <div class="cb-wrap"><div class="cb" style="height:30px; background:#10b981"></div><div class="cb-l">Won</div></div>
+                  <div class="cb-wrap"><div class="cb" style="height:20px; background:#ef4444"></div><div class="cb-l">Lost</div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <!-- 5. Multi-tenant + RBAC -->
+        <div class="feature-block">
+          <div class="feature-block-content">
+            <div class="feature-icon" style="background:#fdf4ff; color:#9333ea">
+              <Shield size={28} strokeWidth={1.8} />
+            </div>
+            <div class="feature-block-label">Access Control</div>
+            <h2 class="feature-block-title">Fine-grained roles &amp; permissions</h2>
+            <p class="feature-block-desc">Create custom roles with precise control over what each user can see and do — down to the object and field level.</p>
+            <ul class="feature-list">
+              <li>Custom roles with named permission sets</li>
+              <li>App-level permissions: manage objects, users, automations, analytics</li>
+              <li>Object-level CRUD permissions per role</li>
+              <li>Field-level read/write restrictions</li>
+              <li>Sharing model: Public Read/Write, Public Read Only, Private</li>
+              <li>Multi-workspace support (each company gets an isolated tenant)</li>
+            </ul>
+            <a href="/user-guide/users-roles" class="feature-learn">Learn more about Users &amp; Roles →</a>
+          </div>
+          <div class="feature-block-visual">
+            <div class="rbac-preview">
+              <div class="rbac-role">
+                <div class="rbac-role-name">Sales Rep</div>
+                <div class="rbac-perms">
+                  <div class="rp rp-yes">✓ View Contacts</div>
+                  <div class="rp rp-yes">✓ Create Deals</div>
+                  <div class="rp rp-yes">✓ Edit Own Records</div>
+                  <div class="rp rp-no">✗ Delete Records</div>
+                  <div class="rp rp-no">✗ Manage Objects</div>
+                  <div class="rp rp-no">✗ Manage Users</div>
+                </div>
+              </div>
+              <div class="rbac-role">
+                <div class="rbac-role-name">Admin</div>
+                <div class="rbac-perms">
+                  <div class="rp rp-yes">✓ All Record Operations</div>
+                  <div class="rp rp-yes">✓ Manage Objects &amp; Fields</div>
+                  <div class="rp rp-yes">✓ Manage Users</div>
+                  <div class="rp rp-yes">✓ Create Automations</div>
+                  <div class="rp rp-no">✗ System Settings</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <!-- More features grid -->
+        <div class="more-features">
+          <div class="section-header">
+            <span class="section-label">More Features</span>
+            <h2 class="section-title">And much more</h2>
+            <p class="section-subtitle">Every tool your CRM team needs, all in one place.</p>
+          </div>
+          <div class="more-grid">
+            <div class="more-card">
+              <div class="more-icon" style="background:#fce7f3; color:#ec4899;">
+                <Mail size={24} strokeWidth={2} />
+              </div>
+              <h4>Email Templates</h4>
+              <p>Create reusable HTML email templates with merge fields. Send directly from records or via automation.</p>
+            </div>
+            <div class="more-card">
+              <div class="more-icon" style="background:#e0f2fe; color:#0891b2;">
+                <Link2 size={24} strokeWidth={2} />
+              </div>
+              <h4>Integrations &amp; Webhooks</h4>
+              <p>Connect Mini CRM to any external system using REST API, API keys, and outgoing webhooks.</p>
+            </div>
+            <div class="more-card">
+              <div class="more-icon" style="background:#ffedd5; color:#f97316;">
+                <Sparkles size={24} strokeWidth={2} />
+              </div>
+              <h4>AI Onboarding</h4>
+              <p>Our AI automatically sets up objects, fields, and sample records based on your industry and use case.</p>
+            </div>
+            <div class="more-card">
+              <div class="more-icon" style="background:#e0e7ff; color:#6366f1;">
+                <Search size={24} strokeWidth={2} />
+              </div>
+              <h4>Global Search</h4>
+              <p>Find any record across all objects instantly with the powerful full-text search engine.</p>
+            </div>
+            <div class="more-card">
+              <div class="more-icon" style="background:#f0fdf4; color:#10b981;">
+                <Network size={24} strokeWidth={2} />
+              </div>
+              <h4>Schema Builder</h4>
+              <p>Visualise your entire data model — objects, fields, and relationships — on an interactive canvas.</p>
+            </div>
+            <div class="more-card">
+              <div class="more-icon" style="background:#fef3c7; color:#d97706;">
+                <Key size={24} strokeWidth={2} />
+              </div>
+              <h4>API Key Access</h4>
+              <p>Generate scoped API keys for third-party integrations with per-object access restrictions and IP whitelisting.</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="features-cta">
+      <div class="container">
+        <h2>Ready to see it in action?</h2>
+        <p>Create your free workspace in under 2 minutes. No credit card required.</p>
+        <div class="cta-btns">
+          <a href="http://localhost:3000/register" class="btn btn-primary btn-lg">Start Free</a>
+          <a href="/getting-started" class="btn" style="background:rgba(255,255,255,0.15); color:white; border:2px solid rgba(255,255,255,0.4);">View Getting Started Guide</a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <Footer />
+</BaseLayout>
+
+<style>
+  .main { padding-top: 72px; }
+
+  /* Hero */
+  .features-hero {
+    background: linear-gradient(135deg, #f8faff 0%, #eef3ff 100%);
+    padding: 80px 0 72px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .hero-content {
+    text-align: center;
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  .hero-label {
+    display: inline-block;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--primary);
+    background: var(--primary-subtle);
+    padding: 5px 14px;
+    border-radius: 999px;
+    margin-bottom: 20px;
+  }
+  .features-hero h1 {
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 800;
+    margin: 0 auto 20px;
+    line-height: 1.15;
+  }
+  .accent { color: var(--primary); }
+  .features-hero p {
+    font-size: clamp(1rem, 2vw, 1.25rem);
+    color: var(--text-secondary);
+    margin: 0 auto 36px;
+  }
+  .hero-cta { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+
+  /* Feature blocks */
+  .feature-block {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+    padding: 60px 0;
+  }
+  .feature-block-reverse { direction: rtl; }
+  .feature-block-reverse > * { direction: ltr; }
+
+  .feature-icon {
+    width: 56px; height: 56px;
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 16px;
+  }
+  .feature-block-label {
+    font-size: 0.8125rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--primary);
+    margin-bottom: 10px;
+  }
+  .feature-block-title {
+    font-size: 2rem;
+    font-weight: 800;
+    line-height: 1.2;
+    margin-bottom: 16px;
+  }
+  .feature-block-desc {
+    color: var(--text-secondary);
+    margin-bottom: 24px;
+    line-height: 1.7;
+    font-size: 1.0625rem;
+  }
+  .feature-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+  .feature-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    color: var(--text-secondary);
+    font-size: 0.9375rem;
+  }
+  .feature-list li::before {
+    content: "✓";
+    color: var(--primary);
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .feature-learn {
+    font-weight: 600;
+    color: var(--primary);
+    font-size: 0.9375rem;
+  }
+  .feature-learn:hover { text-decoration: underline; }
+
+  .section-divider {
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* Visual: Object card */
+  .visual-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: var(--shadow-lg);
+  }
+  .visual-card-header {
+    padding: 14px 16px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .visual-card-title { color: white; font-weight: 700; font-size: 1rem; }
+  .visual-card-badge {
+    font-size: 0.7rem; background: rgba(255,255,255,0.2);
+    color: white; padding: 2px 8px; border-radius: 999px; font-weight: 600;
+  }
+  .visual-card-body { padding: 8px 0; }
+  .visual-field {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 16px; border-bottom: 1px solid #f1f5f9;
+  }
+  .visual-field:last-child { border-bottom: none; }
+  .vf-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .vf-name { flex: 1; font-size: 0.875rem; color: var(--text); font-weight: 500; }
+  .vf-type { font-size: 0.75rem; color: var(--text-muted); font-family: monospace; }
+
+  /* Visual: Record preview */
+  .record-preview {
+    background: white; border: 1px solid var(--border);
+    border-radius: 12px; overflow: hidden; box-shadow: var(--shadow-lg);
+  }
+  .record-header {
+    display: flex; align-items: center; gap: 14px;
+    padding: 20px; background: #f8fafc; border-bottom: 1px solid var(--border);
+  }
+  .record-icon {
+    width: 44px; height: 44px; border-radius: 50%;
+    background: var(--primary); color: white;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 0.875rem; flex-shrink: 0;
+  }
+  .record-name { font-weight: 700; font-size: 1rem; }
+  .record-sub { font-size: 0.8125rem; color: var(--text-secondary); }
+  .record-stage {
+    margin-left: auto;
+    background: #d1fae5; color: #065f46;
+    font-size: 0.75rem; font-weight: 600;
+    padding: 4px 10px; border-radius: 999px;
+  }
+  .record-fields { padding: 16px 20px; display: flex; flex-direction: column; gap: 8px; border-bottom: 1px solid var(--border); }
+  .rf { display: flex; justify-content: space-between; font-size: 0.875rem; }
+  .rf-label { color: var(--text-secondary); font-weight: 500; }
+  .record-related { padding: 14px 20px; }
+  .related-title { font-size: 0.8125rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+  .related-count { background: var(--border); color: var(--text-secondary); font-size: 0.75rem; padding: 1px 7px; border-radius: 999px; }
+  .related-item { font-size: 0.875rem; color: var(--text-secondary); padding: 6px 0; border-bottom: 1px solid #f1f5f9; }
+  .related-item:last-child { border-bottom: none; }
+
+  /* Visual: Flow */
+  .flow-preview {
+    display: flex; flex-direction: column; align-items: center; gap: 0;
+    padding: 16px;
+  }
+  .flow-node {
+    width: 100%; display: flex; align-items: flex-start; gap: 12px;
+    padding: 14px; border-radius: 10px; border: 1px solid var(--border);
+    background: white; box-shadow: var(--shadow-sm);
+  }
+  .flow-trigger { border-left: 4px solid #f59e0b; }
+  .flow-condition { border-left: 4px solid #6366f1; }
+  .flow-action { border-left: 4px solid #0066FF; }
+  .fn-icon { font-size: 1.25rem; line-height: 1; flex-shrink: 0; }
+  .fn-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); margin-bottom: 2px; }
+  .fn-val { font-size: 0.8125rem; color: var(--text); }
+  .flow-arrow { font-size: 1.25rem; color: var(--text-muted); line-height: 1; padding: 4px 0; }
+
+  /* Visual: Dashboard */
+  .dashboard-preview {
+    background: white; border: 1px solid var(--border);
+    border-radius: 12px; overflow: hidden; box-shadow: var(--shadow-lg); padding: 16px;
+  }
+  .dash-row { display: flex; gap: 12px; margin-bottom: 16px; }
+  .dash-metric {
+    flex: 1; background: #f8fafc; border: 1px solid var(--border);
+    border-radius: 8px; padding: 14px 12px; text-align: center;
+  }
+  .dm-val { font-size: 1.5rem; font-weight: 800; color: var(--text); }
+  .dm-label { font-size: 0.7rem; color: var(--text-secondary); margin-top: 4px; }
+  .dash-chart { background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; padding: 12px; }
+  .chart-label { font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 12px; }
+  .chart-bars { display: flex; align-items: flex-end; gap: 8px; height: 80px; }
+  .cb-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; height: 100%; justify-content: flex-end; }
+  .cb { width: 100%; border-radius: 4px 4px 0 0; }
+  .cb-l { font-size: 0.6rem; color: var(--text-secondary); text-align: center; }
+
+  /* Visual: RBAC */
+  .rbac-preview { display: flex; flex-direction: column; gap: 16px; }
+  .rbac-role {
+    background: white; border: 1px solid var(--border); border-radius: 10px; overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+  .rbac-role-name {
+    background: #0f172a; color: white; padding: 10px 16px;
+    font-size: 0.875rem; font-weight: 700;
+  }
+  .rbac-perms { padding: 10px 16px; display: flex; flex-direction: column; gap: 6px; }
+  .rp { font-size: 0.8125rem; }
+  .rp-yes { color: #065f46; }
+  .rp-no { color: #b91c1c; }
+
+  /* More features */
+  .more-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+  .more-card {
+    background: white; border: 1px solid var(--border); border-radius: 12px;
+    padding: 28px 24px; box-shadow: var(--shadow);
+    transition: box-shadow 0.2s, transform 0.2s;
+  }
+  .more-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-2px); }
+  .more-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 14px;
+  }
+  .more-card h4 { font-size: 1rem; font-weight: 700; margin-bottom: 8px; }
+  .more-card p { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.6; }
+
+  /* CTA */
+  .features-cta {
+    background: linear-gradient(135deg, #0066FF 0%, #004ecc 100%);
+    color: white; padding: 80px 0; text-align: center;
+  }
+  .features-cta h2 { color: white; margin-bottom: 16px; font-size: 2.5rem; }
+  .features-cta p { color: rgba(255,255,255,0.8); font-size: 1.2rem; margin-bottom: 36px; }
+  .cta-btns { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+
+  @media (max-width: 900px) {
+    .feature-block { grid-template-columns: 1fr; gap: 40px; }
+    .feature-block-reverse { direction: ltr; }
+    .features-hero h1 { font-size: 2.25rem; }
+    .more-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 640px) {
+    .more-grid { grid-template-columns: 1fr; }
+    .dash-row { flex-direction: column; }
+  }
+</style>

@@ -1,0 +1,385 @@
+---
+import DocsLayout from '../../layouts/DocsLayout.astro';
+---
+
+<DocsLayout
+  title="Records - User Guide - Mini CRM"
+  description="Learn how to create, edit, view, and manage records in Mini CRM"
+>
+  <h1>Records</h1>
+
+  <p>
+    Records are individual instances of your objects - the actual data you're tracking in
+    Mini CRM. This guide covers all aspects of working with records, from creation to deletion,
+    and everything in between.
+  </p>
+
+  <h2>Understanding Records</h2>
+
+  <p>
+    If objects are like templates or blueprints, records are the actual items created from
+    those templates. For example:
+  </p>
+
+  <ul>
+    <li>A <strong>Customer</strong> object might have records for "Acme Corp", "TechStart Inc", etc.</li>
+    <li>An <strong>Opportunity</strong> object might have records for "Q1 Enterprise Deal", "Website Redesign", etc.</li>
+    <li>A <strong>Case</strong> object might have records for individual support tickets</li>
+  </ul>
+
+  <h2>Creating Records</h2>
+
+  <p>There are several ways to create new records in Mini CRM:</p>
+
+  <h3>Method 1: Manual Creation</h3>
+  <ol>
+    <li>Navigate to the object (e.g., Customers, Opportunities) from the main menu</li>
+    <li>Click the <strong>"New"</strong> button in the top right</li>
+    <li>Fill in the field values:
+      <ul>
+        <li><strong>Required fields</strong> are marked with a red asterisk</li>
+        <li><strong>Lookup fields</strong> have a search icon - click to find related records</li>
+        <li><strong>Picklist fields</strong> show dropdown menus with predefined options</li>
+        <li><strong>Date fields</strong> have calendar pickers</li>
+      </ul>
+    </li>
+    <li>Click <strong>"Save"</strong> to create the record</li>
+    <li>Or click <strong>"Save & New"</strong> to create another record immediately</li>
+  </ol>
+
+  <h3>Method 2: Quick Create from Related Lists</h3>
+  <p>
+    When viewing a record, you can create related records directly from related lists:
+  </p>
+  <ol>
+    <li>Open a record (e.g., a Customer)</li>
+    <li>Scroll to a related list (e.g., Opportunities)</li>
+    <li>Click <strong>"New"</strong> in the related list header</li>
+    <li>The relationship field is pre-filled automatically</li>
+    <li>Fill in remaining fields and save</li>
+  </ol>
+
+  <h3>Method 3: Clone Existing Records</h3>
+  <p>
+    Save time by cloning similar records:
+  </p>
+  <ol>
+    <li>Open the record you want to clone</li>
+    <li>Click the <strong>"Clone"</strong> button</li>
+    <li>All field values are copied to a new record</li>
+    <li>Modify as needed and save</li>
+  </ol>
+
+  <div class="note">
+    <strong>Note:</strong> Some fields like auto-number fields and unique fields won't be cloned
+    to prevent conflicts.
+  </div>
+
+  <h3>Method 4: Import Records</h3>
+  <p>
+    For bulk record creation, use the import feature:
+  </p>
+  <ol>
+    <li>Navigate to the object</li>
+    <li>Click <strong>"Import"</strong></li>
+    <li>Upload a CSV file with your data</li>
+    <li>Map CSV columns to object fields</li>
+    <li>Review and confirm the import</li>
+  </ol>
+
+  <h2>Viewing Records</h2>
+
+  <h3>List View</h3>
+  <p>
+    The list view shows all records in a table format:
+  </p>
+  <ul>
+    <li><strong>Search:</strong> Use the search box to find records by any field value</li>
+    <li><strong>Sort:</strong> Click column headers to sort ascending or descending</li>
+    <li><strong>Filter:</strong> Apply filters to show only records matching criteria</li>
+    <li><strong>Select:</strong> Use checkboxes to select multiple records for bulk actions</li>
+    <li><strong>Pagination:</strong> Navigate through pages if you have many records</li>
+  </ul>
+
+  <h3>Detail View</h3>
+  <p>
+    Click a record to see its complete details:
+  </p>
+  <ul>
+    <li><strong>Field values:</strong> All fields displayed in sections</li>
+    <li><strong>Related lists:</strong> Child records and relationships</li>
+    <li><strong>Activity history:</strong> Audit trail of changes</li>
+    <li><strong>Action buttons:</strong> Edit, Delete, Clone, Share</li>
+  </ul>
+
+  <h3>Customizing List Views</h3>
+  <p>
+    Create custom views to see exactly what you need:
+  </p>
+  <ol>
+    <li>Click <strong>"Create View"</strong> in the list view</li>
+    <li>Name your view</li>
+    <li>Select which columns to display</li>
+    <li>Add filter criteria</li>
+    <li>Choose sort order</li>
+    <li>Save and share with other users if desired</li>
+  </ol>
+
+  <h2>Editing Records</h2>
+
+  <h3>Single Record Edit</h3>
+  <ol>
+    <li>Open the record detail page</li>
+    <li>Click the <strong>"Edit"</strong> button</li>
+    <li>Modify field values as needed</li>
+    <li>Click <strong>"Save"</strong> to commit changes</li>
+    <li>Or click <strong>"Cancel"</strong> to discard changes</li>
+  </ol>
+
+  <h3>Inline Editing</h3>
+  <p>
+    For quick updates, use inline editing in list views:
+  </p>
+  <ol>
+    <li>Double-click a field value in the list view</li>
+    <li>The field becomes editable</li>
+    <li>Enter the new value</li>
+    <li>Press Enter or click outside to save</li>
+    <li>Press Escape to cancel</li>
+  </ol>
+
+  <h3>Bulk Edit</h3>
+  <p>
+    Update multiple records at once:
+  </p>
+  <ol>
+    <li>In the list view, select records using checkboxes</li>
+    <li>Click <strong>"Bulk Edit"</strong></li>
+    <li>Choose which fields to update</li>
+    <li>Enter new values (applied to all selected records)</li>
+    <li>Review changes and confirm</li>
+  </ol>
+
+  <div class="warning">
+    <strong>Warning:</strong> Bulk edits affect all selected records. Always review carefully
+    before confirming. Consider testing on a few records first.
+  </div>
+
+  <h2>Deleting Records</h2>
+
+  <h3>Single Record Deletion</h3>
+  <ol>
+    <li>Open the record</li>
+    <li>Click the <strong>"Delete"</strong> button</li>
+    <li>Confirm the deletion in the dialog</li>
+  </ol>
+
+  <h3>Bulk Deletion</h3>
+  <ol>
+    <li>Select multiple records in the list view</li>
+    <li>Click <strong>"Delete"</strong></li>
+    <li>Confirm that you want to delete all selected records</li>
+  </ol>
+
+  <div class="warning">
+    <strong>Important:</strong> Deletions are permanent and cannot be undone. If the object has
+    master-detail relationships, deleting a parent record will also delete all child records.
+  </div>
+
+  <h2>Related Lists</h2>
+
+  <p>
+    Related lists show records that are connected through lookup or master-detail relationships.
+    They appear at the bottom of the record detail page.
+  </p>
+
+  <h3>Using Related Lists</h3>
+  <ul>
+    <li><strong>View related records:</strong> See all child records in a mini-list</li>
+    <li><strong>Create new:</strong> Click "New" to create a related record</li>
+    <li><strong>Remove:</strong> For lookup relationships, remove the association</li>
+    <li><strong>Open:</strong> Click a record to view its full details</li>
+    <li><strong>Sort and search:</strong> Related lists support basic sorting and filtering</li>
+  </ul>
+
+  <h3>Example: Customer Related Lists</h3>
+  <p>A Customer record might show these related lists:</p>
+  <ul>
+    <li><strong>Contacts:</strong> People at this company</li>
+    <li><strong>Opportunities:</strong> Sales deals with this customer</li>
+    <li><strong>Cases:</strong> Support tickets from this customer</li>
+    <li><strong>Activities:</strong> Emails, calls, and meetings</li>
+  </ul>
+
+  <h2>Attachments and Files</h2>
+
+  <p>
+    Attach files to records to keep everything organized in one place.
+  </p>
+
+  <h3>Adding Attachments</h3>
+  <ol>
+    <li>Open a record</li>
+    <li>Scroll to the <strong>Attachments</strong> section</li>
+    <li>Click <strong>"Upload File"</strong> or drag and drop files</li>
+    <li>Supported file types: PDF, Word, Excel, images, and more</li>
+    <li>Files are stored securely with the record</li>
+  </ol>
+
+  <h3>Managing Attachments</h3>
+  <ul>
+    <li><strong>Download:</strong> Click the file name</li>
+    <li><strong>Preview:</strong> View images and PDFs inline</li>
+    <li><strong>Delete:</strong> Remove files you no longer need</li>
+    <li><strong>Version:</strong> Upload new versions (previous versions are kept)</li>
+  </ul>
+
+  <h2>Record Sharing</h2>
+
+  <p>
+    Control who can access specific records beyond role-based permissions.
+  </p>
+
+  <h3>Sharing a Record</h3>
+  <ol>
+    <li>Open the record</li>
+    <li>Click <strong>"Share"</strong></li>
+    <li>Select users or roles to share with</li>
+    <li>Choose access level:
+      <ul>
+        <li><strong>View Only:</strong> Can see the record but not edit</li>
+        <li><strong>Edit:</strong> Can view and modify the record</li>
+      </ul>
+    </li>
+    <li>Click <strong>"Share"</strong> to grant access</li>
+  </ol>
+
+  <h3>Removing Sharing</h3>
+  <ol>
+    <li>Open the record</li>
+    <li>Click <strong>"Sharing"</strong></li>
+    <li>See all users with access</li>
+    <li>Click the X next to a user to revoke access</li>
+  </ol>
+
+  <h2>Record History and Audit Trail</h2>
+
+  <p>
+    Mini CRM tracks changes to records for accountability and troubleshooting.
+  </p>
+
+  <h3>Viewing History</h3>
+  <ul>
+    <li>Open a record</li>
+    <li>Scroll to <strong>History</strong> or <strong>Activity</strong></li>
+    <li>See a chronological list of changes</li>
+    <li>Each entry shows:
+      <ul>
+        <li>Who made the change</li>
+        <li>When it was made</li>
+        <li>Which field was changed</li>
+        <li>Old and new values</li>
+      </ul>
+    </li>
+  </ul>
+
+  <h2>Advanced Features</h2>
+
+  <h3>Record Locking</h3>
+  <p>
+    Lock records to prevent further edits:
+  </p>
+  <ul>
+    <li>Useful for closed deals or archived data</li>
+    <li>Only administrators can unlock</li>
+    <li>Prevents accidental changes</li>
+  </ul>
+
+  <h3>Mass Transfer</h3>
+  <p>
+    Reassign record ownership in bulk:
+  </p>
+  <ol>
+    <li>Select records in list view</li>
+    <li>Click <strong>"Change Owner"</strong></li>
+    <li>Select the new owner</li>
+    <li>Confirm the transfer</li>
+  </ol>
+
+  <h3>Merge Duplicates</h3>
+  <p>
+    Combine duplicate records:
+  </p>
+  <ol>
+    <li>Identify duplicates (use duplicate detection rules)</li>
+    <li>Select up to 3 records to merge</li>
+    <li>Choose which values to keep from each record</li>
+    <li>Merge - the selected record remains, others are deleted</li>
+    <li>All related records and history are preserved</li>
+  </ol>
+
+  <h2>Best Practices</h2>
+
+  <h3>Data Entry</h3>
+  <ul>
+    <li>Fill in all required fields before saving</li>
+    <li>Use consistent naming conventions (e.g., "Acme Corp" not "ACME" or "acme corp")</li>
+    <li>Check for duplicates before creating new records</li>
+    <li>Use picklist values instead of free text when available</li>
+    <li>Add notes and comments for context</li>
+  </ul>
+
+  <h3>Record Management</h3>
+  <ul>
+    <li>Keep records up to date - set reminders if needed</li>
+    <li>Archive or delete outdated records</li>
+    <li>Use meaningful record names (they appear in search results)</li>
+    <li>Attach relevant files rather than storing them elsewhere</li>
+    <li>Review related lists regularly to maintain relationships</li>
+  </ul>
+
+  <h3>Performance</h3>
+  <ul>
+    <li>Use list view filters instead of scrolling through all records</li>
+    <li>Create custom views for frequently-used filters</li>
+    <li>Limit the number of columns in list views</li>
+    <li>Archive old records to keep the database lean</li>
+  </ul>
+
+  <h2>Keyboard Shortcuts</h2>
+
+  <p>Work faster with these shortcuts:</p>
+  <ul>
+    <li><strong>Ctrl/Cmd + S:</strong> Save the current record</li>
+    <li><strong>Ctrl/Cmd + E:</strong> Enter edit mode</li>
+    <li><strong>Escape:</strong> Cancel editing</li>
+    <li><strong>Ctrl/Cmd + K:</strong> Quick search</li>
+    <li><strong>Ctrl/Cmd + N:</strong> Create new record</li>
+  </ul>
+
+  <h2>Troubleshooting</h2>
+
+  <h3>Can't Save Record</h3>
+  <p>Check for:</p>
+  <ul>
+    <li>Missing required fields</li>
+    <li>Validation rule failures (error message should explain)</li>
+    <li>Field length exceeded</li>
+    <li>Permission issues</li>
+  </ul>
+
+  <h3>Record Not Appearing in List</h3>
+  <ul>
+    <li>Check active filters</li>
+    <li>Verify you have view permissions</li>
+    <li>Try the "All Records" view</li>
+    <li>Search by record ID directly</li>
+  </ul>
+
+  <h3>Related List Empty</h3>
+  <ul>
+    <li>Verify relationship field is set on child records</li>
+    <li>Check permissions on the related object</li>
+    <li>Ensure records exist (create one to test)</li>
+  </ul>
+</DocsLayout>

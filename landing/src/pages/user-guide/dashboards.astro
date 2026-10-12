@@ -1,0 +1,338 @@
+---
+import DocsLayout from '../../layouts/DocsLayout.astro';
+---
+
+<DocsLayout
+  title="Dashboards - User Guide - Mini CRM"
+  description="Learn how to create and manage dashboards in Mini CRM"
+>
+  <h1>Dashboards</h1>
+
+  <p>
+    Dashboards provide real-time insights into your business with customizable widgets,
+    charts, and metrics. This guide covers creating dashboards, configuring widgets,
+    and sharing insights with your team.
+  </p>
+
+  <h2>Dashboard Overview</h2>
+
+  <p>
+    A dashboard is a collection of widgets that display data from your CRM. Each widget
+    can show metrics, charts, tables, or custom text to help you monitor KPIs and make
+    data-driven decisions.
+  </p>
+
+  <h2>Creating a Dashboard</h2>
+
+  <ol>
+    <li>Navigate to <strong>Dashboards</strong></li>
+    <li>Click <strong>"New Dashboard"</strong></li>
+    <li>Enter dashboard name and description</li>
+    <li>Click <strong>Save</strong></li>
+    <li>Start adding widgets</li>
+  </ol>
+
+  <h2>Widget Types</h2>
+
+  <h3>Metric Widget</h3>
+  <p>Display a single number - count, sum, average, min, or max.</p>
+  <ul>
+    <li><strong>Use for:</strong> Total customers, revenue this month, open cases</li>
+    <li><strong>Configuration:</strong>
+      <ul>
+        <li>Select object</li>
+        <li>Choose aggregation (count, sum, avg, etc.)</li>
+        <li>Select field to aggregate (for sum/avg)</li>
+        <li>Add filters</li>
+      </ul>
+    </li>
+    <li><strong>Example:</strong> Count of Opportunities where Stage = "Closed Won"</li>
+  </ul>
+
+  <h3>Chart Widget</h3>
+  <p>Visualize data with bar, line, pie, or donut charts.</p>
+  <ul>
+    <li><strong>Chart types:</strong>
+      <ul>
+        <li><strong>Bar:</strong> Compare categories</li>
+        <li><strong>Line:</strong> Show trends over time</li>
+        <li><strong>Pie/Donut:</strong> Show proportions</li>
+      </ul>
+    </li>
+    <li><strong>Configuration:</strong>
+      <ul>
+        <li>Select object and chart type</li>
+        <li>Choose X-axis (category or date field)</li>
+        <li>Choose Y-axis (metric to measure)</li>
+        <li>Add filters and sort order</li>
+      </ul>
+    </li>
+    <li><strong>Example:</strong> Bar chart of Opportunities by Stage, showing total Amount</li>
+  </ul>
+
+  <h3>Table Widget</h3>
+  <p>Show a list of records with selected columns.</p>
+  <ul>
+    <li><strong>Use for:</strong> Recent records, top performers, items needing attention</li>
+    <li><strong>Configuration:</strong>
+      <ul>
+        <li>Select object</li>
+        <li>Choose columns to display</li>
+        <li>Add filters</li>
+        <li>Set sort order</li>
+        <li>Limit number of rows</li>
+      </ul>
+    </li>
+    <li><strong>Example:</strong> Top 10 Opportunities by Amount, sorted descending</li>
+  </ul>
+
+  <h3>Text Widget</h3>
+  <p>Add custom text, instructions, or formatting.</p>
+  <ul>
+    <li><strong>Use for:</strong> Dashboard titles, explanations, links, instructions</li>
+    <li><strong>Supports:</strong> Markdown formatting, links, headings</li>
+    <li><strong>Example:</strong> "This dashboard shows Q1 sales performance. Updated daily at 6am."</li>
+  </ul>
+
+  <h2>Adding Widgets</h2>
+
+  <ol>
+    <li>Open your dashboard</li>
+    <li>Click <strong>"Add Widget"</strong></li>
+    <li>Select widget type</li>
+    <li>Configure data source and display options</li>
+    <li>Preview the widget</li>
+    <li>Click <strong>Save</strong></li>
+    <li>Drag to position and resize as needed</li>
+  </ol>
+
+  <h2>Widget Configuration</h2>
+
+  <h3>Filters</h3>
+  <p>Limit which records are included:</p>
+  <ul>
+    <li>Add multiple filters with AND/OR logic</li>
+    <li>Use date ranges (this month, last quarter, etc.)</li>
+    <li>Filter by owner, status, or any field</li>
+    <li>Create dynamic filters that update automatically</li>
+  </ul>
+
+  <h3>Aggregations</h3>
+  <p>For metric and chart widgets:</p>
+  <ul>
+    <li><strong>Count:</strong> Number of records</li>
+    <li><strong>Sum:</strong> Total of a numeric field</li>
+    <li><strong>Average:</strong> Mean value</li>
+    <li><strong>Min/Max:</strong> Smallest/largest value</li>
+  </ul>
+
+  <h3>Grouping</h3>
+  <p>For charts and tables:</p>
+  <ul>
+    <li>Group by picklist values (Stage, Status, Priority)</li>
+    <li>Group by date (day, week, month, quarter, year)</li>
+    <li>Group by lookup field (Owner, Account, etc.)</li>
+  </ul>
+
+  <h2>Dashboard Layout</h2>
+
+  <h3>Arranging Widgets</h3>
+  <ul>
+    <li>Drag widgets to reposition</li>
+    <li>Resize by dragging corners</li>
+    <li>Widgets snap to grid for alignment</li>
+    <li>Use full width for important metrics</li>
+    <li>Group related widgets together</li>
+  </ul>
+
+  <h3>Best Layout Practices</h3>
+  <ul>
+    <li>Put most important metrics at the top</li>
+    <li>Use large widgets for key KPIs</li>
+    <li>Group related metrics</li>
+    <li>Use text widgets as section headers</li>
+    <li>Maintain consistent widget sizes</li>
+    <li>Leave some white space - don't overcrowd</li>
+  </ul>
+
+  <h2>Sharing Dashboards</h2>
+
+  <h3>Share with Users</h3>
+  <ol>
+    <li>Open the dashboard</li>
+    <li>Click <strong>"Share"</strong></li>
+    <li>Select users or roles</li>
+    <li>Choose access level:
+      <ul>
+        <li><strong>View:</strong> Can see the dashboard</li>
+        <li><strong>Edit:</strong> Can modify widgets and layout</li>
+      </ul>
+    </li>
+    <li>Click <strong>Share</strong></li>
+  </ol>
+
+  <h3>Public Dashboards</h3>
+  <p>Make dashboards visible to all workspace users:</p>
+  <ul>
+    <li>Enable "Public" option in dashboard settings</li>
+    <li>Appears in everyone's dashboard list</li>
+    <li>Useful for company-wide metrics</li>
+  </ul>
+
+  <h3>Default Dashboards</h3>
+  <p>Set a default dashboard for users:</p>
+  <ul>
+    <li>Mark dashboard as "Default for [Role]"</li>
+    <li>Users see this when they open Dashboards</li>
+    <li>Different defaults per role (Sales, Support, Manager)</li>
+  </ul>
+
+  <h2>Dashboard Examples</h2>
+
+  <h3>Sales Performance Dashboard</h3>
+  <ul>
+    <li>Metric: Total Revenue (Closed Won Opportunities)</li>
+    <li>Chart: Revenue by Month (Line chart)</li>
+    <li>Chart: Opportunities by Stage (Bar chart)</li>
+    <li>Table: Top 10 Deals by Amount</li>
+    <li>Metric: Win Rate (%)</li>
+    <li>Metric: Average Deal Size</li>
+  </ul>
+
+  <h3>Customer Support Dashboard</h3>
+  <ul>
+    <li>Metric: Open Cases</li>
+    <li>Metric: Avg. Resolution Time</li>
+    <li>Chart: Cases by Priority (Pie chart)</li>
+    <li>Chart: Cases Opened vs Closed (Line chart)</li>
+    <li>Table: Oldest Open Cases</li>
+    <li>Table: Cases Awaiting Response</li>
+  </ul>
+
+  <h3>Executive Overview</h3>
+  <ul>
+    <li>Metric: Total Customers</li>
+    <li>Metric: MRR (Monthly Recurring Revenue)</li>
+    <li>Chart: Revenue by Product Line (Bar chart)</li>
+    <li>Chart: Customer Growth (Line chart)</li>
+    <li>Metric: Customer Churn Rate</li>
+    <li>Metric: NPS Score</li>
+  </ul>
+
+  <h2>Real-Time Updates</h2>
+
+  <p>Dashboards update automatically:</p>
+  <ul>
+    <li>Data refreshes every 5 minutes by default</li>
+    <li>Click refresh icon to update immediately</li>
+    <li>See "Last updated" timestamp</li>
+    <li>Changes to records reflect in widgets</li>
+  </ul>
+
+  <h2>Exporting Dashboards</h2>
+
+  <h3>Export as PDF</h3>
+  <ol>
+    <li>Open the dashboard</li>
+    <li>Click <strong>"Export"</strong></li>
+    <li>Select <strong>"PDF"</strong></li>
+    <li>Download file</li>
+    <li>Share with stakeholders</li>
+  </ol>
+
+  <h3>Export as Image</h3>
+  <ul>
+    <li>Useful for presentations and reports</li>
+    <li>PNG format with transparent background option</li>
+    <li>Select resolution (standard, high, print-quality)</li>
+  </ul>
+
+  <h3>Schedule Email Reports</h3>
+  <p>Send dashboard automatically:</p>
+  <ol>
+    <li>Click <strong>"Schedule"</strong></li>
+    <li>Set frequency (daily, weekly, monthly)</li>
+    <li>Choose recipients</li>
+    <li>Select format (PDF or PNG)</li>
+    <li>Save schedule</li>
+  </ol>
+
+  <h2>Advanced Features</h2>
+
+  <h3>Date Range Filters</h3>
+  <p>Let users customize the time period:</p>
+  <ul>
+    <li>Add date range selector to dashboard</li>
+    <li>Applies to all widgets</li>
+    <li>Options: Today, This Week, This Month, This Quarter, This Year, Custom</li>
+  </ul>
+
+  <h3>Drill-Down</h3>
+  <p>Click chart segments to see details:</p>
+  <ul>
+    <li>Click a bar in a chart to see underlying records</li>
+    <li>Opens filtered list view</li>
+    <li>Navigate back to dashboard</li>
+  </ul>
+
+  <h3>Conditional Formatting</h3>
+  <p>Highlight important values:</p>
+  <ul>
+    <li>Set thresholds (red if below target, green if above)</li>
+    <li>Apply to metrics and table cells</li>
+    <li>Use colors, icons, or bold text</li>
+  </ul>
+
+  <h2>Best Practices</h2>
+
+  <h3>Dashboard Design</h3>
+  <ul>
+    <li>Focus on 5-10 key metrics per dashboard</li>
+    <li>Don't try to show everything - create multiple dashboards</li>
+    <li>Use consistent colors and formatting</li>
+    <li>Add context with text widgets</li>
+    <li>Test on different screen sizes</li>
+  </ul>
+
+  <h3>Data Quality</h3>
+  <ul>
+    <li>Ensure source data is accurate</li>
+    <li>Handle null/empty values appropriately</li>
+    <li>Validate calculations before publishing</li>
+    <li>Document any assumptions or caveats</li>
+  </ul>
+
+  <h3>Performance</h3>
+  <ul>
+    <li>Limit table widgets to 50 rows or fewer</li>
+    <li>Use filters to reduce data volume</li>
+    <li>Avoid too many widgets on one dashboard (aim for under 12)</li>
+    <li>Consider separate dashboards for detailed analysis</li>
+  </ul>
+
+  <h2>Troubleshooting</h2>
+
+  <h3>Widget Shows No Data</h3>
+  <ul>
+    <li>Check filters - may be too restrictive</li>
+    <li>Verify records exist in the object</li>
+    <li>Ensure user has permissions to view object</li>
+    <li>Try removing filters temporarily</li>
+  </ul>
+
+  <h3>Incorrect Numbers</h3>
+  <ul>
+    <li>Review aggregation settings (sum vs. count)</li>
+    <li>Check for duplicate records</li>
+    <li>Verify field types (text vs. number)</li>
+    <li>Look for null values affecting calculations</li>
+  </ul>
+
+  <h3>Dashboard Not Updating</h3>
+  <ul>
+    <li>Click refresh icon</li>
+    <li>Check browser cache (clear if needed)</li>
+    <li>Verify data was actually changed</li>
+    <li>Check dashboard permissions</li>
+  </ul>
+</DocsLayout>

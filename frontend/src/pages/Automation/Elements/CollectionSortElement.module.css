@@ -1,0 +1,26 @@
+.wrapper { display: flex; flex-direction: column; gap: var(--spacing-1); }
+
+.sortList { display: flex; flex-direction: column; gap: var(--spacing-2); width: 100%; }
+
+.sortRow {
+  display: grid;
+  grid-template-columns: 1fr 140px auto;
+  align-items: center;
+  gap: var(--spacing-2);
+}
+
+.delBtn {
+  display: flex; align-items: center; justify-content: center;
+  width: 26px; height: 26px;
+  border: 1px solid var(--border-color); border-radius: var(--border-radius-sm);
+  background: none; color: var(--color-gray-400); cursor: pointer; font-size: 14px;
+  transition: all var(--transition-fast);
+}
+.delBtn:hover { background: var(--color-danger-light); color: var(--color-danger); border-color: var(--color-danger); }
+
+.addBtn {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: var(--font-size-xs); font-weight: var(--font-weight-medium);
+  color: var(--color-primary); background: none; border: none; cursor: pointer; padding: 2px 0;
+}
+.addBtn:hover { text-decoration: underline; }

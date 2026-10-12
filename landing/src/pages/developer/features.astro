@@ -1,0 +1,42 @@
+---
+import DevLayout from '../../layouts/DevLayout.astro';
+---
+
+<DevLayout
+  title="Features - Developer Guide - Mini CRM"
+  description="Implementation details for each major feature"
+>
+  <h1>Features</h1>
+
+  <p>
+    This document explains how each major feature is implemented in Mini CRM.
+  </p>
+
+  <h2>Dynamic Object Engine</h2>
+
+  <p>Users create custom objects without code changes. ObjectMeta stores definitions, FieldMeta stores field configs, DynamicRecord stores actual data with flexible Map structure.</p>
+
+  <h2>Record CRUD</h2>
+
+  <p>Create, read, update, delete operations on DynamicRecord. Validation based on FieldMeta. Supports pagination, search, and filtering.</p>
+
+  <h2>Automation Flows</h2>
+
+  <p>Trigger-based workflows with conditions and actions. Supports record creation, updates, email sending, and webhooks.</p>
+
+  <h2>Analytics & Dashboards</h2>
+
+  <p>Widget-based dashboards with metrics, charts, tables. MongoDB aggregation pipelines for data queries.</p>
+
+  <h2>Email Templates</h2>
+
+  <p>Merge field syntax with double braces. Template rendering replaces placeholders with record data.</p>
+
+  <h2>AI Onboarding</h2>
+
+  <p>Generate workspace schema based on industry using AI API. Creates objects and fields automatically.</p>
+
+  <h2>Schema Builder</h2>
+
+  <p>Visual representation of object relationships. Frontend renders objects as nodes with relationship lines.</p>
+</DevLayout>

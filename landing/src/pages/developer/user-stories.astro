@@ -1,0 +1,1069 @@
+---
+import DevLayout from '../../layouts/DevLayout.astro';
+import {
+  CheckCircle,
+  ChevronDown,
+  ChevronRight,
+  BookOpen,
+  Code2,
+  TestTube,
+  Users,
+  Shield,
+  Database,
+  Zap,
+  Mail,
+  BarChart2,
+  Building2,
+} from 'lucide-astro';
+
+/* ── DATA (UNCHANGED) ───────────────────────────────────────── */
+const TEST_COLORS = {
+  positive: { bg: '#dcfce7', color: '#166534', label: 'Positive' },
+  negative: { bg: '#fee2e2', color: '#991b1b', label: 'Negative' },
+  boundary: { bg: '#fef3c7', color: '#92400e', label: 'Boundary' },
+  security: { bg: '#fce7f3', color: '#9d174d', label: 'Security' },
+  regression: { bg: '#ede9fe', color: '#5b21b6', label: 'Regression' },
+};
+
+const EPICS = [
+  {
+    id: 'E01',
+    title: 'Authentication & Session Management',
+    icon: Shield,
+    color: '#6366f1',
+    stories: [
+      {
+        id: 'US-001',
+        title: 'User Registration',
+        role: 'New user',
+        goal: 'create an account and workspace',
+        benefit: 'I can start managing my CRM data',
+        acceptance: [
+          'Registration form collects: first name, last name, email, password, company name',
+          'Password must contain uppercase, lowercase, number, and special character',
+          'Company name and slug must be unique across all workspaces',
+          'On success, user is automatically logged in and a workspace is provisioned',
+          'Default roles and standard CRM objects (Account, Contact, Lead, Opportunity, Task, Case) are seeded',
+        ],
+        tests: [
+          {
+            id: 'TC-001-01',
+            type: 'positive',
+            desc: 'Register with valid data → redirect to dashboard, objects seeded',
+          },
+          {
+            id: 'TC-001-02',
+            type: 'negative',
+            desc: 'Duplicate email → 409 error "user already exists"',
+          },
+          {
+            id: 'TC-001-03',
+            type: 'negative',
+            desc: 'Weak password → 400 validation error listing requirements',
+          },
+          {
+            id: 'TC-001-04',
+            type: 'negative',
+            desc: 'Duplicate company name → 409 error',
+          },
+          {
+            id: 'TC-001-05',
+            type: 'boundary',
+            desc: 'Company name with special chars → slug generated correctly',
+          },
+        ],
+      },
+      {
+        id: 'US-002',
+        title: 'User Login',
+        role: 'Registered user',
+        goal: 'log in with email and password',
+        benefit: 'I can access my CRM workspace',
+        acceptance: [
+          'Login creates a server-side session (UUID stored as HttpOnly crm.sid cookie)',
+          'Session expires after 24 hours of inactivity',
+          'Failed logins are counted; account locked for 30 min after 5 failures',
+          'Successful login resets the failure counter',
+        ],
+        tests: [
+          {
+            id: 'TC-002-01',
+            type: 'positive',
+            desc: 'Valid credentials → session created, redirected to dashboard',
+          },
+          {
+            id: 'TC-002-02',
+            type: 'negative',
+            desc: 'Wrong password → 401; failure counter incremented',
+          },
+          {
+            id: 'TC-002-03',
+            type: 'security',
+            desc: '5th failed login → account locked, subsequent attempts return 423',
+          },
+          {
+            id: 'TC-002-04',
+            type: 'security',
+            desc: 'Forged/expired cookie → 401, user redirected to login',
+          },
+        ],
+      },
+      {
+        id: 'US-003',
+        title: 'Session Management',
+        role: 'Logged-in user',
+        goal: 'view and revoke my active sessions',
+        benefit: 'I can maintain account security',
+        acceptance: [
+          'Settings → Security shows all active sessions with IP, browser, and last-access time',
+          'Current session is clearly marked',
+          'Any non-current session can be revoked individually',
+          'Revoking deletes the session from the database immediately',
+          'Password change invalidates all other sessions',
+        ],
+        tests: [
+          {
+            id: 'TC-003-01',
+            type: 'positive',
+            desc: 'Login from two browsers → both appear in sessions list',
+          },
+          {
+            id: 'TC-003-02',
+            type: 'positive',
+            desc: 'Revoke session B while in session A → session B gets 401 on next request',
+          },
+          {
+            id: 'TC-003-03',
+            type: 'negative',
+            desc: 'Try to revoke own current session via DELETE endpoint → 400 error',
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'E02',
+    title: 'Data Model & Object Configuration',
+    icon: Database,
+    color: '#3b82f6',
+    stories: [
+      {
+        id: 'US-010',
+        title: 'Create Custom Object',
+        role: 'Admin',
+        goal: 'create a custom object with a name, label, and icon',
+        benefit: 'I can model my unique business data',
+        acceptance: [
+          'Object requires: Label, Plural Label, API Name (auto-generated from label)',
+          'API Name must be lowercase, alphanumeric with underscores, unique per workspace',
+          'Default system fields (name, description, owner_id) are seeded automatically',
+          'Object appears in Setup → Objects list and optionally in sidebar navigation',
+          'Color and icon can be customised from the Lucide icon set',
+        ],
+        tests: [
+          {
+            id: 'TC-010-01',
+            type: 'positive',
+            desc: 'Create object "Campaign" → apiName "campaign", seeded with 3 system fields',
+          },
+          {
+            id: 'TC-010-02',
+            type: 'negative',
+            desc: 'Duplicate apiName → 409 error',
+          },
+          {
+            id: 'TC-010-03',
+            type: 'negative',
+            desc: 'Non-admin user → 403 forbidden',
+          },
+          {
+            id: 'TC-010-04',
+            type: 'boundary',
+            desc: 'Object limit reached for plan → 429 error',
+          },
+        ],
+      },
+      {
+        id: 'US-011',
+        title: 'Create & Configure Fields',
+        role: 'Admin',
+        goal: 'add fields of various types to an object',
+        benefit: 'I can capture the right data for my business',
+        acceptance: [
+          'Supported types: text, textarea, number, currency, percent, date, datetime, boolean, picklist, multipicklist, email, phone, url, lookup, master_detail, formula, auto_number, rollup_summary',
+          'lookupObjectApiName is preserved through create AND edit operations',
+          'Formula fields are read-only and computed server-side',
+          'Rollup summary fields (COUNT, SUM, MIN, MAX, AVG) aggregate child record data',
+          'Auto-number fields generate sequential values atomically (e.g. CASE-00001)',
+          'Field API Name cannot be changed after creation',
+        ],
+        tests: [
+          {
+            id: 'TC-011-01',
+            type: 'positive',
+            desc: 'Create lookup field pointing to Account → lookupObjectApiName saved correctly',
+          },
+          {
+            id: 'TC-011-02',
+            type: 'regression',
+            desc: 'Edit lookup field (change section) → lookupObjectApiName still present after save',
+          },
+          {
+            id: 'TC-011-03',
+            type: 'positive',
+            desc: 'Create rollup COUNT field on Account for Contacts → value appears on Account detail',
+          },
+          {
+            id: 'TC-011-04',
+            type: 'positive',
+            desc: 'Create formula field first_name + " " + last_name → shows concatenated value on record',
+          },
+          {
+            id: 'TC-011-05',
+            type: 'negative',
+            desc: 'Invalid formula expression → 400 with parse error message',
+          },
+        ],
+      },
+      {
+        id: 'US-012',
+        title: 'Page Layouts',
+        role: 'Admin',
+        goal: 'design the field arrangement on record pages using drag-and-drop',
+        benefit: 'users see the most relevant fields prominently',
+        acceptance: [
+          'Drag fields between sections and between left/right columns',
+          'Sections can be added, renamed, and removed',
+          'Saved layout is used by both RecordDetail and RecordForm (fields appear in same positions)',
+          'Fallback: if no layout exists, fields are grouped by their section property',
+          'Back button on LayoutBuilder returns to the page that opened it (object settings or record detail)',
+        ],
+        tests: [
+          {
+            id: 'TC-012-01',
+            type: 'positive',
+            desc: 'Place field in column 2 → appears in right column on both view and edit pages',
+          },
+          {
+            id: 'TC-012-02',
+            type: 'positive',
+            desc: 'Open LayoutBuilder from RecordDetail → back button returns to that record',
+          },
+          {
+            id: 'TC-012-03',
+            type: 'positive',
+            desc: 'Open LayoutBuilder from Object Settings → back button returns to fields tab',
+          },
+        ],
+      },
+      {
+        id: 'US-013',
+        title: 'Validation Rules',
+        role: 'Admin',
+        goal: 'define cross-field validation rules on an object',
+        benefit: 'data integrity is enforced on every save',
+        acceptance: [
+          'Rules have: Name, Description, Expression (formula), Error Message, Active toggle',
+          'Expression is validated server-side using the formula parser before saving the rule',
+          'Active rules are evaluated on record create and PUT (full update); inactive rules are skipped',
+          'All custom functions (LENGTH, ISBLANK, TODAY, REGEX, etc.) work in rule expressions',
+          'Failed rules return descriptive error messages to the user',
+        ],
+        tests: [
+          {
+            id: 'TC-013-01',
+            type: 'positive',
+            desc: 'Rule: LENGTH(phone) == 10 → saving lead with 9-digit phone fails with error message',
+          },
+          {
+            id: 'TC-013-02',
+            type: 'positive',
+            desc: 'Rule: close_date > start_date → records with inverted dates are rejected',
+          },
+          {
+            id: 'TC-013-03',
+            type: 'positive',
+            desc: 'Inactive rule → record saves even if rule expression would fail',
+          },
+          {
+            id: 'TC-013-04',
+            type: 'negative',
+            desc: 'Invalid expression in rule → 400 when saving object settings',
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'E03',
+    title: 'Record Management',
+    icon: BookOpen,
+    color: '#10b981',
+    stories: [
+      {
+        id: 'US-020',
+        title: 'Create & Edit Records',
+        role: 'User',
+        goal: 'create and update records in any object',
+        benefit: 'I can manage my business data',
+        acceptance: [
+          'Record form uses the saved page layout (same column positions as record detail)',
+          'Lookup fields show a search popup; typing filters results in real time',
+          'When creating from a related list "New" button, the parent lookup is pre-filled',
+          'Required fields validated before submission',
+          'Object-level validation rules run server-side on save',
+          'Formula and rollup fields are hidden from the edit form (read-only)',
+          'Owner field (lookup to user) is editable',
+        ],
+        tests: [
+          {
+            id: 'TC-020-01',
+            type: 'positive',
+            desc: 'Create Contact from Account related list → Account field pre-filled with parent',
+          },
+          {
+            id: 'TC-020-02',
+            type: 'negative',
+            desc: 'Submit form with empty required field → inline error shown, API not called',
+          },
+          {
+            id: 'TC-020-03',
+            type: 'positive',
+            desc: 'Edit record, change lookup field → selected record ID saved to data map',
+          },
+          {
+            id: 'TC-020-04',
+            type: 'positive',
+            desc: 'Rollup field on parent updates within seconds of child record creation',
+          },
+        ],
+      },
+      {
+        id: 'US-021',
+        title: 'Record List Views',
+        role: 'User',
+        goal: 'browse, filter, search, and sort records',
+        benefit: 'I can quickly find the records I need',
+        acceptance: [
+          'List shows paginated records with configurable columns (up to 9)',
+          'Columns saved to localStorage per object',
+          'Inline editing: click pencil icon → edit cell value directly',
+          'Standard views: All, Mine, Created Today/This Week/This Month',
+          'Custom saved views with filter conditions',
+          'Search filters across searchable fields',
+        ],
+        tests: [
+          {
+            id: 'TC-021-01',
+            type: 'positive',
+            desc: '"Mine" view → only records where ownerId matches current user',
+          },
+          {
+            id: 'TC-021-02',
+            type: 'positive',
+            desc: 'Save custom view → persists across page refreshes via localStorage',
+          },
+          {
+            id: 'TC-021-03',
+            type: 'positive',
+            desc: 'Inline edit text field → PATCH request sent, list cell updates without reload',
+          },
+        ],
+      },
+      {
+        id: 'US-022',
+        title: 'Related Lists',
+        role: 'User',
+        goal: 'see child records on a parent record detail page',
+        benefit: 'I can navigate relationships between records',
+        acceptance: [
+          'Related lists automatically appear for any lookup/master_detail fields pointing to this object',
+          "Each related list shows the child object's icon (not just a letter)",
+          'Clicking "New" in a related list opens the form with parent field pre-filled',
+          'Related lists are collapsible with mini-pagination (5 records per page)',
+          'Column chooser persists column selection per parent-child pair',
+        ],
+        tests: [
+          {
+            id: 'TC-022-01',
+            type: 'positive',
+            desc: 'Campaign with lookup from Lead → Leads related list appears on Campaign detail',
+          },
+          {
+            id: 'TC-022-02',
+            type: 'regression',
+            desc: 'After editing lookup field → related list still appears (lookupObjectApiName preserved)',
+          },
+          {
+            id: 'TC-022-03',
+            type: 'positive',
+            desc: 'Related list "New" button → form opens with campaign_id field pre-populated',
+          },
+        ],
+      },
+      {
+        id: 'US-023',
+        title: 'Import & Export Records',
+        role: 'User with permission',
+        goal: 'bulk import and export records via CSV',
+        benefit: 'I can migrate data and share records efficiently',
+        acceptance: [
+          'Export downloads a CSV of all records the user can see (respects data access + field visibility)',
+          'Import accepts CSV with headers matching field labels OR API names (case-insensitive)',
+          'Import runs validation rules and field constraints per row',
+          'Import returns created/failed counts and per-row error details',
+          'Max 5,000 rows per import',
+          'Import/Export buttons only visible when user has canImport/canExport permission',
+        ],
+        tests: [
+          {
+            id: 'TC-023-01',
+            type: 'positive',
+            desc: 'Export contacts → CSV with correct headers, one row per record',
+          },
+          {
+            id: 'TC-023-02',
+            type: 'positive',
+            desc: 'Import CSV with 3 valid rows → created: 3, failed: 0',
+          },
+          {
+            id: 'TC-023-03',
+            type: 'negative',
+            desc: 'Import CSV with missing required field → failed: N with row-level errors',
+          },
+          {
+            id: 'TC-023-04',
+            type: 'security',
+            desc: 'User without canExport → Export button hidden; GET /export → 403',
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'E04',
+    title: 'Roles & Permissions',
+    icon: Shield,
+    color: '#ef4444',
+    stories: [
+      {
+        id: 'US-030',
+        title: 'Object-Level Permissions',
+        role: 'Admin',
+        goal: 'control what each role can do on each object',
+        benefit: 'data security is enforced at every touchpoint',
+        acceptance: [
+          'Permissions per object: canCreate, canRead, canUpdate, canDelete, canExport, canImport',
+          'Superusers and Admins bypass all permission checks',
+          'Backend enforces permissions via checkObjectPermission middleware on every route',
+          'Frontend hides New/Edit/Delete/Export/Import buttons based on permissions',
+          'Attempting a forbidden action via API returns 403 with descriptive message',
+        ],
+        tests: [
+          {
+            id: 'TC-030-01',
+            type: 'security',
+            desc: 'Role without canCreate → POST /records/contact → 403; "New Contact" button hidden',
+          },
+          {
+            id: 'TC-030-02',
+            type: 'security',
+            desc: 'Role without canDelete → bulk delete button hidden; DELETE route → 403',
+          },
+          {
+            id: 'TC-030-03',
+            type: 'positive',
+            desc: 'Grant canRead only → user can view records but Edit/Delete buttons absent',
+          },
+        ],
+      },
+      {
+        id: 'US-031',
+        title: 'Field-Level Permissions',
+        role: 'Admin',
+        goal: 'hide or make read-only individual fields per role',
+        benefit:
+          'sensitive data (e.g. salary) is never exposed to the wrong users',
+        acceptance: [
+          'canView: false → field hidden in record detail, form, and API response',
+          'canEdit: false → field shown as read-only grey text in edit form; backend strips it from updates',
+          'Placeholder divs preserve grid layout when fields are hidden',
+          'Superusers and Admins see all fields regardless of fieldPermissions',
+        ],
+        tests: [
+          {
+            id: 'TC-031-01',
+            type: 'security',
+            desc: 'Set canView: false on "salary" field → field absent from API response and UI',
+          },
+          {
+            id: 'TC-031-02',
+            type: 'security',
+            desc: 'Set canEdit: false on "email" → PUT with email in body → email silently stripped, not saved',
+          },
+          {
+            id: 'TC-031-03',
+            type: 'positive',
+            desc: 'Admin views same record → salary field visible',
+          },
+        ],
+      },
+      {
+        id: 'US-032',
+        title: 'Data Access Control',
+        role: 'Admin',
+        goal: 'restrict which records a role can see',
+        benefit: "reps only see their own records, managers see their team's",
+        acceptance: [
+          '"Own Records Only" → all queries filtered by ownerId = current user',
+          '"Own & Subordinates" → queries include subordinate users\' records (role parent hierarchy)',
+          '"All Records" → no ownership filter applied',
+          'Data access filter applied to: list, get, export, import record checks',
+        ],
+        tests: [
+          {
+            id: 'TC-032-01',
+            type: 'positive',
+            desc: '"Own" access → GET /records/lead returns only leads where ownerId = user._id',
+          },
+          {
+            id: 'TC-032-02',
+            type: 'positive',
+            desc: '"Own & Subordinates" → returns own + subordinate users\' records',
+          },
+          {
+            id: 'TC-032-03',
+            type: 'security',
+            desc: '"Own" access → GET /records/lead/:foreignId → 404 (not 403, to avoid leaking existence)',
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'E05',
+    title: 'Users & Workspaces',
+    icon: Users,
+    color: '#8b5cf6',
+    stories: [
+      {
+        id: 'US-040',
+        title: 'User Management',
+        role: 'Admin',
+        goal: 'create, view, and edit users as full records',
+        benefit: 'user profiles are as rich as any CRM record',
+        acceptance: [
+          'Users are displayed in a record-detail-style page with layout support',
+          'Standard fields: First Name, Last Name, Email, Phone, Title, Department, System Role, Status',
+          'Admins can add custom fields to the User object via Setup → Objects → User',
+          'Custom field values stored in User.profileData',
+          'Role field shows a lookup-style selector of available RBAC roles',
+          'Reset Password button invalidates all user sessions and sets a new password',
+        ],
+        tests: [
+          {
+            id: 'TC-040-01',
+            type: 'positive',
+            desc: 'Create user → record visible at /admin/users/:id with all standard fields',
+          },
+          {
+            id: 'TC-040-02',
+            type: 'positive',
+            desc: 'Add custom field "Employee Number" to User object → appears on user form',
+          },
+          {
+            id: 'TC-040-03',
+            type: 'positive',
+            desc: 'Reset password → old session cookie returns 401 on next request',
+          },
+          {
+            id: 'TC-040-04',
+            type: 'positive',
+            desc: 'Role selector shows all roles from /api/roles; selected role ID saved',
+          },
+        ],
+      },
+      {
+        id: 'US-041',
+        title: 'Workspace Management',
+        role: 'Admin/Superuser',
+        goal: 'organise users into workspaces within an organisation',
+        benefit: 'teams are isolated and focused on their data',
+        acceptance: [
+          'One Tenant (organisation) can have multiple Workspaces',
+          'A user belongs to one Tenant but can be a member of multiple Workspaces',
+          'Workspaces have: name, description, color, icon, members',
+          'Active workspace shown in sidebar header; clicking opens a workspace switcher',
+          'Switching workspace updates the session (persisted server-side)',
+          'Default workspace is accessible to all users without explicit membership',
+        ],
+        tests: [
+          {
+            id: 'TC-041-01',
+            type: 'positive',
+            desc: 'Create two workspaces → sidebar shows switcher with both',
+          },
+          {
+            id: 'TC-041-02',
+            type: 'positive',
+            desc: 'Switch workspace → POST /workspaces/switch → session updated → GET /auth/me returns new activeWorkspaceId',
+          },
+          {
+            id: 'TC-041-03',
+            type: 'negative',
+            desc: 'Switch to workspace user is not a member of → 403',
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'E06',
+    title: 'Automations & Email',
+    icon: Zap,
+    color: '#f59e0b',
+    stories: [
+      {
+        id: 'US-050',
+        title: 'Action Buttons & Screen Flows',
+        role: 'Admin',
+        goal: 'configure action buttons that trigger automations on record pages',
+        benefit: 'users can perform complex actions with one click',
+        acceptance: [
+          'Buttons defined in Object Settings → Action Buttons tab as a table',
+          'Each button has: Label, Icon (Lucide), Variant, Color (opt-in), Location, Result Mode, Automation, Confirm Message',
+          'Variant styling (primary/secondary/danger/success/ghost) applies unless a custom colour is set',
+          'Custom colour only applied when "Use custom colour" checkbox is explicitly ticked',
+          'Location: Record Detail, Record List (bulk), or Both',
+        ],
+        tests: [
+          {
+            id: 'TC-050-01',
+            type: 'positive',
+            desc: 'Add Danger variant button → button renders in red without any custom colour set',
+          },
+          {
+            id: 'TC-050-02',
+            type: 'regression',
+            desc: 'Previous bug: colour defaulted to #6366f1, overriding variant — now fixed via opt-in checkbox',
+          },
+          {
+            id: 'TC-050-03',
+            type: 'positive',
+            desc: '"Record List" location → button appears in RecordList bulk action bar',
+          },
+        ],
+      },
+      {
+        id: 'US-051',
+        title: 'Email Senders',
+        role: 'Admin',
+        goal: 'configure multiple outbound email addresses with SMTP settings',
+        benefit: 'automations can send email from the right address per team',
+        acceptance: [
+          'Each sender has: Display Name, From Address, Reply-To, SMTP credentials',
+          'Marked as Default → used by automations when no sender specified',
+          '"Available To" controls access: All users or specific users',
+          'Test button sends a real test email to verify SMTP settings',
+          'Automation email action: uses emailSenderId if set, else workspace default, else env vars',
+        ],
+        tests: [
+          {
+            id: 'TC-051-01',
+            type: 'positive',
+            desc: 'Set default sender → automation email action uses it without explicit sender config',
+          },
+          {
+            id: 'TC-051-02',
+            type: 'positive',
+            desc: 'Test button with valid SMTP → test email received at target address',
+          },
+          {
+            id: 'TC-051-03',
+            type: 'negative',
+            desc: 'Test button with wrong SMTP credentials → 422 with SMTP error message',
+          },
+          {
+            id: 'TC-051-04',
+            type: 'security',
+            desc: 'User not in allowedUserIds → sender absent from GET /email-senders/mine',
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'E07',
+    title: 'Analytics & Dashboards',
+    icon: BarChart2,
+    color: '#0ea5e9',
+    stories: [
+      {
+        id: 'US-060',
+        title: 'Dashboard Overview',
+        role: 'User with canViewAnalytics',
+        goal: 'see key metrics and activity at a glance',
+        benefit: 'I can make informed decisions quickly',
+        acceptance: [
+          'Dashboard shows: total records, custom objects, active users, objects in use',
+          'Line chart: records created over last 14 days',
+          'Bar chart: records by object type',
+          'Quick Access grid shows first 6 nav-visible objects with their configured icon and colour',
+          'Documentation section shows User Manual and Developer Reference tabs',
+        ],
+        tests: [
+          {
+            id: 'TC-060-01',
+            type: 'security',
+            desc: 'User without canViewAnalytics → /analytics route redirects to /',
+          },
+          {
+            id: 'TC-060-02',
+            type: 'positive',
+            desc: 'Quick Access card for Contact → shows User icon (purple), links to /o/contact',
+          },
+          {
+            id: 'TC-060-03',
+            type: 'positive',
+            desc: 'Charts render after /analytics/overview responds with data',
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'E08',
+    title: 'Platform & API',
+    icon: Code2,
+    color: '#64748b',
+    stories: [
+      {
+        id: 'US-070',
+        title: 'REST API Access',
+        role: 'Developer/Integration',
+        goal: 'access CRM data programmatically using API keys',
+        benefit:
+          'I can build integrations and automations on top of the platform',
+        acceptance: [
+          'API keys generated in Settings → Security with optional expiry and IP whitelist',
+          'Key passed as X-API-Key header; no session cookie needed',
+          'Optional allowedObjects restricts which objects the key can access',
+          'All object and field permissions enforced for API key requests',
+          'Usage logged per request (method, path, object, response time)',
+        ],
+        tests: [
+          {
+            id: 'TC-070-01',
+            type: 'positive',
+            desc: 'Valid API key → GET /api/records/contact → returns records',
+          },
+          {
+            id: 'TC-070-02',
+            type: 'security',
+            desc: 'API key restricted to contact → GET /api/records/lead → 403',
+          },
+          {
+            id: 'TC-070-03',
+            type: 'security',
+            desc: 'Expired API key → 401 "API key has expired"',
+          },
+          {
+            id: 'TC-070-04',
+            type: 'security',
+            desc: 'IP not in whitelist → 403 "IP not whitelisted"',
+          },
+        ],
+      },
+      {
+        id: 'US-071',
+        title: 'Formula & Validation Expressions',
+        role: 'Developer/Admin',
+        goal: 'write safe expressions for computed fields and validation rules',
+        benefit: 'business logic can be expressed without code',
+        acceptance: [
+          'Parser supports: arithmetic (+,-,*,/), comparison (==,!=,>,>=,<,<=), logic (&&,||,!), string concatenation',
+          'Built-in functions: LENGTH, ISBLANK, ISNULL, CONTAINS, REGEX, TODAY, NOW, UPPER, LOWER, TRIM, ABS, ROUND, YEAR, MONTH, DAY',
+          'Field API names injected as variables at evaluation time',
+          'Expressions validated via POST /api/records/validate-formula before saving',
+          'FormulaEditor in UI provides Fields, Functions, Operators, and Examples panels with click-to-insert',
+        ],
+        tests: [
+          {
+            id: 'TC-071-01',
+            type: 'positive',
+            desc: 'POST /validate-formula with "LENGTH(phone) == 10" → { valid: true }',
+          },
+          {
+            id: 'TC-071-02',
+            type: 'negative',
+            desc: 'POST /validate-formula with "LENGTH(phone ==" → { valid: false, error: "Missing closing parenthesis" }',
+          },
+          {
+            id: 'TC-071-03',
+            type: 'positive',
+            desc: 'Validation rule "close_date > start_date" → saves record with valid dates, rejects inverted dates',
+          },
+        ],
+      },
+    ],
+  },
+];
+
+/* (⚠️ Keep your full EPICS array here exactly as-is) */
+
+const totalStories = EPICS.reduce((s, e) => s + e.stories.length, 0);
+const totalTests = EPICS.reduce(
+  (s, e) => e.stories.reduce((ss, st) => ss + st.tests.length, 0) + s,
+  0,
+);
+---
+
+<DevLayout
+  title="User Stories"
+  description="Build backlog, acceptance criteria, and test cases for the CRM platform"
+>
+  <div class="page">
+    <div class="header">
+      <div>
+        <h1 class="title">User Stories & Test Cases</h1>
+        <p class="subtitle">Complete backlog in sequential build order.</p>
+      </div>
+
+      <div class="stats">
+        <div class="stat">
+          <span class="statNum">{EPICS.length}</span>
+          <span class="statLabel">Epics</span>
+        </div>
+        <div class="stat">
+          <span class="statNum">{totalStories}</span>
+          <span class="statLabel">User Stories</span>
+        </div>
+        <div class="stat">
+          <span class="statNum">{totalTests}</span>
+          <span class="statLabel">Test Cases</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Legend -->
+    <div class="legend">
+      <span class="legendLabel">Test types:</span>
+      {
+        Object.entries(TEST_COLORS).map(([type, cfg]) => (
+          <span
+            style={`background:${cfg.bg};color:${cfg.color}`}
+            class="legendBadge"
+          >
+            {cfg.label}
+          </span>
+        ))
+      }
+    </div>
+
+    {
+      EPICS.map((epic) => (
+        <div class="epic" data-epic>
+          <div class="epicHeader" style={`border-left:4px solid ${epic.color}`}>
+            <div class="epicLeft">
+              <epic.icon size={18} color={epic.color} />
+              <div>
+                <div class="epicTitle">
+                  <span class="epicId">{epic.id}</span>
+                  {epic.title}
+                </div>
+                <div class="epicMeta">{epic.stories.length} stories</div>
+              </div>
+            </div>
+            <ChevronDown class="toggleIcon" size={16} />
+          </div>
+
+          <div class="epicBody">
+            {epic.stories.map((story) => (
+              <div class="story" data-story>
+                <div class="storyHeader">
+                  <div class="storyMeta">
+                    <span class="storyId">{story.id}</span>
+                    <span>{story.title}</span>
+                  </div>
+                  <ChevronRight class="toggleIcon" size={14} />
+                </div>
+
+                <div class="storyNarrative">
+                  <strong>As a {story.role}</strong>, I want to {story.goal}, so
+                  that {story.benefit}.
+                </div>
+
+                <div class="storyBody">
+                  <h5 class="sectionLabel">
+                    <CheckCircle size={13} /> Acceptance Criteria
+                  </h5>
+                  <ul>
+                    {story.acceptance.map((c) => (
+                      <li>{c}</li>
+                    ))}
+                  </ul>
+
+                  <h5 class="sectionLabel">
+                    <TestTube size={13} /> Test Cases
+                  </h5>
+                  <table class="testTable">
+                    <thead>
+                      <tr>
+                        <th>ID</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {story.tests.map((t) => (
+                        <tr>
+                          <td>
+                            <code>{t.id}</code>
+                          </td>
+                          <td>
+                            <span
+                              class="badge"
+                              style={`background:${TEST_COLORS[t.type].bg};color:${TEST_COLORS[t.type].color}`}
+                            >
+                              {TEST_COLORS[t.type].label}
+                            </span>
+                          </td>
+                          <td>{t.desc}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ))
+    }
+  </div>
+
+  <!-- ── INTERACTIVITY ───────────────────────────────────────── -->
+  <script>
+    document.querySelectorAll('[data-epic]').forEach((epic) => {
+      const header = epic.querySelector('.epicHeader');
+      const body = epic.querySelector('.epicBody');
+
+      header.addEventListener('click', () => {
+        body.classList.toggle('open');
+      });
+    });
+
+    document.querySelectorAll('[data-story]').forEach((story) => {
+      const header = story.querySelector('.storyHeader');
+      const body = story.querySelector('.storyBody');
+
+      header.addEventListener('click', () => {
+        body.classList.toggle('open');
+      });
+    });
+  </script>
+
+  <!-- ── STYLES ─────────────────────────────────────────────── -->
+  <style>
+    .page {
+      padding: 24px;
+      font-family: Arial;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .title {
+      font-size: 28px;
+    }
+    .subtitle {
+      color: #666;
+    }
+
+    .stats {
+      display: flex;
+      gap: 20px;
+    }
+    .statNum {
+      font-size: 20px;
+      font-weight: bold;
+      display: block;
+    }
+
+    .legend {
+      margin-bottom: 16px;
+    }
+    .legendBadge {
+      padding: 4px 8px;
+      border-radius: 10px;
+      margin-right: 6px;
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    .epic {
+      border: 1px solid #eee;
+      margin-bottom: 16px;
+      border-radius: 8px;
+    }
+    .epicHeader {
+      padding: 12px;
+      display: flex;
+      justify-content: space-between;
+      cursor: pointer;
+      background: #fafafa;
+    }
+
+    .epicBody {
+      display: none;
+      padding: 12px;
+    }
+    .epicBody.open {
+      display: block;
+    }
+
+    .story {
+      border-top: 1px solid #eee;
+      padding: 10px;
+    }
+    .storyHeader {
+      display: flex;
+      justify-content: space-between;
+      cursor: pointer;
+    }
+
+    .storyBody {
+      display: none;
+      margin-top: 10px;
+    }
+    .storyBody.open {
+      display: block;
+    }
+
+    .badge {
+      padding: 2px 6px;
+      border-radius: 10px;
+      font-size: 10px;
+      font-weight: bold;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    th,
+    td {
+      border: 1px solid #ddd;
+      padding: 6px;
+      text-align: left;
+    }
+
+    .epicLeft {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+  </style>
+</DevLayout>

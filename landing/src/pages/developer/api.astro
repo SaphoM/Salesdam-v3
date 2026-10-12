@@ -1,0 +1,207 @@
+---
+import DevLayout from '../../layouts/DevLayout.astro';
+const jsonOpen = '{';
+const jsonClose = '}';
+---
+
+<DevLayout
+  title="API Reference - Developer Guide - Mini CRM"
+  description="Complete API endpoint documentation"
+>
+  <h1>API Reference</h1>
+
+  <p>
+    Complete reference for all Mini CRM API endpoints. Base URL: <code>http://localhost:5001/api</code>
+  </p>
+
+  <h2>Authentication</h2>
+
+  <h3>POST /api/auth/register</h3>
+  <p>Create new workspace and user account.</p>
+  <pre><code>{`${jsonOpen}
+  "workspaceName": "Acme Corp",
+  "email": "admin@acme.com",
+  "password": "securepass123",
+  "name": "John Doe"
+${jsonClose}`}</code></pre>
+
+  <h3>POST /api/auth/login</h3>
+  <p>Authenticate user and create session.</p>
+  <pre><code>{`${jsonOpen}
+  "email": "admin@acme.com",
+  "password": "securepass123"
+${jsonClose}`}</code></pre>
+
+  <h3>POST /api/auth/logout</h3>
+  <p>Destroy session and log out.</p>
+
+  <h3>GET /api/auth/me</h3>
+  <p>Get current user and tenant info.</p>
+
+  <h2>Objects</h2>
+
+  <h3>GET /api/objects</h3>
+  <p>List all custom objects in workspace.</p>
+
+  <h3>GET /api/objects/:apiName</h3>
+  <p>Get object metadata by API name.</p>
+
+  <h3>POST /api/objects</h3>
+  <p>Create new custom object.</p>
+  <pre><code>{`${jsonOpen}
+  "label": "Customer",
+  "apiName": "customer",
+  "pluralLabel": "Customers"
+${jsonClose}`}</code></pre>
+
+  <h3>PUT /api/objects/:id</h3>
+  <p>Update object metadata.</p>
+
+  <h3>DELETE /api/objects/:id</h3>
+  <p>Delete object (and all records).</p>
+
+  <h2>Fields</h2>
+
+  <h3>GET /api/fields/:objectId</h3>
+  <p>List fields for an object.</p>
+
+  <h3>POST /api/fields</h3>
+  <p>Create new field.</p>
+  <pre><code>{`${jsonOpen}
+  "objectId": "...",
+  "label": "Company Name",
+  "apiName": "company_name",
+  "type": "text",
+  "required": true,
+  "length": 255
+${jsonClose}`}</code></pre>
+
+  <h3>PUT /api/fields/:id</h3>
+  <p>Update field definition.</p>
+
+  <h3>DELETE /api/fields/:id</h3>
+  <p>Delete field.</p>
+
+  <h2>Records</h2>
+
+  <h3>GET /api/records/:objectName</h3>
+  <p>List records for an object.</p>
+  <p>Query params: <code>page</code>, <code>limit</code>, <code>search</code></p>
+
+  <h3>GET /api/records/:objectName/:id</h3>
+  <p>Get single record by ID.</p>
+
+  <h3>POST /api/records/:objectName</h3>
+  <p>Create new record.</p>
+  <pre><code>{`${jsonOpen}
+  "name": "Acme Corp",
+  "email": "contact@acme.com",
+  "revenue": 1000000
+${jsonClose}`}</code></pre>
+
+  <h3>PUT /api/records/:objectName/:id</h3>
+  <p>Update record.</p>
+
+  <h3>DELETE /api/records/:objectName/:id</h3>
+  <p>Delete record.</p>
+
+  <h2>Users</h2>
+
+  <h3>GET /api/users</h3>
+  <p>List workspace users.</p>
+
+  <h3>POST /api/users</h3>
+  <p>Create new user.</p>
+  <pre><code>{`${jsonOpen}
+  "email": "user@example.com",
+  "name": "Jane Smith",
+  "password": "password123",
+  "roleId": "..."
+${jsonClose}`}</code></pre>
+
+  <h3>PUT /api/users/:id</h3>
+  <p>Update user.</p>
+
+  <h3>DELETE /api/users/:id</h3>
+  <p>Deactivate user.</p>
+
+  <h2>Roles</h2>
+
+  <h3>GET /api/roles</h3>
+  <p>List roles.</p>
+
+  <h3>POST /api/roles</h3>
+  <p>Create role with permissions.</p>
+
+  <h3>PUT /api/roles/:id</h3>
+  <p>Update role.</p>
+
+  <h2>Automation</h2>
+
+  <h3>GET /api/admin/automations</h3>
+  <p>List automation flows.</p>
+
+  <h3>POST /api/admin/automations</h3>
+  <p>Create automation flow.</p>
+
+  <h3>PUT /api/admin/automations/:id</h3>
+  <p>Update flow.</p>
+
+  <h3>DELETE /api/admin/automations/:id</h3>
+  <p>Delete flow.</p>
+
+  <h2>Dashboards</h2>
+
+  <h3>GET /api/admin/dashboards</h3>
+  <p>List dashboards.</p>
+
+  <h3>POST /api/admin/dashboards</h3>
+  <p>Create dashboard.</p>
+
+  <h3>PUT /api/admin/dashboards/:id</h3>
+  <p>Update dashboard and widgets.</p>
+
+  <h3>DELETE /api/admin/dashboards/:id</h3>
+  <p>Delete dashboard.</p>
+
+  <h2>Error Responses</h2>
+
+  <pre><code>{`// 400 Bad Request
+${jsonOpen}
+  "success": false,
+  "error": "Validation error message"
+${jsonClose}
+
+// 401 Unauthorized
+${jsonOpen}
+  "success": false,
+  "error": "Not authenticated"
+${jsonClose}
+
+// 403 Forbidden
+${jsonOpen}
+  "success": false,
+  "error": "Permission denied"
+${jsonClose}
+
+// 404 Not Found
+${jsonOpen}
+  "success": false,
+  "error": "Resource not found"
+${jsonClose}
+
+// 500 Server Error
+${jsonOpen}
+  "success": false,
+  "error": "Internal server error"
+${jsonClose}`}</code></pre>
+
+  <h2>Authentication Headers</h2>
+
+  <p>For API key authentication:</p>
+  <pre><code>Authorization: Bearer YOUR_API_KEY</code></pre>
+
+  <p>For session-based (browser):</p>
+  <pre><code>Cookie: connect.sid=SESSION_ID
+Credentials: include</code></pre>
+</DevLayout>

@@ -1,0 +1,216 @@
+---
+import MainLayout from '../../layouts/MainLayout.astro';
+---
+
+<MainLayout title="Deal Line Items | Salesdam Docs" description="Managing deal line items and products">
+  <div class="content-wrapper">
+    <h1>Deal Line Items</h1>
+
+    <p class="intro">Add products and services to deals to break down the deal value and track what you're selling.</p>
+
+    <h2>What are Line Items?</h2>
+
+    <p>Line items represent individual products or services within a deal. They allow you to:</p>
+    <ul>
+      <li>Break down deal value by product</li>
+      <li>Track quantities and pricing</li>
+      <li>Calculate discounts and totals</li>
+      <li>Generate accurate quotes and invoices</li>
+      <li>Analyze product mix by deal</li>
+    </ul>
+
+    <h2>Line Item Fields</h2>
+
+    <table>
+      <tr>
+        <th>Field</th>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+      <tr>
+        <td>Product</td>
+        <td>Lookup (Product)</td>
+        <td>Product or service being sold</td>
+      </tr>
+      <tr>
+        <td>Quantity</td>
+        <td>Number</td>
+        <td>How many units</td>
+      </tr>
+      <tr>
+        <td>Unit Price</td>
+        <td>Currency</td>
+        <td>Price per unit</td>
+      </tr>
+      <tr>
+        <td>Discount %</td>
+        <td>Percent</td>
+        <td>Discount percentage (optional)</td>
+      </tr>
+      <tr>
+        <td>Discount Amount</td>
+        <td>Currency</td>
+        <td>Fixed discount (optional)</td>
+      </tr>
+      <tr>
+        <td>Subtotal</td>
+        <td>Currency (Formula)</td>
+        <td>Quantity × Unit Price</td>
+      </tr>
+      <tr>
+        <td>Total</td>
+        <td>Currency (Formula)</td>
+        <td>Subtotal - Discount</td>
+      </tr>
+      <tr>
+        <td>Description</td>
+        <td>Textarea</td>
+        <td>Line item details</td>
+      </tr>
+    </table>
+
+    <h2>Adding Line Items to Deal</h2>
+
+    <h3>Step-by-Step</h3>
+
+    <ol>
+      <li>Open the deal record</li>
+      <li>Scroll to "Line Items" section</li>
+      <li>Click "Add Line Item" button</li>
+      <li>Select product from dropdown or create new</li>
+      <li>Enter quantity</li>
+      <li>Unit price auto-fills from product</li>
+      <li>Optional: Add discount (% or fixed amount)</li>
+      <li>Add line item notes if needed</li>
+      <li>Click "Add" to add to deal</li>
+      <li>Repeat for additional items</li>
+    </ol>
+
+    <h3>Quick Add from Product List</h3>
+
+    <ol>
+      <li>In line items section, click "Quick Add"</li>
+      <li>Search products by name or SKU</li>
+      <li>Click product to add</li>
+      <li>Enter quantity</li>
+      <li>Click "Add"</li>
+      <li>Product added with default pricing</li>
+    </ol>
+
+    <h2>Managing Line Items</h2>
+
+    <h3>Edit Line Item</h3>
+
+    <ol>
+      <li>Click on the line item row</li>
+      <li>Update quantity, price, or discount</li>
+      <li>Changes auto-calculate totals</li>
+      <li>Click "Save"</li>
+    </ol>
+
+    <h3>Delete Line Item</h3>
+
+    <ol>
+      <li>Click on the line item</li>
+      <li>Click "Delete" icon</li>
+      <li>Confirm deletion</li>
+      <li>Deal total updates automatically</li>
+    </ol>
+
+    <h3>Duplicate Line Item</h3>
+
+    <ol>
+      <li>Click on the line item</li>
+      <li>Click "Duplicate" icon</li>
+      <li>New line item created with same product/quantity</li>
+      <li>Modify if needed</li>
+    </ol>
+
+    <h2>Deal Total Calculation</h2>
+
+    <p>The deal automatically calculates:</p>
+
+    <pre><code>Subtotal = Sum of all line item subtotals
+Discount = Sum of all line item discounts
+Deal Total = Subtotal - Discount
+
+Example:
+  Line Item 1: 2 × $500 = $1,000 (10% discount = $900)
+  Line Item 2: 1 × $2,000 = $2,000 (no discount)
+  ─────────────────────────────────
+  Subtotal: $3,000
+  Total Discount: $100
+  Deal Total: $2,900</code></pre>
+
+    <h2>Bulk Import Line Items</h2>
+
+    <p>Import multiple line items from CSV:</p>
+
+    <ol>
+      <li>In line items section, click "Import"</li>
+      <li>Download CSV template</li>
+      <li>Fill in product details and quantities</li>
+      <li>Upload CSV file</li>
+      <li>Review import preview</li>
+      <li>Click "Import" to add all items</li>
+    </ol>
+
+    <h3>CSV Format</h3>
+
+    <pre><code>Product SKU,Product Name,Quantity,Unit Price,Discount %
+SKU001,Professional Services,5,1000,10
+SKU002,Software License,20,500,0
+SKU003,Support Package,1,2000,5</code></pre>
+
+    <h2>Line Items in Quote/Invoice</h2>
+
+    <p>When you generate a quote or invoice from a deal:</p>
+
+    <ul>
+      <li>All line items automatically included</li>
+      <li>Quantities and prices carried over</li>
+      <li>Discounts applied</li>
+      <li>Professional formatting applied</li>
+      <li>Client sees itemized breakdown</li>
+    </ul>
+
+    <h2>Permissions</h2>
+
+    <p>Line item access depends on deal permissions:</p>
+
+    <ul>
+      <li>Can add/edit if user can update deal</li>
+      <li>Can delete if user can delete deal line items</li>
+      <li>Read-only if user has read-only deal access</li>
+    </ul>
+
+    <h2>Best Practices</h2>
+
+    <ul>
+      <li>✓ Add all relevant products/services</li>
+      <li>✓ Be specific in item descriptions</li>
+      <li>✓ Update quantities as deal progresses</li>
+      <li>✓ Apply appropriate discounts</li>
+      <li>✓ Review line items before generating quote</li>
+      <li>✗ Don't forget to add line items</li>
+      <li>✗ Don't add duplicate items</li>
+      <li>✗ Don't use incorrect product prices</li>
+    </ul>
+
+    <div class="note">
+      <strong>💡 Tip:</strong> Use the "Clone from Previous Deal" feature to quickly add line items similar to a previous opportunity.
+    </div>
+
+    <h2>Next Steps</h2>
+
+    <ul>
+      <li><a href="/features/quotes">Generate Quotes</a></li>
+      <li><a href="/features/orders">Create Orders from Deals</a></li>
+      <li><a href="/features/invoices">Generate Invoices</a></li>
+    </ul>
+
+    <div class="success">
+      <strong>✓ Line Items Added!</strong> Now generate a quote. See <a href="/features/quotes">Generate Quotes</a>.
+    </div>
+  </div>
+</MainLayout>

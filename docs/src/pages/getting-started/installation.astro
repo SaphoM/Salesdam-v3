@@ -1,0 +1,168 @@
+---
+import MainLayout from '../../layouts/MainLayout.astro';
+
+const clone = `git clone <repo-url> Salesdam-v3
+cd Salesdam-v3`;
+
+const backendEnv = `# backend/.env
+NODE_ENV=development
+PORT=5000
+MONGODB_URI=mongodb://localhost:27017/salesdam
+SESSION_SECRET=<a long random string>
+
+# Email (optional in development — messages are logged instead)
+SMTP_HOST=
+SMTP_PORT=587
+SMTP_USER=
+SMTP_PASS=
+SMTP_SECURE=false`;
+
+const frontendEnv = `# frontend/.env
+VITE_API_URL=http://localhost:5000/api/v1
+
+# Feature flags — 'true' enables, anything else disables
+VITE_FEATURE_DASHBOARDS=true
+VITE_FEATURE_AUTOMATION=true
+VITE_FEATURE_EMAIL_TEMPLATES=true
+VITE_FEATURE_EMAIL_SENDERS=true
+VITE_FEATURE_PDF_TEMPLATES=true
+VITE_FEATURE_INTEGRATIONS=true`;
+
+const docsEnv = `# docs/.env
+# Set to require an access key to read the docs. Leave unset for open docs.
+# NOT prefixed PUBLIC_ on purpose: PUBLIC_ vars are inlined into the client
+# bundle, which would publish the key to anyone with devtools.
+DOCS_ACCESS_KEY=
+
+# Where the explorer's "Try it" sends requests
+PUBLIC_API_URL=http://localhost:5000/api/v1
+PUBLIC_APP_URL=http://localhost:5173`;
+
+const install = `# Backend
+cd backend
+npm install
+npm run db:up        # starts MongoDB in Docker, or run your own
+npm run seed         # standard objects, fields and a first tenant
+npm run dev          # http://localhost:5000
+
+# Frontend, in a second terminal
+cd frontend
+npm install
+npm run dev          # http://localhost:5173
+
+# Docs, in a third
+cd docs
+npm install
+npm run dev`;
+---
+
+<MainLayout
+  title="Installation"
+  description="Prerequisites, environment variables and running the Salesdam stack locally."
+>
+  <h1>Installation</h1>
+  <p class="lead">
+    Four independent Node applications share one repository: the API, the app, this
+    documentation site, and the marketing site. Each has its own
+    <code>package.json</code> and its own <code>.env</code>.
+  </p>
+
+  <h2>Prerequisites</h2>
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th>Requirement</th><th>Version</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td>Node.js</td><td>20 or newer</td><td>The backend is ESM throughout.</td></tr>
+        <tr><td>MongoDB</td><td>6 or newer</td><td>A replica set is required — the record write paths use transactions.</td></tr>
+        <tr><td>Docker</td><td>Any recent</td><td>Optional. <code>npm run db:up</code> starts a suitable MongoDB for you.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="warning">
+    <strong>MongoDB must support transactions.</strong> Record creates and updates
+    run in a session so that validation, auto-numbers, rollups and formulas either
+    all land or none do. A standalone <code>mongod</code> without a replica set will
+    fail on write. <code>npm run db:up</code> provisions one correctly.
+  </div>
+
+  <h2>Clone</h2>
+  <pre><code>{clone}</code></pre>
+
+  <h2>Environment</h2>
+  <h3>Backend</h3>
+  <pre><code>{backendEnv}</code></pre>
+  <p>
+    <code>SESSION_SECRET</code> signs session cookies — use a long random value, and
+    a different one per environment. Changing it invalidates every existing session.
+  </p>
+
+  <h3>Frontend</h3>
+  <pre><code>{frontendEnv}</code></pre>
+  <p>
+    Vite only exposes variables prefixed <code>VITE_</code> to the browser. Feature
+    flags are read in <code>src/config/features.js</code> and compared against the
+    string <code>'true'</code>, so any other value disables the feature.
+  </p>
+
+  <h3>Docs</h3>
+  <pre><code>{docsEnv}</code></pre>
+
+  <h2>Install and run</h2>
+  <pre><code>{install}</code></pre>
+
+  <div class="note">
+    <strong>Seed before first login.</strong> <code>npm run seed</code> creates the
+    standard objects, their fields and an initial tenant. Without it the app loads
+    with no objects and the sidebar is empty.
+  </div>
+
+  <h2>Ports</h2>
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th>Service</th><th>Port</th></tr></thead>
+      <tbody>
+        <tr><td>API</td><td><code>5000</code></td></tr>
+        <tr><td>App</td><td><code>5173</code></td></tr>
+        <tr><td>Docs</td><td><code>4321</code> (Astro's default; the marketing site also claims it — run one at a time or pass <code>--port</code>)</td></tr>
+        <tr><td>MongoDB</td><td><code>27017</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>Verifying</h2>
+  <ul>
+    <li><code>GET http://localhost:5000/health</code> should return a success envelope.</li>
+    <li>The app should load its login page at <code>http://localhost:5173</code>.</li>
+    <li>Sign in, then check the sidebar lists the seeded objects.</li>
+  </ul>
+
+  <h2>Common problems</h2>
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th>Symptom</th><th>Cause</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>Writes fail with a transaction error</td>
+          <td>MongoDB is not running as a replica set. Use <code>npm run db:up</code>.</td>
+        </tr>
+        <tr>
+          <td>App loads but every request 401s</td>
+          <td><code>VITE_API_URL</code> points somewhere else, or the API isn't running.</td>
+        </tr>
+        <tr>
+          <td>Login succeeds, next request 401s</td>
+          <td>Cookies are being dropped — check the API's CORS origin and that credentials are allowed.</td>
+        </tr>
+        <tr>
+          <td>Sidebar is empty after login</td>
+          <td>The seed hasn't run.</td>
+        </tr>
+        <tr>
+          <td>Docs "Try it" fails with a network error</td>
+          <td>The docs origin isn't on the API's CORS allow-list, or <code>PUBLIC_API_URL</code> is wrong.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</MainLayout>

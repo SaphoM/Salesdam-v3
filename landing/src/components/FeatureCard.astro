@@ -1,0 +1,47 @@
+---
+const { title, description, icon, iconColor = '#0066FF' } = Astro.props;
+---
+
+<div class="feature-card">
+  <div class="feature-icon" style={`background: ${iconColor}15; color: ${iconColor};`}>
+    <slot name="icon" />
+  </div>
+  <h3 class="feature-title">{title}</h3>
+  <p class="feature-description">{description}</p>
+</div>
+
+<style>
+  .feature-card {
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 32px;
+    box-shadow: var(--shadow);
+    transition: all 0.25s ease;
+  }
+
+  .feature-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .feature-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+
+  .feature-title {
+    font-size: 1.5rem;
+    margin-bottom: 12px;
+    color: var(--text);
+  }
+
+  .feature-description {
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+</style>

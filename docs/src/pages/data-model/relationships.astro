@@ -1,0 +1,122 @@
+---
+import MainLayout from '../../layouts/MainLayout.astro';
+
+const lookup = `{
+  "label": "Client",
+  "apiName": "client_id",
+  "type": "lookup",
+  "lookupObjectApiName": "client",
+  "lookupDisplayField": "name",
+  "cascadeDelete": false
+}`;
+
+const detail = `{
+  "label": "Deal",
+  "apiName": "deal",
+  "type": "lookup",
+  "lookupObjectApiName": "deal",
+  "lookupDisplayField": "name",
+  "cascadeDelete": true
+}`;
+---
+
+<MainLayout
+  title="Relationships"
+  description="Lookups, master-detail, cascade delete and related lists."
+>
+  <h1>Relationships</h1>
+  <p class="lead">
+    Objects are related through fields. A relationship field stores the id of the
+    record it points at, and the platform resolves it to a label for display.
+  </p>
+
+  <h2>Field types</h2>
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th>Type</th><th>Meaning</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><code>lookup</code></td>
+          <td>A reference to a record on another object. Independent lifecycles by default.</td>
+        </tr>
+        <tr>
+          <td><code>master_detail</code></td>
+          <td>A stronger form of the same idea: the child is owned by the parent.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>A lookup</h2>
+  <pre><code>{lookup}</code></pre>
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th>Property</th><th>Meaning</th></tr></thead>
+      <tbody>
+        <tr><td><code>lookupObjectApiName</code></td><td>The object being pointed at.</td></tr>
+        <tr><td><code>lookupDisplayField</code></td><td>Which field to show instead of the raw id. Defaults to <code>name</code>.</td></tr>
+        <tr><td><code>cascadeDelete</code></td><td>Whether deleting the target deletes this record too.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="note">
+    <strong>The stored value is an id.</strong> Over the API you send and receive the
+    referenced record's id, not its label. The display field only governs rendering,
+    and is resolved separately.
+  </div>
+
+  <h2>Cascade delete, and why rollups need it</h2>
+  <p>
+    <code>cascadeDelete: true</code> makes the relationship a genuine
+    parent-child one: deleting the parent deletes the children.
+  </p>
+  <pre><code>{detail}</code></pre>
+  <p>
+    This is also the condition for a <a href="/concepts/rollup-summaries">rollup
+    summary</a>. A rollup only offers child objects whose relationship field has
+    cascade delete enabled — because an aggregate over records that can outlive
+    their parent would eventually include orphans, and quietly report a wrong total.
+  </p>
+
+  <div class="warning">
+    <strong>Cascade delete is not reversible.</strong> Removing a parent removes
+    every child through every cascading relationship. There is no undo, and a soft
+    delete on the parent does not spare them.
+  </div>
+
+  <h2>Deleting an object</h2>
+  <p>
+    Deleting a custom object cascades to its fields, records, layouts, counters and
+    screens, and strips the object from workspace allow-lists, object groups and
+    role permissions. System objects cannot be deleted at all.
+  </p>
+
+  <h2>Related lists</h2>
+  <p>
+    Where a child object points at a parent, the parent's detail page can show a
+    related list of those children. Which columns appear is configured per
+    relationship field:
+  </p>
+  <pre><code>PUT /api/v1/objects/:objectApiName/fields/:lookupFieldApiName/related-list-config</code></pre>
+
+  <h2>Querying across a relationship</h2>
+  <p>
+    Filters operate on the stored id, so to list children of a known parent, filter
+    the child object by its relationship field:
+  </p>
+  <pre><code>{`GET /api/v1/records/contact?filter=${'%'}5B${'%'}7B"field":"client_id","operator":"eq","value":"665f…"${'%'}7D${'%'}5D`}</code></pre>
+  <p>
+    There is no join or nested-field filter syntax — you cannot filter contacts by
+    their client's name in one request. Resolve the parent first, then filter by its
+    id, or use a rollup to bring the value you need onto the record.
+  </p>
+
+  <h2>Constraints</h2>
+  <ul>
+    <li>A lookup target must exist when the field is created, or the request 404s.</li>
+    <li>Relationship fields are excluded from record create forms for computed objects.</li>
+    <li>Relationships never cross tenants — a lookup can only resolve within the caller's tenant.</li>
+    <li>For return-type inference in formulas, a relationship field counts as text, because that is what an id is.</li>
+  </ul>
+</MainLayout>

@@ -1,0 +1,129 @@
+---
+import MainLayout from '../../layouts/MainLayout.astro';
+
+// Held as strings: a bare `{` in .astro markup opens a JS expression, so the JSON
+// in these curl examples was compiled as JavaScript and broke the build.
+const loginCurl = `curl -X POST http://localhost:5000/api/v1/auth/login \\
+  -H "Content-Type: application/json" \\
+  -c cookies.txt \\
+  -d '{
+    "email": "user@example.com",
+    "password": "YourPassword123"
+  }'`;
+
+const sessionCurl = `# Reuse the cookie jar the login wrote
+curl -b cookies.txt http://localhost:5000/api/v1/records/contact`;
+
+const apiKeyCurl = `curl -H "X-API-Key: $SALESDAM_API_KEY" \\
+  http://localhost:5000/api/v1/records/contact`;
+---
+
+<MainLayout title="Authentication | Salesdam Docs" description="Authentication methods and security">
+  <div class="content-wrapper">
+    <h1>Authentication</h1>
+
+    <p class="intro">Learn about different authentication methods available in Salesdam and how to secure your account.</p>
+
+    <h2>Authentication Methods</h2>
+
+    <h3>Email & Password</h3>
+    <p>Standard email and password login.</p>
+    <ul>
+      <li>Email address (username)</li>
+      <li>Password (minimum 8 characters)</li>
+      <li>Account verification required</li>
+    </ul>
+
+    <h3>Two-Factor Authentication (2FA)</h3>
+    <p>Add an extra layer of security to your account.</p>
+    <ul>
+      <li>Time-based One-Time Password (TOTP)</li>
+      <li>SMS verification</li>
+      <li>Backup codes for account recovery</li>
+    </ul>
+
+    <h3>API Authentication</h3>
+    <p>For programmatic access to the API:</p>
+    <ul>
+      <li>JWT (JSON Web Tokens)</li>
+      <li>API Keys</li>
+      <li>Token refresh mechanism</li>
+    </ul>
+
+    <h2>Login Process</h2>
+
+    <ol>
+      <li>Navigate to Salesdam login page</li>
+      <li>Enter email address</li>
+      <li>Enter password</li>
+      <li>If 2FA enabled, enter code from authenticator or SMS</li>
+      <li>Click "Sign In"</li>
+      <li>Redirected to dashboard</li>
+    </ol>
+
+    <h2>Session Management</h2>
+
+    <p>Your session is stored securely:</p>
+    <ul>
+      <li>JWT token stored in secure httpOnly cookie</li>
+      <li>Session timeout: 30 days (configurable)</li>
+      <li>Multiple simultaneous logins allowed</li>
+      <li>View and manage active sessions</li>
+    </ul>
+
+    <div class="note">
+      <strong>🔐 Security Tip:</strong> Always log out after using a shared computer. Check your active sessions regularly for suspicious activity.
+    </div>
+
+    <h2>API Authentication</h2>
+
+    <div class="warning">
+      <strong>There is no JWT or bearer token.</strong> An earlier version of this
+      page described <code>Authorization: Bearer …</code>; the API has never
+      accepted it. Logging in creates a server-side <em>session</em> and sets a
+      cookie, and programmatic access uses an <code>X-API-Key</code> header. A
+      bearer header is ignored and the request is treated as unauthenticated.
+    </div>
+
+    <h3>Signing in (session cookie)</h3>
+    <p>
+      <code>POST /auth/login</code> creates a session and returns the cookie that
+      identifies it. <code>-c</code> saves it to a jar so later calls can reuse it:
+    </p>
+    <pre><code>{loginCurl}</code></pre>
+    <pre><code>{sessionCurl}</code></pre>
+    <p>
+      Sessions are stored server-side, so they can be listed and revoked —
+      see <code>GET /auth/sessions</code>.
+    </p>
+
+    <h3>Programmatic access (API key)</h3>
+    <p>
+      For scripts and integrations, create a key under <strong>Integrations</strong>
+      and send it on every request. Keys carry scopes and can be restricted by IP
+      and by object:
+    </p>
+    <pre><code>{apiKeyCurl}</code></pre>
+    <p>
+      Full details, including scopes and rotation, are in the developer docs under
+      <a href="/api/authentication">API Authentication</a>.
+    </p>
+
+    <h2>Remember Me</h2>
+
+    <p>The "Remember Me" option extends your session:</p>
+    <ul>
+      <li>Extended session duration: 90 days</li>
+      <li>Requires additional verification after 30 days</li>
+      <li>Only use on personal devices</li>
+    </ul>
+
+    <div class="warning">
+      <strong>⚠️ Warning:</strong> Don't use "Remember Me" on shared computers.
+    </div>
+
+    <div class="success">
+      <strong>✓ Authenticated!</strong> You're logged in. For more info, see <a href="/user-guide/password-reset">Password Reset & Security</a>.
+    </div>
+  </div>
+</MainLayout>

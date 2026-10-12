@@ -1,0 +1,133 @@
+---
+import MainLayout from '../../layouts/MainLayout.astro';
+
+const component = `// components/common/Thing/Thing.jsx
+import styles from './Thing.module.css';
+
+const Thing = ({ label, active }) => (
+  <div className={\`\${styles.thing} \${active ? styles.active : ''}\`}>
+    {label}
+  </div>
+);
+
+export default Thing;`;
+
+const css = `/* components/common/Thing/Thing.module.css */
+.thing {
+  padding: var(--spacing-3);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  color: var(--color-gray-700);
+  background: var(--color-white);
+}
+
+.active {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}`;
+
+const query = `const { data: objectData, isLoading } = useQuery({
+  queryKey: ['object', apiName],
+  queryFn: () => getObject(apiName),
+  enabled: !!apiName,
+});`;
+---
+
+<MainLayout
+  title="Frontend Development"
+  description="Component conventions, CSS modules, design tokens and server state."
+>
+  <h1>Frontend Development</h1>
+  <p class="lead">
+    React with Vite. One folder per component, CSS modules for styling, design
+    tokens for every colour and measurement.
+  </p>
+
+  <h2>Component layout</h2>
+  <pre><code>{component}</code></pre>
+  <pre><code>{css}</code></pre>
+  <p>
+    One folder per component containing <code>X.jsx</code> and
+    <code>X.module.css</code>. Around 105 components follow this; match it.
+  </p>
+
+  <h2>Design tokens</h2>
+  <p>
+    Every colour, space, radius and shadow is a custom property in
+    <code>src/styles/variables.css</code>, loaded globally from
+    <code>main.jsx</code>.
+  </p>
+  <div class="error">
+    <strong>Never write a raw hex.</strong> Dark mode is implemented purely as a
+    token override on <code>[data-theme='dark']</code>, which inverts the grey ramp.
+    A hardcoded colour survives the switch unchanged — which is how you get white
+    text on a white background.
+  </div>
+  <p>
+    Where you need a tint of a token, mix from the token rather than hardcoding the
+    result: <code>color-mix(in srgb, var(--color-primary) 8%, var(--color-gray-50))</code>.
+    Note that <code>--color-primary-light</code> is a fixed near-white and washes out
+    against dark-mode text.
+  </p>
+
+  <h2>Server state</h2>
+  <pre><code>{query}</code></pre>
+  <ul>
+    <li>All server data goes through TanStack Query. Defaults: 5-minute <code>staleTime</code>, no refetch on focus or reconnect.</li>
+    <li>API calls live in <code>src/services/api/</code>, which unwraps the envelope and throws a plain <code>Error</code> on failure — components should not call <code>fetch</code>.</li>
+    <li>After a mutation, invalidate every cache key that holds the changed data. Field metadata is cached under more than one key.</li>
+  </ul>
+
+  <div class="warning">
+    <strong><code>Layout</code> is rendered inside each page, not as a route
+    layout.</strong> So every navigation unmounts the whole shell, including the
+    sidebar. Anything that must survive navigation — accordion state, scroll
+    position — has to be persisted outside component state; see
+    <code>layout/Sidebar/navGroupState.js</code> and <code>navScrollState.js</code>
+    for the established pattern.
+  </div>
+
+  <h2>Routing</h2>
+  <p>
+    One flat <code>&lt;Routes&gt;</code> block in <code>App.jsx</code>. A new route
+    must go <strong>before</strong> the catch-all <code>path="*"</code> or it will
+    render the 404 page. Pages are wrapped as
+    <code>&lt;ProtectedRoute&gt;&lt;Layout&gt;&lt;Page /&gt;&lt;/Layout&gt;&lt;/ProtectedRoute&gt;</code>.
+  </p>
+
+  <h2>Feature flags</h2>
+  <p>
+    Flags live in <code>src/config/features.js</code>, read as
+    <code>import.meta.env.VITE_FEATURE_X === 'true'</code>. Only
+    <code>VITE_</code>-prefixed variables reach the browser — and everything that
+    does is embedded in the bundle, so never put a secret in one.
+  </p>
+
+  <h2>Rendering field values</h2>
+  <p>
+    Switch on <code>resolveDisplayType(field)</code> from
+    <code>utils/fieldDisplayType.js</code>, not on <code>field.type</code> directly. A
+    formula field's own type is <code>'formula'</code>, which says nothing about how
+    to render it — the resolver maps it to its declared return type so a currency
+    formula renders as currency.
+  </p>
+
+  <h2>Known rough edges</h2>
+  <ul>
+    <li>
+      No shared <code>Tabs</code> component — each page rolls its own with
+      <code>activeTab</code> state. <code>RecordTabs.jsx</code> is the closest
+      reference.
+    </li>
+    <li>
+      <code>react-hooks/set-state-in-effect</code> fires in 52 files. It is an
+      existing baseline, not something you introduced — but don't add to it.
+    </li>
+    <li>
+      Two near-identical <code>renderCellValue</code> implementations exist in
+      <code>RelatedList.jsx</code> and <code>RelatedListTable.jsx</code>. Change both,
+      or consolidate them.
+    </li>
+    <li>No route-level code splitting; every page is in the main bundle.</li>
+  </ul>
+</MainLayout>

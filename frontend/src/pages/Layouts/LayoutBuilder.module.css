@@ -1,0 +1,583 @@
+/* ─────────────────────────────────────────────────────────────
+   PAGE — constrained height so the canvas (not the outer page)
+   scrolls. Height = viewport - topbar - contentInner padding (3rem).
+   ───────────────────────────────────────────────────────────── */
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+  height: calc(100vh - var(--topbar-height) - 3rem);
+  overflow: hidden;
+}
+
+/* ─── Header ─────────────────────────────────────────────────── */
+.header {
+  flex-shrink: 0;
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  color: var(--color-gray-500);
+  font-size: var(--font-size-sm);
+  text-decoration: none;
+  margin-bottom: var(--spacing-3);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-family: inherit;
+}
+.backLink:hover {
+  color: var(--color-primary);
+}
+
+.headerRow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--spacing-4);
+}
+.title {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-gray-900);
+}
+.subtitle {
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-500);
+  margin-top: 2px;
+}
+.headerActions {
+  display: flex;
+  gap: var(--spacing-3);
+  align-items: center;
+  flex-shrink: 0;
+}
+
+/* ─── Fullscreen button ────────────────────────────────────────── */
+.fsBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  background: var(--color-white);
+  color: var(--color-gray-500);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition:
+    background var(--transition-fast),
+    color var(--transition-fast),
+    border-color var(--transition-fast);
+}
+.fsBtn:hover {
+  background: var(--color-gray-100);
+  color: var(--color-gray-800);
+  border-color: var(--color-gray-300);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   BUILDER — two-column grid that fills remaining page height.
+   flex: 1 + min-height: 0 is the correct pattern for a flex
+   child that should shrink and let its children scroll.
+   ───────────────────────────────────────────────────────────── */
+.builder {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: var(--spacing-4);
+  overflow: hidden;
+}
+
+/* ─── Left panel: available fields ─────────────────────────── */
+.fieldPanel {
+  display: flex;
+  flex-direction: column;
+  background: var(--color-white);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-4);
+  overflow: hidden; /* clips the rounded corners */
+  height: 100%;
+  box-sizing: border-box;
+}
+
+/* Left panel tab switcher */
+.panelTabs {
+  display: flex;
+  gap: 2px;
+  margin-bottom: var(--spacing-2);
+  flex-shrink: 0;
+  background: var(--color-gray-100);
+  border-radius: var(--border-radius-sm);
+  padding: 2px;
+}
+.panelTab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: 4px 8px;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  border: none;
+  border-radius: var(--border-radius-sm);
+  background: transparent;
+  color: var(--color-gray-500);
+  cursor: pointer;
+  transition:
+    background var(--transition-fast),
+    color var(--transition-fast);
+}
+.panelTab:hover {
+  color: var(--color-gray-800);
+}
+.panelTabActive {
+  background: var(--color-white) !important;
+  color: var(--color-gray-900) !important;
+  box-shadow: var(--shadow-sm);
+}
+
+.panelTitle {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-gray-700);
+  margin-bottom: var(--spacing-1);
+  flex-shrink: 0;
+}
+.panelHint {
+  font-size: var(--font-size-xs);
+  color: var(--color-gray-400);
+  margin-bottom: var(--spacing-3);
+  flex-shrink: 0;
+}
+
+.fieldList {
+  flex: 1;
+  min-height: 0; /* REQUIRED: lets a flex child scroll instead of grow */
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1);
+  padding: var(--spacing-1);
+  border-radius: var(--border-radius-sm);
+  transition: background var(--transition-fast);
+}
+.fieldList::-webkit-scrollbar {
+  width: 4px;
+}
+.fieldList::-webkit-scrollbar-thumb {
+  background: var(--color-gray-200);
+  border-radius: 2px;
+}
+.fieldList.dragOver {
+  background: var(--color-primary-light);
+}
+
+.fieldChip {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-2);
+  background: var(--color-gray-50);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-sm);
+  cursor: grab;
+  font-size: var(--font-size-xs);
+  user-select: none;
+  flex-shrink: 0;
+  transition:
+    box-shadow var(--transition-fast),
+    border-color var(--transition-fast);
+}
+.fieldChip:hover {
+  box-shadow: var(--shadow-sm);
+  border-color: var(--color-gray-300);
+}
+.fieldChip.dragging {
+  box-shadow: var(--shadow-lg);
+  opacity: 0.9;
+  cursor: grabbing;
+}
+
+.grip {
+  color: var(--color-gray-300);
+  flex-shrink: 0;
+}
+.chipLabel {
+  display: block;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-gray-700);
+}
+.chipType {
+  display: block;
+  color: var(--color-gray-400);
+  font-size: 10px;
+  text-transform: capitalize;
+  margin-top: 1px;
+}
+.emptyPanel {
+  padding: var(--spacing-4);
+  text-align: center;
+  color: var(--color-gray-400);
+  font-size: var(--font-size-xs);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   CANVAS — fills the right grid column and scrolls vertically.
+   overflow-y: scroll always shows the scrollbar so users know
+   they can scroll to the Add Section button.
+   ───────────────────────────────────────────────────────────── */
+.canvas {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+  overflow: hidden; /* canvas itself does NOT scroll — sections do */
+  box-sizing: border-box;
+}
+
+/* ─── Sections droppable wrapper ──────────────────────────── */
+.sectionsContainer {
+  flex: 1;
+  min-height: 0; /* lets the flex child shrink so overflow-y works */
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+  overflow-y: scroll;
+  overflow-x: hidden;
+  padding-bottom: var(--spacing-4);
+}
+.sectionsContainer::-webkit-scrollbar {
+  width: 6px;
+}
+.sectionsContainer::-webkit-scrollbar-track {
+  background: transparent;
+}
+.sectionsContainer::-webkit-scrollbar-thumb {
+  background: var(--color-gray-200);
+  border-radius: 3px;
+}
+.sectionsContainer::-webkit-scrollbar-thumb:hover {
+  background: var(--color-gray-300);
+}
+.sectionsOver {
+  outline: 2px dashed var(--color-primary);
+  outline-offset: 6px;
+  border-radius: var(--border-radius-lg);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   SECTION — no overflow: hidden here (would clip the drag
+   transform). Border-radius is respected visually through the
+   .sectionHeader and .columns border-radius below.
+   ───────────────────────────────────────────────────────────── */
+.section {
+  background: var(--color-white);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-lg);
+  transition:
+    box-shadow var(--transition-fast),
+    border-color var(--transition-fast);
+}
+.sectionDragging {
+  box-shadow: var(--shadow-xl);
+  border-color: var(--color-primary);
+  opacity: 0.96;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  padding: var(--spacing-3) var(--spacing-4);
+  background: var(--color-gray-50);
+  border-bottom: 1px solid var(--border-color);
+  /* Top corners match the section border-radius */
+  border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
+}
+
+.sectionGrip {
+  color: var(--color-gray-400);
+  cursor: grab;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  padding: var(--spacing-1);
+  border-radius: var(--border-radius-sm);
+  transition:
+    color var(--transition-fast),
+    background var(--transition-fast);
+}
+.sectionGrip:hover {
+  color: var(--color-gray-700);
+  background: var(--color-gray-200);
+}
+.sectionGrip:active {
+  cursor: grabbing;
+}
+
+.sectionLabel {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-gray-800);
+  padding: 2px 0;
+  outline: none;
+  min-width: 0;
+}
+.sectionLabel:focus {
+  border-bottom: 2px solid var(--color-primary);
+}
+
+.sectionActions {
+  display: flex;
+  gap: var(--spacing-2);
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.sectionBtn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px var(--spacing-2);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-sm);
+  background: var(--color-white);
+  font-size: var(--font-size-xs);
+  color: var(--color-gray-600);
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    background var(--transition-fast),
+    color var(--transition-fast);
+}
+.sectionBtn:hover {
+  background: var(--color-gray-100);
+}
+.sectionBtn.danger {
+  color: var(--color-danger);
+  border-color: var(--color-danger);
+}
+.sectionBtn.danger:hover {
+  background: var(--color-danger-light);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   COLUMNS — the grid holding 1 or 2 drop zones.
+   overflow: hidden here (not on .section) clips the column
+   backgrounds to the section's bottom rounded corners.
+   The 1px gap shows the border-color as a column separator.
+   ───────────────────────────────────────────────────────────── */
+.columns {
+  display: grid;
+  gap: 1px;
+  background: var(--border-color);
+  overflow: hidden;
+  border-radius: 0 0 var(--border-radius-lg) var(--border-radius-lg);
+}
+
+.column {
+  background: var(--color-white);
+  padding: var(--spacing-3) var(--spacing-4);
+  min-height: 100px;
+  transition: background var(--transition-fast);
+}
+.column.dragOver {
+  background: #eff6ff;
+}
+
+.columnHeader {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-gray-400);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--spacing-3);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+}
+
+/* ─── Placed fields ───────────────────────────────────────── */
+.placedField {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-2) var(--spacing-3);
+  background: var(--color-gray-50);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-sm);
+  margin-bottom: var(--spacing-2);
+  font-size: var(--font-size-xs);
+  user-select: none;
+  transition:
+    box-shadow var(--transition-fast),
+    border-color var(--transition-fast);
+}
+.placedField:hover {
+  box-shadow: var(--shadow-sm);
+  border-color: var(--color-gray-300);
+}
+.placedField.dragging {
+  box-shadow: var(--shadow-lg);
+  opacity: 0.9;
+}
+
+.placedGrip {
+  cursor: grab;
+  color: var(--color-gray-300);
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+.placedInfo {
+  flex: 1;
+  min-width: 0;
+}
+.placedLabel {
+  display: block;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-gray-700);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.placedType {
+  display: block;
+  font-size: 10px;
+  color: var(--color-gray-400);
+  text-transform: capitalize;
+  margin-top: 1px;
+}
+.required {
+  color: var(--color-danger);
+  font-size: var(--font-size-xs);
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.dropHint {
+  border: 2px dashed var(--color-gray-200);
+  border-radius: var(--border-radius);
+  padding: var(--spacing-5) var(--spacing-4);
+  text-align: center;
+  color: var(--color-gray-400);
+  font-size: var(--font-size-xs);
+}
+.column.dragOver .dropHint {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  background: var(--color-primary-light);
+}
+
+/* ─── Flow section preview tile ───────────────────────────── */
+.flowPreviewTile {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  padding: var(--spacing-4) var(--spacing-5);
+  background: linear-gradient(135deg, var(--color-primary-light), #f0f0ff);
+  border-top: 1px solid var(--border-color);
+  border-radius: 0 0 var(--border-radius-lg) var(--border-radius-lg);
+}
+.flowPreviewName {
+  display: block;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-primary);
+}
+.flowPreviewSub {
+  display: block;
+  font-size: var(--font-size-xs);
+  color: var(--color-gray-500);
+  margin-top: 2px;
+}
+
+/* ─── Flow drop zone ──────────────────────────────────────── */
+.flowDropZone {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-3);
+  padding: var(--spacing-5);
+  border: 2px dashed var(--color-primary);
+  border-radius: var(--border-radius-lg);
+  color: var(--color-primary);
+  font-size: var(--font-size-sm);
+  background: var(--color-primary-light);
+  opacity: 0.7;
+  flex-shrink: 0;
+  transition:
+    opacity var(--transition-fast),
+    background var(--transition-fast);
+}
+.flowDropZoneOver {
+  opacity: 1;
+  background: #e0e7ff;
+}
+
+/* ─── Add section ─────────────────────────────────────────── */
+.addSection {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-3);
+  background: var(--color-white);
+  border: 2px dashed var(--border-color);
+  border-radius: var(--border-radius-lg);
+  color: var(--color-gray-500);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all var(--transition-fast);
+}
+.addSection:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  background: var(--color-primary-light);
+}
+
+/* ─── Fullscreen / focus mode ─────────────────────────────── */
+.fullscreen {
+  position: fixed;
+  inset: 0;
+  z-index: calc(var(--z-modal) + 50);
+  background: var(--color-gray-100);
+  padding: var(--spacing-5) var(--spacing-6);
+  height: 100vh;
+  max-height: 100vh;
+  overflow: hidden;
+}
+
+/* ─── Loading ─────────────────────────────────────────────── */
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+}
+.spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--color-gray-200);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

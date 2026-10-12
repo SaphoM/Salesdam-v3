@@ -1,0 +1,83 @@
+.body { display: flex; flex-direction: column; gap: var(--spacing-5); }
+
+.section { display: flex; flex-direction: column; gap: var(--spacing-3); }
+.sectionTitle {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-gray-700);
+  margin: 0;
+}
+
+/* ─── Access options ──────────────────────────────── */
+.options { display: flex; flex-direction: column; gap: var(--spacing-2); }
+
+.option {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  padding: var(--spacing-3) var(--spacing-4);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  background: var(--color-white);
+  cursor: pointer;
+  text-align: left;
+  transition: border-color var(--transition-fast), background var(--transition-fast);
+}
+.option:hover    { border-color: var(--color-primary); background: var(--color-gray-50); }
+.optionActive    { border-color: var(--color-primary); background: var(--color-primary-light); }
+
+.optionIcon { color: var(--color-gray-500); flex-shrink: 0; }
+.optionActive .optionIcon { color: var(--color-primary); }
+
+.optionText { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+.optionText strong { font-size: var(--font-size-sm); color: var(--color-gray-800); }
+.optionText span   { font-size: var(--font-size-xs); color: var(--color-gray-500); }
+
+.radio {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid var(--border-color);
+  flex-shrink: 0;
+  transition: border-color var(--transition-fast), background var(--transition-fast);
+}
+.radioOn { border-color: var(--color-primary); background: var(--color-primary); }
+
+/* ─── Pick lists ──────────────────────────────────── */
+.pickList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  max-height: 180px;
+  overflow-y: auto;
+  padding: var(--spacing-2);
+}
+.pickList::-webkit-scrollbar { width: 4px; }
+.pickList::-webkit-scrollbar-thumb { background: var(--color-gray-200); border-radius: 2px; }
+
+.pickItem {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-700);
+  padding: var(--spacing-1) var(--spacing-2);
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+}
+.pickItem:hover { background: var(--color-gray-50); }
+.pickItem input { accent-color: var(--color-primary); }
+.email { color: var(--color-gray-400); font-size: var(--font-size-xs); margin-left: 4px; }
+
+/* ─── Edit toggle ─────────────────────────────────── */
+.toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-700);
+  cursor: pointer;
+}
+.toggle input { accent-color: var(--color-primary); width: 16px; height: 16px; }

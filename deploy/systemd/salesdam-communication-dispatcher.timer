@@ -1,0 +1,14 @@
+# Salesdam Insurance Workspace - Communication Dispatcher Timer
+# Runs every 5 minutes to deliver queued communications
+
+[Unit]
+Description=Frequent timer for Salesdam Insurance Communication Dispatcher
+Requires=salesdam-communication-dispatcher.service
+
+[Timer]
+OnCalendar=*:0/5
+Persistent=true
+Unit=salesdam-communication-dispatcher.service
+
+[Install]
+WantedBy=timers.target

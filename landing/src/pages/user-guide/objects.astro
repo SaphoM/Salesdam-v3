@@ -1,0 +1,324 @@
+---
+import DocsLayout from '../../layouts/DocsLayout.astro';
+---
+
+<DocsLayout
+  title="Object Settings - User Guide - Mini CRM"
+  description="Learn how to create and manage custom objects in Mini CRM"
+>
+  <h1>Object Settings</h1>
+
+  <p>
+    Objects are the foundation of your Mini CRM data model. They represent the types of data
+    you want to track, similar to tables in a database or tabs in a spreadsheet. This guide
+    covers everything you need to know about creating, configuring, and managing objects.
+  </p>
+
+  <h2>Understanding Objects</h2>
+
+  <p>
+    Think of objects as templates for storing information. For example, you might create
+    a "Customer" object to store customer information, an "Opportunity" object to track
+    sales deals, or a "Case" object to manage support tickets.
+  </p>
+
+  <p>Each object consists of:</p>
+
+  <ul>
+    <li><strong>Fields:</strong> Individual data points (like "Name", "Email", "Phone")</li>
+    <li><strong>Records:</strong> Individual instances of the object (specific customers, deals, etc.)</li>
+    <li><strong>Relationships:</strong> Connections to other objects</li>
+    <li><strong>Settings:</strong> Configuration options and permissions</li>
+  </ul>
+
+  <h2>Creating a Custom Object</h2>
+
+  <p>Follow these steps to create a new object:</p>
+
+  <ol>
+    <li>Navigate to <strong>Object Settings</strong> from the main menu</li>
+    <li>Click the <strong>"New Object"</strong> button</li>
+    <li>Fill in the object details:
+      <ul>
+        <li><strong>Label:</strong> The display name (e.g., "Customer")</li>
+        <li><strong>Plural Label:</strong> For list views (e.g., "Customers")</li>
+        <li><strong>API Name:</strong> Internal identifier (e.g., "customer")</li>
+        <li><strong>Description:</strong> Optional explanation of the object's purpose</li>
+      </ul>
+    </li>
+    <li>Click <strong>Save</strong></li>
+  </ol>
+
+  <div class="note">
+    <strong>Naming Convention:</strong> API Names should be lowercase, use underscores for spaces,
+    and be descriptive but concise. Good examples: "customer", "sales_opportunity", "support_case".
+  </div>
+
+  <h2>Field Types</h2>
+
+  <p>Mini CRM supports various field types to accommodate different kinds of data:</p>
+
+  <h3>Text</h3>
+  <p>
+    Short text strings up to 255 characters. Perfect for names, IDs, short descriptions, and codes.
+  </p>
+  <ul>
+    <li>Maximum length configurable</li>
+    <li>Can be marked as required or unique</li>
+    <li>Supports default values</li>
+  </ul>
+
+  <h3>Number</h3>
+  <p>
+    Numeric values with optional decimal places. Use for quantities, amounts, scores, and calculations.
+  </p>
+  <ul>
+    <li>Specify number of decimal places (0-8)</li>
+    <li>Set minimum and maximum values</li>
+    <li>Use in formulas and rollup calculations</li>
+  </ul>
+
+  <h3>Date</h3>
+  <p>
+    Calendar dates without time components. Ideal for birthdays, deadlines, start dates, and milestones.
+  </p>
+  <ul>
+    <li>Date picker for easy selection</li>
+    <li>Can default to today's date</li>
+    <li>Use in date-based automation triggers</li>
+  </ul>
+
+  <h3>Boolean</h3>
+  <p>
+    True/false checkbox fields. Perfect for yes/no questions, feature flags, and status indicators.
+  </p>
+  <ul>
+    <li>Displays as a checkbox</li>
+    <li>Default to checked or unchecked</li>
+    <li>Use in conditional logic</li>
+  </ul>
+
+  <h3>Picklist</h3>
+  <p>
+    Dropdown menu with predefined options. Ensures data consistency for categorical data.
+  </p>
+  <ul>
+    <li>Define available options (one per line)</li>
+    <li>Set a default selection</li>
+    <li>Options are enforced (users can't enter custom values)</li>
+  </ul>
+  <p><strong>Example options:</strong> Hot, Warm, Cold / Small, Medium, Large / Bronze, Silver, Gold</p>
+
+  <h3>Lookup</h3>
+  <p>
+    Reference to a record in another object. Creates a link between related data without
+    parent-child dependency.
+  </p>
+  <ul>
+    <li>Select which object to reference</li>
+    <li>Users can search and select records</li>
+    <li>Deleting the referenced record clears the lookup value</li>
+    <li>Creates a related list on the referenced record</li>
+  </ul>
+  <p>
+    <strong>Example:</strong> An "Account Manager" lookup field on the Customer object that
+    references the User object.
+  </p>
+
+  <h3>Master-Detail</h3>
+  <p>
+    Parent-child relationship with cascading behavior. The child record cannot exist without
+    the parent.
+  </p>
+  <ul>
+    <li>Deleting the parent deletes all child records</li>
+    <li>Child records inherit sharing from parent</li>
+    <li>Enables rollup summary fields on parent</li>
+    <li>Tighter relationship than lookup</li>
+  </ul>
+  <p>
+    <strong>Example:</strong> An "Account" master-detail field on the Contact object. If the
+    Account is deleted, all associated Contacts are deleted.
+  </p>
+
+  <h2>Adding Fields to an Object</h2>
+
+  <p>After creating an object, add fields to define what data it stores:</p>
+
+  <ol>
+    <li>Click on the object name in Object Settings</li>
+    <li>Scroll to the <strong>Fields</strong> section</li>
+    <li>Click <strong>"New Field"</strong></li>
+    <li>Select the field type</li>
+    <li>Configure field properties:
+      <ul>
+        <li><strong>Label:</strong> Display name</li>
+        <li><strong>API Name:</strong> Internal name</li>
+        <li><strong>Required:</strong> Must be filled in</li>
+        <li><strong>Unique:</strong> No duplicate values allowed</li>
+        <li><strong>Default Value:</strong> Pre-filled value</li>
+        <li><strong>Help Text:</strong> Tooltip guidance</li>
+      </ul>
+    </li>
+    <li>Click <strong>Save</strong></li>
+  </ol>
+
+  <h2>Schema Builder</h2>
+
+  <p>
+    The Schema Builder provides a visual representation of your objects and their relationships.
+    It's an invaluable tool for understanding and designing your data model.
+  </p>
+
+  <h3>Accessing the Schema Builder</h3>
+  <ol>
+    <li>Go to <strong>Object Settings</strong></li>
+    <li>Click <strong>"Schema Builder"</strong> in the top toolbar</li>
+  </ol>
+
+  <h3>What You'll See</h3>
+  <ul>
+    <li><strong>Object boxes:</strong> Each object appears as a card showing its name and fields</li>
+    <li><strong>Relationship lines:</strong> Lookup and master-detail relationships shown as connecting lines</li>
+    <li><strong>Field types:</strong> Icons indicate different field types</li>
+    <li><strong>Draggable layout:</strong> Rearrange objects for better visualization</li>
+  </ul>
+
+  <h3>Using the Schema Builder</h3>
+  <ul>
+    <li>Drag objects to organize the layout</li>
+    <li>Hover over relationship lines to see details</li>
+    <li>Click on an object to view full configuration</li>
+    <li>Use zoom controls to see more or fewer objects</li>
+    <li>Export as image for documentation</li>
+  </ul>
+
+  <div class="note">
+    <strong>Pro Tip:</strong> Use the Schema Builder when planning new features or onboarding
+    team members. A visual diagram is much easier to understand than a list of object definitions.
+  </div>
+
+  <h2>Configuring Page Layouts</h2>
+
+  <p>
+    Page layouts control how fields are arranged when viewing or editing records. Customize
+    layouts to improve user experience and productivity.
+  </p>
+
+  <h3>Layout Configuration</h3>
+  <ul>
+    <li>Drag fields to reorder them</li>
+    <li>Group related fields together</li>
+    <li>Mark fields as read-only for specific roles</li>
+    <li>Hide fields that aren't needed</li>
+    <li>Add section headers for organization</li>
+  </ul>
+
+  <h2>Validation Rules</h2>
+
+  <p>
+    Validation rules enforce data quality by preventing invalid data from being saved.
+  </p>
+
+  <h3>Creating a Validation Rule</h3>
+  <ol>
+    <li>Go to the object detail page</li>
+    <li>Scroll to <strong>Validation Rules</strong></li>
+    <li>Click <strong>"New Rule"</strong></li>
+    <li>Enter rule details:
+      <ul>
+        <li><strong>Name:</strong> Descriptive rule name</li>
+        <li><strong>Formula:</strong> Condition that must be FALSE to save</li>
+        <li><strong>Error Message:</strong> Shown when validation fails</li>
+      </ul>
+    </li>
+    <li>Test the rule</li>
+    <li>Activate it</li>
+  </ol>
+
+  <p><strong>Example:</strong> Prevent saving if "Close Date" is in the past for open Opportunities:</p>
+  <pre><code>AND(
+  ISPICKVAL(Stage, "Open"),
+  Close_Date < TODAY()
+)</code></pre>
+
+  <h2>Best Practices</h2>
+
+  <h3>Object Design</h3>
+  <ul>
+    <li>Start with core objects and add more as needed</li>
+    <li>Don't create too many objects - consolidate when possible</li>
+    <li>Use clear, business-friendly names</li>
+    <li>Document object purposes in the description field</li>
+  </ul>
+
+  <h3>Field Management</h3>
+  <ul>
+    <li>Only mark fields as required if they're truly necessary</li>
+    <li>Use picklists instead of text fields for standardized values</li>
+    <li>Add help text to clarify field purposes</li>
+    <li>Choose appropriate field types (Number for quantities, not Text)</li>
+    <li>Use unique constraints to prevent duplicates</li>
+  </ul>
+
+  <h3>Relationships</h3>
+  <ul>
+    <li>Use master-detail for true parent-child relationships</li>
+    <li>Use lookup for loose associations</li>
+    <li>Limit the number of relationships per object (avoid complexity)</li>
+    <li>Think about what happens when records are deleted</li>
+  </ul>
+
+  <h3>Performance</h3>
+  <ul>
+    <li>Avoid creating excessive fields (aim for under 100 per object)</li>
+    <li>Use indexed fields for frequently searched values</li>
+    <li>Consider data volume when designing relationships</li>
+  </ul>
+
+  <h2>Common Patterns</h2>
+
+  <h3>Account-Contact-Opportunity</h3>
+  <p>A classic CRM structure:</p>
+  <ul>
+    <li><strong>Account:</strong> Companies or organizations</li>
+    <li><strong>Contact:</strong> People at those companies (master-detail to Account)</li>
+    <li><strong>Opportunity:</strong> Sales deals (lookup to Account and Contact)</li>
+  </ul>
+
+  <h3>Ticket Management</h3>
+  <p>For support or service requests:</p>
+  <ul>
+    <li><strong>Case:</strong> Support tickets</li>
+    <li><strong>Case Comment:</strong> Updates on cases (master-detail to Case)</li>
+    <li><strong>Solution:</strong> Knowledge base articles</li>
+  </ul>
+
+  <h3>Project Tracking</h3>
+  <p>For managing work:</p>
+  <ul>
+    <li><strong>Project:</strong> Major initiatives</li>
+    <li><strong>Task:</strong> Individual work items (master-detail to Project)</li>
+    <li><strong>Milestone:</strong> Key deliverables (master-detail to Project)</li>
+  </ul>
+
+  <h2>Troubleshooting</h2>
+
+  <h3>Can't Delete an Object</h3>
+  <p>
+    Objects can't be deleted if they have records or are referenced by other objects.
+    First delete all records and remove relationship fields.
+  </p>
+
+  <h3>Field Not Showing on Record</h3>
+  <p>
+    Check the page layout configuration. The field might be hidden or restricted by
+    field-level security settings.
+  </p>
+
+  <h3>Relationship Not Working</h3>
+  <p>
+    Verify that both objects exist and the relationship field is properly configured.
+    Check that users have permission to view both objects.
+  </p>
+</DocsLayout>

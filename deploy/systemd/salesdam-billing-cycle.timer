@@ -1,0 +1,15 @@
+# Salesdam Insurance Workspace - Billing Cycle Timer
+# Runs daily at 3:00 AM
+
+[Unit]
+Description=Daily timer for Salesdam Insurance Billing Cycle
+Requires=salesdam-billing-cycle.service
+
+[Timer]
+OnCalendar=*-*-* 03:00:00
+Persistent=true
+RandomizedDelaySec=15min
+Unit=salesdam-billing-cycle.service
+
+[Install]
+WantedBy=timers.target

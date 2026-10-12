@@ -1,0 +1,166 @@
+---
+import MainLayout from '../../layouts/MainLayout.astro';
+
+const errorShape = `{
+  "success": false,
+  "message": "Validation failed: Client Number cannot be blank",
+  "errors": [
+    "Client Number cannot be blank",
+    "Amount must be greater than the discount"
+  ],
+  "fieldErrors": {
+    "client_number": "Client Number cannot be blank"
+  }
+}`;
+
+const handler = `async function save(objectApiName, body) {
+  const res = await fetch(\`/api/v1/records/\${objectApiName}\`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-API-Key': key },
+    body: JSON.stringify(body),
+  });
+
+  const payload = await res.json();
+
+  if (res.ok) return payload.data;
+
+  // fieldErrors is keyed by field API name — attach each one to its input.
+  if (res.status === 400 && payload.fieldErrors) {
+    return { fieldErrors: payload.fieldErrors, formErrors: payload.errors ?? [] };
+  }
+
+  // Everything else is a single message worth surfacing verbatim.
+  throw new Error(payload.message || \`Request failed (\${res.status})\`);
+}`;
+
+const ruleError = `{
+  "success": false,
+  "message": "Client Number cannot be blank",
+  "errors": ["Client Number cannot be blank"]
+}`;
+---
+
+<MainLayout
+  title="Errors"
+  description="The error envelope, validation errors, and what to do about each status code."
+>
+  <h1>Errors</h1>
+  <p class="lead">
+    Failures use the same envelope as successes, with
+    <code>success: false</code>. Anything non-2xx has a
+    <code>message</code> you can show a user.
+  </p>
+
+  <h2>The error envelope</h2>
+  <pre><code>{errorShape}</code></pre>
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th>Field</th><th>Always present</th><th>Use for</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><code>message</code></td>
+          <td>Yes</td>
+          <td>A single human-readable summary. Safe to display.</td>
+        </tr>
+        <tr>
+          <td><code>errors</code></td>
+          <td>No — validation failures only</td>
+          <td>Every problem found, as a flat list. Good for a form-level summary.</td>
+        </tr>
+        <tr>
+          <td><code>fieldErrors</code></td>
+          <td>No — validation failures only</td>
+          <td>Keyed by field API name, for highlighting individual inputs.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="note">
+    <strong>Validation reports everything at once.</strong> All field errors and
+    all triggered validation rules are collected before the response is sent, so
+    a user fixes one round of problems rather than discovering them one at a time.
+  </div>
+
+  <h2>Status codes</h2>
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th>Status</th><th>Meaning</th><th>What to do</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><code>400</code></td>
+          <td>Field validation failed, a validation rule was triggered, or the body was malformed.</td>
+          <td>Show <code>fieldErrors</code> against inputs. Do not retry unchanged.</td>
+        </tr>
+        <tr>
+          <td><code>401</code></td>
+          <td>No valid credential, or the key is revoked or expired.</td>
+          <td>Re-authenticate. Don't retry with the same credential.</td>
+        </tr>
+        <tr>
+          <td><code>403</code></td>
+          <td>Authenticated, but a role permission, key scope or IP allow-list denies it.</td>
+          <td>A configuration problem, not a transient one. Surface it to an admin.</td>
+        </tr>
+        <tr>
+          <td><code>404</code></td>
+          <td>No such object or record <em>in this tenant</em>.</td>
+          <td>Check the <code>apiName</code> and the active tenant.</td>
+        </tr>
+        <tr>
+          <td><code>409</code></td>
+          <td>Uniqueness conflict — a unique field value or a taken <code>apiName</code>.</td>
+          <td>Change the conflicting value.</td>
+        </tr>
+        <tr>
+          <td><code>429</code></td>
+          <td>Rate limit tripped.</td>
+          <td>Honour <code>Retry-After</code> and back off. See <a href="/api/rate-limits">Rate Limits</a>.</td>
+        </tr>
+        <tr>
+          <td><code>500</code></td>
+          <td>Unhandled server error.</td>
+          <td>Safe to retry once with backoff. Report it if it persists.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="warning">
+    <strong>Only <code>429</code> and <code>500</code> are worth retrying.</strong> Every
+    other <code>4xx</code> will fail identically until the request or the
+    configuration changes.
+  </div>
+
+  <h2>Validation rule failures</h2>
+  <p>
+    Object validation rules are cross-field checks that run on every save. A rule
+    <strong>blocks the save when its expression evaluates to true</strong> — the
+    expression describes the condition to reject. Its configured error message is
+    returned verbatim:
+  </p>
+  <pre><code>{ruleError}</code></pre>
+  <p>
+    These arrive as <code>400</code>s alongside field errors. Because a rule is
+    about the record as a whole, it is normally reported at form level rather than
+    against a single input — though a rule may name a field. See
+    <a href="/concepts/validation-rules">Validation Rules</a>.
+  </p>
+
+  <div class="note">
+    <strong>A broken rule surfaces as a validation error, not a crash.</strong> If a
+    rule's expression fails to parse or throws (division by zero, say), the save is
+    rejected with a message naming the rule — it does not 500.
+  </div>
+
+  <h2>Handling errors</h2>
+  <pre><code>{handler}</code></pre>
+
+  <h2>Development versus production</h2>
+  <p>
+    Outside <code>NODE_ENV=development</code>, <code>500</code> responses omit stack
+    traces and internal detail. Don't parse <code>message</code> to detect a
+    specific failure — branch on the status code, which is stable, rather than on
+    wording, which is not.
+  </p>
+</MainLayout>

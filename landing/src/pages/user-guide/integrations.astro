@@ -1,0 +1,399 @@
+---
+import DocsLayout from '../../layouts/DocsLayout.astro';
+const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+const curlExample = esc(`curl -X GET \\
+  'http://localhost:5001/api/records/contact' \\
+  -H 'X-API-Key: YOUR_API_KEY' \\
+  -H 'Content-Type: application/json'`);
+
+const exampleResponse = esc(`{
+  "success": true,
+  "data": [
+    {
+      "id": "abc123",
+      "name": "Acme Corp",
+      "industry": "Technology",
+      "revenue": 1000000,
+      "createdAt": "2026-01-15T10:30:00Z"
+    }
+  ],
+  "total": 1
+}`);
+
+const webhookPayload = esc(`{
+  "event": "record.created",
+  "tenantId": "tenant123",
+  "objectApiName": "contact",
+  "recordId": "rec456",
+  "timestamp": "2026-01-15T10:30:00Z",
+  "data": {
+    "name": "Jane Doe",
+    "email": "jane@example.com"
+  }
+}`);
+
+const nodeExample = esc(`// Node.js — using the REST API with axios
+const axios = require('axios');
+
+const client = axios.create({
+  baseURL: 'http://localhost:5001/api',
+  headers: { 'X-API-Key': 'YOUR_API_KEY' }
+});
+
+// Create a record
+const { data } = await client.post('/records/contact', {
+  name: 'New Contact',
+  email: 'contact@example.com',
+  industry: 'Technology'
+});
+
+// Query records
+const list = await client.get('/records/contact', {
+  params: { limit: 10, page: 1 }
+});
+
+// Update a record
+await client.put('/records/contact/' + recordId, {
+  status: 'Active'
+});`);
+
+const pythonExample = esc(`import requests
+
+BASE = 'http://localhost:5001/api'
+HEADERS = {'X-API-Key': 'YOUR_API_KEY'}
+
+# Create record
+r = requests.post(f'{BASE}/records/contact',
+    json={'name': 'New Contact', 'email': 'contact@example.com'},
+    headers=HEADERS)
+record = r.json()['data']
+
+# Search records
+r = requests.get(f'{BASE}/search', params={'q': 'technology'}, headers=HEADERS)
+
+# Delete record
+requests.delete(f'{BASE}/records/contact/{record["_id"]}', headers=HEADERS)`);
+---
+
+<DocsLayout
+  title="Integrations - User Guide - Mini CRM"
+  description="Connect Mini CRM to external systems with APIs and webhooks"
+>
+  <h1>Integrations</h1>
+
+  <p>
+    Mini CRM's integration capabilities allow you to connect with external systems,
+    automate data synchronization, and build custom integrations. This guide covers
+    API keys, webhooks, and best practices for integrations.
+  </p>
+
+  <h2>API Overview</h2>
+
+  <p>
+    Mini CRM provides a RESTful API that allows external applications to interact
+    with your data. The API supports all core operations: create, read, update, and delete.
+  </p>
+
+  <h3>API Base URL</h3>
+  <pre><code>http://localhost:5001/api</code></pre>
+
+  <h3>Authentication</h3>
+  <p>All API requests require authentication via API keys:</p>
+  <pre><code>Authorization: Bearer YOUR_API_KEY</code></pre>
+
+  <h2>Managing API Keys</h2>
+
+  <h3>Creating an API Key</h3>
+  <ol>
+    <li>Navigate to <strong>Settings</strong> → <strong>API Keys</strong></li>
+    <li>Click <strong>"New API Key"</strong></li>
+    <li>Enter key details:
+      <ul>
+        <li><strong>Name:</strong> Descriptive name (e.g., "Zapier Integration")</li>
+        <li><strong>Description:</strong> What the key is used for</li>
+        <li><strong>Expires:</strong> Optional expiration date</li>
+      </ul>
+    </li>
+    <li>Set permissions (read, write, delete)</li>
+    <li>Click <strong>Generate</strong></li>
+    <li>Copy the API key immediately (shown only once)</li>
+    <li>Store securely - never share publicly</li>
+  </ol>
+
+  <div class="warning">
+    <strong>Security Warning:</strong> API keys grant access to your workspace data. Store them
+    securely, never commit to version control, and rotate them regularly.
+  </div>
+
+  <h3>Managing Keys</h3>
+  <ul>
+    <li><strong>View:</strong> See all active API keys</li>
+    <li><strong>Revoke:</strong> Immediately disable a key</li>
+    <li><strong>Regenerate:</strong> Create new key, invalidate old</li>
+    <li><strong>Monitor:</strong> View usage statistics and last used date</li>
+  </ul>
+
+  <h2>API Endpoints</h2>
+
+  <h3>Objects</h3>
+  <pre><code>GET    /api/objects           # List all objects
+GET    /api/objects/:apiName  # Get object metadata</code></pre>
+
+  <h3>Records</h3>
+  <pre><code>GET    /api/records/:objectName           # List records
+GET    /api/records/:objectName/:id       # Get single record
+POST   /api/records/:objectName           # Create record
+PUT    /api/records/:objectName/:id       # Update record
+DELETE /api/records/:objectName/:id       # Delete record</code></pre>
+
+  <h3>Search</h3>
+  <pre><code>GET    /api/search?q=query&amp;object=objectName  # Search records</code></pre>
+
+  <h3>Example API Request</h3>
+  <pre><code set:html={curlExample}></code></pre>
+
+  <h3>Example Response</h3>
+  <pre><code set:html={exampleResponse}></code></pre>
+
+  <h2>Webhooks</h2>
+
+  <p>
+    Webhooks allow Mini CRM to send real-time data to external systems when events
+    occur. Perfect for integrating with other applications.
+  </p>
+
+  <h3>Creating a Webhook</h3>
+  <ol>
+    <li>Go to <strong>Settings</strong> → <strong>Webhooks</strong></li>
+    <li>Click <strong>"New Webhook"</strong></li>
+    <li>Configure webhook:
+      <ul>
+        <li><strong>Name:</strong> Webhook identifier</li>
+        <li><strong>URL:</strong> External endpoint to receive data</li>
+        <li><strong>Events:</strong> Which triggers fire the webhook</li>
+        <li><strong>Objects:</strong> Which objects to monitor</li>
+      </ul>
+    </li>
+    <li>Set HTTP headers if needed (for authentication)</li>
+    <li>Test the webhook</li>
+    <li>Activate it</li>
+  </ol>
+
+  <h3>Webhook Events</h3>
+  <ul>
+    <li><strong>record.created:</strong> New record created</li>
+    <li><strong>record.updated:</strong> Record modified</li>
+    <li><strong>record.deleted:</strong> Record removed</li>
+    <li><strong>field.changed:</strong> Specific field updated</li>
+  </ul>
+
+  <h3>Webhook Payload</h3>
+  <pre><code set:html={webhookPayload}></code></pre>
+
+  <h3>Webhook Security</h3>
+  <p>Verify webhook authenticity:</p>
+  <ul>
+    <li>Mini CRM sends a signature header: <code>X-Webhook-Signature</code></li>
+    <li>Compare with HMAC-SHA256 hash of payload</li>
+    <li>Use webhook secret for verification</li>
+    <li>Reject requests with invalid signatures</li>
+  </ul>
+
+  <h2>External Objects</h2>
+
+  <p>
+    External objects let you view and interact with data from other systems without
+    importing it into Mini CRM.
+  </p>
+
+  <h3>Creating an External Object</h3>
+  <ol>
+    <li>Go to <strong>Object Settings</strong></li>
+    <li>Click <strong>"New External Object"</strong></li>
+    <li>Configure connection:
+      <ul>
+        <li><strong>Data Source:</strong> External API URL</li>
+        <li><strong>Authentication:</strong> API key, OAuth, or basic auth</li>
+        <li><strong>Mapping:</strong> Map external fields to Mini CRM fields</li>
+      </ul>
+    </li>
+    <li>Test connection</li>
+    <li>Save external object</li>
+  </ol>
+
+  <h3>Supported Data Sources</h3>
+  <ul>
+    <li>REST APIs</li>
+    <li>OData services</li>
+    <li>SOAP web services</li>
+    <li>Custom endpoints</li>
+  </ul>
+
+  <h3>Use Cases</h3>
+  <ul>
+    <li>Display product catalog from e-commerce platform</li>
+    <li>Show invoices from accounting system</li>
+    <li>View tickets from external support tool</li>
+    <li>Access customer data from legacy system</li>
+  </ul>
+
+  <h2>Common Integrations</h2>
+
+  <h3>Email Services</h3>
+  <p>Connect to SendGrid, Mailgun, or AWS SES:</p>
+  <ol>
+    <li>Configure email service in Settings</li>
+    <li>Add API credentials</li>
+    <li>Set default sender address</li>
+    <li>Test email delivery</li>
+    <li>Use in automation flows</li>
+  </ol>
+
+  <h3>Calendar Sync</h3>
+  <p>Sync tasks and events with Google Calendar or Outlook:</p>
+  <ul>
+    <li>Authorize calendar access (OAuth)</li>
+    <li>Map Mini CRM fields to calendar properties</li>
+    <li>Enable two-way sync</li>
+    <li>Set sync frequency</li>
+  </ul>
+
+  <h3>Slack Integration</h3>
+  <p>Send notifications to Slack channels:</p>
+  <ol>
+    <li>Create Slack webhook URL in Slack workspace</li>
+    <li>Add webhook to Mini CRM</li>
+    <li>Configure which events trigger notifications</li>
+    <li>Customize message format</li>
+  </ol>
+
+  <h3>Zapier Integration</h3>
+  <p>Connect to 5,000+ apps via Zapier:</p>
+  <ol>
+    <li>Create API key in Mini CRM</li>
+    <li>Add Mini CRM app in Zapier</li>
+    <li>Authenticate with API key</li>
+    <li>Create Zaps for automation</li>
+  </ol>
+
+  <h2>Data Import/Export</h2>
+
+  <h3>Importing Data</h3>
+  <ol>
+    <li>Navigate to object</li>
+    <li>Click <strong>"Import"</strong></li>
+    <li>Upload CSV file</li>
+    <li>Map columns to fields</li>
+    <li>Handle duplicates (skip, update, or create)</li>
+    <li>Review preview</li>
+    <li>Confirm import</li>
+  </ol>
+
+  <h3>Exporting Data</h3>
+  <ol>
+    <li>Navigate to object</li>
+    <li>Apply filters if needed</li>
+    <li>Click <strong>"Export"</strong></li>
+    <li>Select format (CSV, Excel, JSON)</li>
+    <li>Choose fields to include</li>
+    <li>Download file</li>
+  </ol>
+
+  <h2>Building Custom Integrations</h2>
+
+  <h3>SDK and Libraries</h3>
+  <p>Use official SDKs for easier integration:</p>
+  <ul>
+    <li><strong>JavaScript/Node.js:</strong> <code>npm install mini-crm-sdk</code></li>
+    <li><strong>Python:</strong> <code>pip install mini-crm</code></li>
+    <li><strong>PHP:</strong> Composer package available</li>
+  </ul>
+
+  <h3>Example: Node.js Integration</h3>
+  <pre><code set:html={nodeExample}></code></pre>
+
+  <h3>Example: Python Integration</h3>
+  <pre><code set:html={pythonExample}></code></pre>
+
+  <h2>Best Practices</h2>
+
+  <h3>API Usage</h3>
+  <ul>
+    <li>Use pagination for large datasets (limit 100 records per request)</li>
+    <li>Implement exponential backoff for rate limiting</li>
+    <li>Cache responses when possible</li>
+    <li>Use field selection to reduce payload size</li>
+    <li>Handle errors gracefully with proper status codes</li>
+  </ul>
+
+  <h3>Security</h3>
+  <ul>
+    <li>Never expose API keys in client-side code</li>
+    <li>Use environment variables for credentials</li>
+    <li>Rotate API keys regularly (every 90 days)</li>
+    <li>Use HTTPS for all API requests in production</li>
+    <li>Verify webhook signatures</li>
+    <li>Implement IP whitelisting if possible</li>
+  </ul>
+
+  <h3>Error Handling</h3>
+  <ul>
+    <li>Check HTTP status codes (200 OK, 400 Bad Request, 401 Unauthorized, 500 Server Error)</li>
+    <li>Parse error messages from response body</li>
+    <li>Retry failed requests with backoff</li>
+    <li>Log errors for debugging</li>
+    <li>Notify administrators of persistent failures</li>
+  </ul>
+
+  <h3>Performance</h3>
+  <ul>
+    <li>Batch operations when possible</li>
+    <li>Use webhooks instead of polling for real-time updates</li>
+    <li>Cache frequently-accessed data</li>
+    <li>Implement request queuing for high volumes</li>
+    <li>Monitor API usage and optimize</li>
+  </ul>
+
+  <h2>Rate Limits</h2>
+
+  <p>To ensure system stability, API requests are rate-limited:</p>
+  <ul>
+    <li><strong>Per API Key:</strong> 1,000 requests per hour</li>
+    <li><strong>Per Workspace:</strong> 10,000 requests per hour</li>
+    <li><strong>Webhook Deliveries:</strong> 100 per minute</li>
+  </ul>
+
+  <p>Rate limit headers in responses:</p>
+  <pre><code>X-RateLimit-Limit: 1000
+X-RateLimit-Remaining: 875
+X-RateLimit-Reset: 1712334000</code></pre>
+
+  <h2>Troubleshooting</h2>
+
+  <h3>Authentication Errors</h3>
+  <ul>
+    <li>Verify API key is correct</li>
+    <li>Check Authorization header format</li>
+    <li>Ensure key hasn't expired or been revoked</li>
+    <li>Confirm key has required permissions</li>
+  </ul>
+
+  <h3>Webhook Not Firing</h3>
+  <ul>
+    <li>Verify webhook is active</li>
+    <li>Check event configuration matches trigger</li>
+    <li>Ensure target URL is accessible</li>
+    <li>Review webhook delivery logs</li>
+    <li>Check for SSL certificate issues</li>
+  </ul>
+
+  <h3>Rate Limit Exceeded</h3>
+  <ul>
+    <li>Implement request throttling</li>
+    <li>Use batch endpoints where available</li>
+    <li>Cache data to reduce API calls</li>
+    <li>Spread requests over time</li>
+    <li>Contact support for limit increases</li>
+  </ul>
+</DocsLayout>

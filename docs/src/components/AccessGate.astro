@@ -1,0 +1,288 @@
+---
+import { KeyRound } from 'lucide-astro';
+import { createHash } from 'node:crypto';
+
+/**
+ * Gates the docs behind a shared access key held in the environment.
+ *
+ *   DOCS_ACCESS_KEY=<long random string>   a key is required to read the docs
+ *   unset or empty                         the docs are open to anyone
+ *
+ * Presence of the key is the switch. That is deliberate: a separate
+ * "require a key" flag could be set without a key ever being configured, which
+ * would lock everyone out permanently with no way back in.
+ *
+ * ── Why the variable is not PUBLIC_ ─────────────────────────────────────────
+ * Astro inlines every `PUBLIC_*` variable into the client bundle at build time.
+ * A `PUBLIC_DOCS_ACCESS_KEY` would therefore be sitting in plain text in the
+ * shipped JavaScript, readable from devtools by exactly the people it is meant to
+ * keep out.
+ *
+ * This frontmatter runs at BUILD time in Node, so it can read the non-public
+ * variable and hash it. Only the SHA-256 digest is embedded in the page, and the
+ * browser hashes what the reader types to compare. The key itself never ships.
+ *
+ * ── What this does and does not protect ─────────────────────────────────────
+ * This site is a STATIC build with no SSR adapter, so there is no server to check
+ * the key before sending HTML. The page content is in the static files whatever
+ * the gate decides — someone who reads the network response, or edits the check
+ * out of the JS, sees everything.
+ *
+ * So: this is a lock on the front door, not a safe. It is the right tool for
+ * keeping internal API docs out of casual and search-engine view. It is the wrong
+ * tool if the documentation itself is confidential — for that, gate at the
+ * reverse proxy or host (Nginx auth_request, Cloudflare Access, Netlify password
+ * protection), where the bytes are withheld rather than hidden.
+ *
+ * Never commit real credentials, internal hostnames or customer data into these
+ * pages regardless of this gate.
+ *
+ * The `noindex` meta for a gated build is set in MainLayout, not here — a child
+ * component cannot project into the parent's <head>.
+ */
+
+const accessKey = import.meta.env.DOCS_ACCESS_KEY || '';
+const gateEnabled = accessKey.trim().length > 0;
+
+// Salted so the digest can't be matched against a rainbow table of common
+// passwords. The salt is not secret — it only has to be stable across pages.
+const SALT = 'salesdam-docs-v1:';
+const keyHash = gateEnabled
+  ? createHash('sha256').update(SALT + accessKey.trim()).digest('hex')
+  : '';
+
+// A short, non-reversible fingerprint, so whoever distributes the key can tell
+// readers which key a given build expects without revealing it.
+const keyFingerprint = gateEnabled ? keyHash.slice(0, 8) : '';
+---
+
+{gateEnabled && (
+  <div id="access-gate" class="gate" data-key-hash={keyHash} data-salt={SALT}>
+    <div class="panel">
+      <KeyRound size={22} class="panel-icon" />
+      <h1 class="panel-title">Access key required</h1>
+      <p class="panel-sub">
+        These docs are private. Enter the access key to continue — it is
+        remembered on this device.
+      </p>
+
+      <form id="gate-form" novalidate>
+        <label class="sr-only" for="gate-input">Access key</label>
+        <input
+          id="gate-input"
+          type="password"
+          class="panel-input"
+          placeholder="Access key"
+          autocomplete="current-password"
+          spellcheck="false"
+          autofocus
+        />
+        <button type="submit" class="panel-btn">Unlock</button>
+      </form>
+
+      <p class="panel-err" id="gate-error" role="alert" hidden>
+        That key is not correct.
+      </p>
+      <p class="panel-hint">
+        Expected key fingerprint <code>{keyFingerprint}</code> — ask whoever
+        gave you this link if yours doesn't match.
+      </p>
+    </div>
+  </div>
+)}
+
+{gateEnabled && (
+  <script is:inline>
+    (() => {
+      const gate = document.getElementById('access-gate');
+      if (!gate) return;
+
+      const expected = gate.dataset.keyHash;
+      const salt = gate.dataset.salt;
+      const STORE = 'salesdam.docs.accessKeyHash';
+
+      // Hide the document until the check resolves so gated pages don't flash.
+      // The gate itself sets visibility: visible so it stays on screen.
+      document.documentElement.style.visibility = 'hidden';
+
+      const sha256 = async (text) => {
+        const bytes = new TextEncoder().encode(text);
+        const digest = await crypto.subtle.digest('SHA-256', bytes);
+        return [...new Uint8Array(digest)]
+          .map((b) => b.toString(16).padStart(2, '0'))
+          .join('');
+      };
+
+      const unlock = () => {
+        document.documentElement.style.visibility = '';
+        gate.remove();
+        document.body.style.overflow = '';
+      };
+
+      const show = () => {
+        document.documentElement.style.visibility = '';
+        // Stop the page behind the gate from scrolling while it is up.
+        document.body.style.overflow = 'hidden';
+      };
+
+      // Already unlocked on this device? Compare the STORED HASH against the
+      // expected one, so rotating the key in the environment invalidates every
+      // previously unlocked browser on the next build.
+      let remembered = null;
+      try {
+        remembered = localStorage.getItem(STORE);
+      } catch {
+        // Private browsing — the reader will re-enter the key each session.
+      }
+
+      if (remembered && remembered === expected) {
+        unlock();
+        return;
+      }
+
+      show();
+
+      const form = document.getElementById('gate-form');
+      const input = document.getElementById('gate-input');
+      const error = document.getElementById('gate-error');
+
+      form?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const value = input.value.trim();
+        if (!value) return;
+
+        const hash = await sha256(salt + value);
+        if (hash === expected) {
+          try {
+            localStorage.setItem(STORE, hash);
+          } catch {
+            // Not persistable; the unlock still applies to this page view.
+          }
+          unlock();
+        } else {
+          error.hidden = false;
+          input.select();
+        }
+      });
+
+      input?.addEventListener('input', () => {
+        error.hidden = true;
+      });
+    })();
+  </script>
+)}
+
+<style>
+  .gate {
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-modal);
+    display: grid;
+    place-items: center;
+    padding: var(--spacing-4);
+    background: var(--page-bg);
+    visibility: visible;
+  }
+
+  .panel {
+    width: 100%;
+    max-width: 380px;
+    text-align: center;
+    background: var(--surface);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-lg);
+    padding: var(--spacing-8) var(--spacing-6);
+  }
+
+  .panel-icon {
+    color: var(--color-primary);
+  }
+
+  .panel-title {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-gray-900);
+    margin: var(--spacing-3) 0 var(--spacing-2);
+  }
+
+  .panel-sub {
+    font-size: var(--font-size-sm);
+    color: var(--color-gray-500);
+    line-height: 1.6;
+    margin: 0 0 var(--spacing-5);
+  }
+
+  #gate-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-2);
+  }
+
+  .panel-input {
+    width: 100%;
+    padding: var(--spacing-3);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    background: var(--color-gray-50);
+    font-size: var(--font-size-sm);
+    font-family: var(--font-mono);
+    color: var(--color-gray-900);
+    text-align: center;
+  }
+
+  .panel-input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px var(--color-primary-light);
+    background: var(--surface);
+  }
+
+  .panel-btn {
+    padding: var(--spacing-3);
+    border-radius: var(--border-radius);
+    background: var(--color-primary);
+    color: #ffffff;
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+    cursor: pointer;
+    transition: background var(--transition-fast);
+  }
+
+  .panel-btn:hover {
+    background: var(--color-primary-hover);
+  }
+
+  .panel-err {
+    margin: var(--spacing-3) 0 0;
+    font-size: var(--font-size-sm);
+    color: var(--color-danger);
+  }
+
+  .panel-hint {
+    margin: var(--spacing-4) 0 0;
+    font-size: var(--font-size-xs);
+    color: var(--color-gray-400);
+    line-height: 1.5;
+  }
+
+  .panel-hint code {
+    font-family: var(--font-mono);
+    background: var(--color-gray-100);
+    border: 1px solid var(--border-color);
+    padding: 1px 5px;
+    border-radius: var(--border-radius-sm);
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+</style>

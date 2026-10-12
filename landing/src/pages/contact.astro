@@ -1,0 +1,434 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { MessageCircle, ShoppingCart, Wrench, Handshake, Clock, BookOpen, HelpCircle, Rocket, Sparkles } from 'lucide-astro';
+---
+
+<BaseLayout
+  title="Get in Touch — Mini CRM"
+  description="Contact the Mini CRM team for sales, support, or general enquiries. We're here to help."
+>
+  <Header />
+
+  <main class="main">
+
+    <!-- Hero -->
+    <section class="contact-hero">
+      <div class="container">
+        <div class="hero-content">
+          <div class="hero-label">Contact Us</div>
+          <h1>We'd love to hear from you</h1>
+          <p>Whether you have a question about features, pricing, or just want to say hi — we're ready to help.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contact grid -->
+    <section class="section">
+      <div class="container">
+        <div class="contact-layout">
+
+          <!-- Form -->
+          <div class="contact-form-wrap">
+            <h2>Send us a message</h2>
+            <p class="form-subtitle">We typically respond within one business day.</p>
+
+            <form class="contact-form" id="contactForm" novalidate>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="firstName">First Name <span class="req">*</span></label>
+                  <input type="text" id="firstName" name="firstName" placeholder="John" required />
+                  <span class="field-error" id="firstNameErr"></span>
+                </div>
+                <div class="form-group">
+                  <label for="lastName">Last Name <span class="req">*</span></label>
+                  <input type="text" id="lastName" name="lastName" placeholder="Doe" required />
+                  <span class="field-error" id="lastNameErr"></span>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="email">Email Address <span class="req">*</span></label>
+                <input type="email" id="email" name="email" placeholder="you@company.com" required />
+                <span class="field-error" id="emailErr"></span>
+              </div>
+
+              <div class="form-group">
+                <label for="company">Company Name</label>
+                <input type="text" id="company" name="company" placeholder="Acme Corp" />
+              </div>
+
+              <div class="form-group">
+                <label for="subject">Subject <span class="req">*</span></label>
+                <select id="subject" name="subject" required>
+                  <option value="">Select a subject...</option>
+                  <option value="general">General Enquiry</option>
+                  <option value="sales">Sales &amp; Pricing</option>
+                  <option value="support">Technical Support</option>
+                  <option value="billing">Billing</option>
+                  <option value="partnership">Partnership</option>
+                  <option value="other">Other</option>
+                </select>
+                <span class="field-error" id="subjectErr"></span>
+              </div>
+
+              <div class="form-group">
+                <label for="message">Message <span class="req">*</span></label>
+                <textarea id="message" name="message" rows="6" placeholder="Tell us how we can help..." required></textarea>
+                <span class="field-error" id="messageErr"></span>
+              </div>
+
+              <button type="submit" class="btn btn-primary btn-lg submit-btn" id="submitBtn">
+                <span id="btnText">Send Message</span>
+                <svg id="btnSpinner" class="spinner" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none">
+                  <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+                </svg>
+              </button>
+
+              <div id="formSuccess" class="form-success" style="display:none">
+                <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <span>Message received! We'll get back to you shortly.</span>
+              </div>
+            </form>
+          </div>
+
+          <!-- Side info -->
+          <aside class="contact-info">
+            <!-- Support types -->
+            <div class="info-card">
+              <h3>How can we help?</h3>
+              <div class="support-items">
+                <div class="support-item">
+                  <div class="si-icon" style="background:#EBF2FF; color:#0066FF">
+                    <MessageCircle size={20} strokeWidth={2} />
+                  </div>
+                  <div>
+                    <div class="si-title">General Enquiries</div>
+                    <div class="si-desc">Questions about Mini CRM, how it works, or if it's right for your business.</div>
+                  </div>
+                </div>
+                <div class="support-item">
+                  <div class="si-icon" style="background:#f0fdf4; color:#10b981">
+                    <ShoppingCart size={20} strokeWidth={2} />
+                  </div>
+                  <div>
+                    <div class="si-title">Sales &amp; Pricing</div>
+                    <div class="si-desc">Plan comparisons, Enterprise pricing, and bulk discounts.</div>
+                  </div>
+                </div>
+                <div class="support-item">
+                  <div class="si-icon" style="background:#fef3c7; color:#d97706">
+                    <Wrench size={20} strokeWidth={2} />
+                  </div>
+                  <div>
+                    <div class="si-title">Technical Support</div>
+                    <div class="si-desc">Help with bugs, configuration issues, or anything not working as expected.</div>
+                  </div>
+                </div>
+                <div class="support-item">
+                  <div class="si-icon" style="background:#fdf4ff; color:#9333ea">
+                    <Handshake size={20} strokeWidth={2} />
+                  </div>
+                  <div>
+                    <div class="si-title">Partnerships</div>
+                    <div class="si-desc">Reseller opportunities, integration partnerships, and co-marketing.</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Response time -->
+            <div class="info-card info-card-dark">
+              <div class="rt-icon">
+                <Clock size={28} strokeWidth={2} />
+              </div>
+              <h4>Response Times</h4>
+              <div class="rt-items">
+                <div class="rt-item">
+                  <span class="rt-type">General enquiries</span>
+                  <span class="rt-time">Within 1 business day</span>
+                </div>
+                <div class="rt-item">
+                  <span class="rt-type">Technical support</span>
+                  <span class="rt-time">Within 4 hours (weekdays)</span>
+                </div>
+                <div class="rt-item">
+                  <span class="rt-type">Billing issues</span>
+                  <span class="rt-time">Same business day</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Quick links -->
+            <div class="info-card">
+              <h4>Quick Resources</h4>
+              <div class="quick-links">
+                <a href="/user-guide" class="ql-item">
+                  <BookOpen size={18} strokeWidth={2} />
+                  <span>User Guide</span>
+                </a>
+                <a href="/faq" class="ql-item">
+                  <HelpCircle size={18} strokeWidth={2} />
+                  <span>FAQ</span>
+                </a>
+                <a href="/getting-started" class="ql-item">
+                  <Rocket size={18} strokeWidth={2} />
+                  <span>Getting Started</span>
+                </a>
+                <a href="http://localhost:3000/register" class="ql-item">
+                  <Sparkles size={18} strokeWidth={2} />
+                  <span>Create Free Account</span>
+                </a>
+              </div>
+            </div>
+          </aside>
+
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <Footer />
+</BaseLayout>
+
+<style>
+  .main { padding-top: 72px; }
+
+  .contact-hero {
+    background: linear-gradient(135deg, #f8faff 0%, #eef3ff 100%);
+    padding: 72px 0 60px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .hero-content {
+    text-align: center;
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  .hero-label {
+    display: inline-block;
+    font-size: 0.8125rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--primary); background: var(--primary-subtle);
+    padding: 5px 14px; border-radius: 999px; margin-bottom: 16px;
+  }
+  .contact-hero h1 { font-size: clamp(2rem, 5vw, 2.75rem); font-weight: 800; margin-bottom: 16px; }
+  .contact-hero p { font-size: clamp(1rem, 2vw, 1.125rem); color: var(--text-secondary); }
+
+  /* Layout */
+  .contact-layout {
+    display: grid;
+    grid-template-columns: 1fr 400px;
+    gap: 56px;
+    align-items: start;
+  }
+
+  /* Form */
+  .contact-form-wrap h2 { font-size: 1.75rem; font-weight: 800; margin-bottom: 8px; }
+  .form-subtitle { color: var(--text-secondary); margin-bottom: 32px; }
+
+  .contact-form { display: flex; flex-direction: column; gap: 20px; }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .form-group { display: flex; flex-direction: column; gap: 6px; }
+
+  .form-group label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .req { color: var(--danger); }
+
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    padding: 12px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    font-family: var(--font-sans);
+    font-size: 0.9375rem;
+    color: var(--text);
+    background: white;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    width: 100%;
+  }
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(0,102,255,0.1);
+  }
+  .form-group input.error,
+  .form-group select.error,
+  .form-group textarea.error {
+    border-color: var(--danger);
+  }
+  .form-group input::placeholder,
+  .form-group textarea::placeholder { color: #94a3b8; }
+
+  .form-group textarea { resize: vertical; min-height: 120px; }
+
+  .field-error {
+    font-size: 0.8125rem;
+    color: var(--danger);
+    min-height: 18px;
+  }
+
+  .submit-btn {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    width: 100%;
+  }
+
+  .spinner {
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .form-success {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #d1fae5;
+    color: #065f46;
+    padding: 14px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+  }
+
+  /* Info sidebar */
+  .contact-info { display: flex; flex-direction: column; gap: 20px; }
+
+  .info-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 24px;
+    box-shadow: var(--shadow);
+  }
+  .info-card h3 { font-size: 1.125rem; font-weight: 700; margin-bottom: 20px; }
+  .info-card h4 { font-size: 1rem; font-weight: 700; margin-bottom: 14px; }
+
+  .info-card-dark {
+    background: #0f172a;
+    border-color: #1e293b;
+    color: white;
+  }
+  .info-card-dark h4 { color: white; }
+
+  /* Support items */
+  .support-items { display: flex; flex-direction: column; gap: 16px; }
+  .support-item { display: flex; align-items: flex-start; gap: 12px; }
+  .si-icon {
+    width: 38px; height: 38px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem; flex-shrink: 0;
+  }
+  .si-title { font-size: 0.9rem; font-weight: 700; color: var(--text); margin-bottom: 2px; }
+  .si-desc { font-size: 0.8125rem; color: var(--text-secondary); line-height: 1.4; }
+
+  /* Response times */
+  .rt-icon {
+    width: 48px;
+    height: 48px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+    color: rgba(255,255,255,0.8);
+  }
+  .rt-items { display: flex; flex-direction: column; gap: 10px; }
+  .rt-item {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #1e293b;
+    font-size: 0.875rem;
+  }
+  .rt-item:last-child { border-bottom: none; }
+  .rt-type { color: #94a3b8; }
+  .rt-time { color: #e2e8f0; font-weight: 600; }
+
+  /* Quick links */
+  .quick-links { display: flex; flex-direction: column; gap: 6px; }
+  .ql-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.15s;
+    border: 1px solid transparent;
+  }
+  .ql-item:hover {
+    background: var(--primary-subtle);
+    color: var(--primary);
+    border-color: #c7d7f8;
+  }
+
+  @media (max-width: 1024px) {
+    .contact-layout { grid-template-columns: 1fr; }
+    .contact-info { order: -1; }
+    .info-card-dark, .info-card:last-child { display: none; }
+  }
+  @media (max-width: 640px) {
+    .form-row { grid-template-columns: 1fr; }
+    .contact-hero h1 { font-size: 2rem; }
+  }
+</style>
+
+<script>
+  const form = document.getElementById('contactForm');
+  const submitBtn = document.getElementById('submitBtn');
+  const btnText = document.getElementById('btnText');
+  const btnSpinner = document.getElementById('btnSpinner');
+  const successMsg = document.getElementById('formSuccess');
+
+  function showError(fieldId, msg) {
+    const el = document.getElementById(fieldId + 'Err');
+    const input = document.getElementById(fieldId);
+    if (el) el.textContent = msg;
+    if (input) input.classList.add('error');
+  }
+  function clearErrors() {
+    document.querySelectorAll('.field-error').forEach(e => e.textContent = '');
+    document.querySelectorAll('.error').forEach(e => e.classList.remove('error'));
+  }
+
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    clearErrors();
+
+    const data = Object.fromEntries(new FormData(form));
+    let valid = true;
+
+    if (!data.firstName?.trim()) { showError('firstName', 'Required'); valid = false; }
+    if (!data.lastName?.trim()) { showError('lastName', 'Required'); valid = false; }
+    if (!data.email?.trim() || !/\S+@\S+\.\S+/.test(data.email)) { showError('email', 'Valid email required'); valid = false; }
+    if (!data.subject) { showError('subject', 'Please choose a subject'); valid = false; }
+    if (!data.message?.trim()) { showError('message', 'Please enter a message'); valid = false; }
+
+    if (!valid) return;
+
+    // Simulate sending (replace with actual API call)
+    submitBtn.disabled = true;
+    btnText.textContent = 'Sending...';
+    btnSpinner.style.display = 'block';
+
+    await new Promise(r => setTimeout(r, 1200));
+
+    submitBtn.style.display = 'none';
+    successMsg.style.display = 'flex';
+    form.reset();
+  });
+</script>

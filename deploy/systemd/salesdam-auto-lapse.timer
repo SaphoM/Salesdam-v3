@@ -1,0 +1,15 @@
+# Salesdam Insurance Workspace - Auto Lapse Timer
+# Runs daily at 4:00 AM
+
+[Unit]
+Description=Daily timer for Salesdam Insurance Auto Lapse
+Requires=salesdam-auto-lapse.service
+
+[Timer]
+OnCalendar=*-*-* 04:00:00
+Persistent=true
+RandomizedDelaySec=15min
+Unit=salesdam-auto-lapse.service
+
+[Install]
+WantedBy=timers.target

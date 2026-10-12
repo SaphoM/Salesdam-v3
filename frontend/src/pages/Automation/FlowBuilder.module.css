@@ -1,0 +1,1124 @@
+/* ─── Page ─────────────────────────────────────────────────── */
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+/* ─── Header ──────────────────────────────────────────────── */
+.header {
+  flex-shrink: 0;
+}
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  color: var(--color-gray-500);
+  font-size: var(--font-size-sm);
+  text-decoration: none;
+  margin-bottom: var(--spacing-3);
+}
+.backLink:hover {
+  color: var(--color-primary);
+}
+.headerRow {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  flex-wrap: wrap;
+}
+.nameInput {
+  flex: 1;
+  min-width: 200px;
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  border: none;
+  border-bottom: 2px solid var(--border-color);
+  padding: var(--spacing-2) 0;
+  color: var(--color-gray-900);
+  background: transparent;
+  outline: none;
+}
+.nameInput:focus {
+  border-bottom-color: var(--color-primary);
+}
+.nameInput::placeholder {
+  color: var(--color-gray-400);
+  font-weight: var(--font-weight-normal);
+}
+
+/* ─── Status badge in header ──────────────────────────────── */
+.statusBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px var(--spacing-3);
+  border-radius: var(--border-radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.statusActive {
+  background: #dcfce7;
+  color: #16a34a;
+}
+.statusInactive {
+  background: var(--color-gray-100);
+  color: var(--color-gray-500);
+}
+
+/* ─── Activation section in Settings ─────────────────────── */
+.activationRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-4);
+}
+.activationStatus {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-3);
+  flex: 1;
+}
+.statusDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+.dotActive {
+  background: #22c55e;
+  box-shadow: 0 0 0 3px #dcfce7;
+}
+.dotInactive {
+  background: var(--color-gray-300);
+}
+.activationLabel {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-gray-700);
+}
+.activationHint {
+  font-size: var(--font-size-xs);
+  color: var(--color-gray-400);
+  margin: 2px 0 0;
+}
+.nameInput::placeholder {
+  color: var(--color-gray-400);
+  font-weight: var(--font-weight-normal);
+}
+
+/* ─── Tabs ────────────────────────────────────────────────── */
+.tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 2px solid var(--border-color);
+}
+.tab {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-3) var(--spacing-5);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-gray-500);
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  cursor: pointer;
+  transition: color var(--transition-fast);
+}
+.tab:hover {
+  color: var(--color-gray-700);
+}
+.activeTab {
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
+}
+
+/* ─── Shared input ────────────────────────────────────────── */
+.inp {
+  width: 100%;
+  padding: var(--spacing-2) var(--spacing-3);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  font-family: var(--font-family);
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-800);
+  background: var(--color-gray-50);
+  outline: none;
+  box-sizing: border-box;
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+.inp:focus {
+  border-color: var(--color-primary);
+  background: var(--color-white);
+  box-shadow: 0 0 0 3px var(--color-primary-light);
+}
+.inp::placeholder {
+  color: var(--color-gray-400);
+}
+
+/* ─── Config row ──────────────────────────────────────────── */
+.cfgRow {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-4);
+  padding: var(--spacing-2) 0;
+}
+.cfgMeta {
+  width: 140px;
+  flex-shrink: 0;
+  padding-top: 7px;
+}
+.cfgLabel {
+  display: block;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-gray-700);
+}
+.cfgHint {
+  display: block;
+  font-size: var(--font-size-xs);
+  color: var(--color-gray-400);
+  margin-top: 2px;
+  line-height: 1.3;
+}
+.cfgValue {
+  flex: 1;
+  min-width: 0;
+}
+.cfgSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1);
+}
+
+/* ─── Condition rows ──────────────────────────────────────── */
+.conditionRow {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  margin-bottom: var(--spacing-1);
+}
+.conditionRow .inp {
+  flex: 1;
+}
+.delBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-sm);
+  background: none;
+  color: var(--color-gray-400);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition:
+    background var(--transition-fast),
+    color var(--transition-fast);
+}
+.delBtn:hover {
+  background: var(--color-danger-light);
+  color: var(--color-danger);
+  border-color: var(--color-danger);
+}
+.addCondBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-primary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  margin-top: var(--spacing-1);
+}
+.addCondBtn:hover {
+  text-decoration: underline;
+}
+
+/* ─── Field pairs (update record) ────────────────────────── */
+.fieldPairs {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1);
+  width: 100%;
+}
+.fieldPair {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+}
+.pairField {
+  font-size: var(--font-size-xs);
+  font-family: var(--font-mono);
+  color: #7c3aed;
+  background: #f5f3ff;
+  padding: 2px 6px;
+  border-radius: 3px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.pairEq {
+  color: var(--color-gray-400);
+  font-size: var(--font-size-xs);
+  flex-shrink: 0;
+}
+.addFieldRow {
+  display: flex;
+  gap: var(--spacing-2);
+  margin-top: var(--spacing-2);
+}
+.inlineRow {
+  display: flex;
+  gap: var(--spacing-2);
+}
+
+/* ─── Trigger panel ───────────────────────────────────────── */
+.triggerPanel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-6);
+}
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+  background: var(--color-white);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-5);
+}
+.sectionTitle {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-gray-800);
+}
+.hint {
+  font-size: var(--font-size-xs);
+  color: var(--color-gray-400);
+  margin: 0;
+  line-height: 1.4;
+}
+.hint code {
+  background: var(--color-gray-100);
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-family: var(--font-mono);
+}
+
+/* Type selector cards */
+.typeCards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-3);
+}
+.typeCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1);
+  padding: var(--spacing-4);
+  border: 2px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  background: var(--color-white);
+  cursor: pointer;
+  text-align: left;
+  transition:
+    border-color var(--transition-fast),
+    background var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+.typeCard strong {
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-800);
+}
+.typeCard span {
+  font-size: var(--font-size-xs);
+  color: var(--color-gray-500);
+  line-height: 1.3;
+}
+.typeCard:hover {
+  border-color: var(--color-primary);
+}
+.typeCardActive {
+  border-color: var(--color-primary);
+  background: var(--color-primary-light);
+  box-shadow: 0 0 0 3px var(--color-primary-light);
+}
+.typeCardActive strong {
+  color: var(--color-primary);
+}
+.typeCardIcon {
+  font-size: 22px;
+  color: var(--color-gray-400);
+  margin-bottom: var(--spacing-1);
+}
+.typeCardActive .typeCardIcon {
+  color: var(--color-primary);
+}
+
+/* Event boxes */
+.eventBoxes {
+  display: flex;
+  gap: var(--spacing-2);
+}
+.eventBox {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-2) var(--spacing-3);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-gray-600);
+  background: var(--color-white);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+.eventBox:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+.eventBoxOn {
+  border-color: var(--color-primary);
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+}
+.eventCheck {
+  font-size: 11px;
+  width: 14px;
+}
+
+/* Run when cards */
+.runWhenCards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-3);
+}
+.runWhenCard {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--spacing-3) var(--spacing-4);
+  border: 2px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  background: var(--color-white);
+  cursor: pointer;
+  text-align: left;
+  transition:
+    border-color var(--transition-fast),
+    background var(--transition-fast);
+}
+.runWhenCard strong {
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-800);
+}
+.runWhenCard span {
+  font-size: var(--font-size-xs);
+  color: var(--color-gray-500);
+}
+.runWhenCard:hover {
+  border-color: var(--color-primary);
+}
+.runWhenActive {
+  border-color: var(--color-primary);
+  background: var(--color-primary-light);
+}
+.runWhenActive strong {
+  color: var(--color-primary);
+}
+
+/* Condition block */
+.condBlock {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+  padding: var(--spacing-3);
+  background: var(--color-gray-50);
+  border-radius: var(--border-radius);
+  border: 1px solid var(--border-color);
+}
+.logicRow {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-600);
+}
+.logicRow .inp {
+  width: auto;
+}
+
+/* ─── Steps panel ─────────────────────────────────────────── */
+.stepsPanel {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+}
+
+/* Trigger summary at top of steps */
+.triggerSummary {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  padding: var(--spacing-3) var(--spacing-4);
+  background: var(--color-white);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-lg);
+  cursor: pointer;
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+.triggerSummary:hover {
+  border-color: #7c3aed;
+  box-shadow: 0 0 0 2px #ede9fe;
+}
+.editHint {
+  font-size: var(--font-size-xs);
+  color: var(--color-gray-400);
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+/* Connector / add step area */
+.connector {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  padding: 0;
+}
+.connLine {
+  width: 2px;
+  height: 20px;
+  background: var(--color-gray-200);
+}
+.addStepBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-1);
+  padding: var(--spacing-1) var(--spacing-3);
+  border: 1px dashed var(--border-color);
+  border-radius: var(--border-radius-full);
+  background: var(--color-white);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-gray-500);
+  cursor: pointer;
+  transition:
+    border-color var(--transition-fast),
+    color var(--transition-fast),
+    background var(--transition-fast);
+}
+.addStepBtn:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  background: var(--color-primary-light);
+}
+
+/* Add step menu */
+.addMenu {
+  /* position + top + left + minWidth + maxHeight come from portal inline style */
+  background: var(--color-white);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-xl);
+  overflow-y: auto;
+  animation: fadeDown 150ms ease;
+}
+@keyframes fadeDown {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.menuGroup {
+  padding: var(--spacing-2) var(--spacing-3);
+  font-size: 10px;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-gray-400);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  background: var(--color-gray-50);
+  border-bottom: 1px solid var(--border-color);
+}
+.menuItem {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  width: 100%;
+  padding: var(--spacing-2) var(--spacing-4);
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-700);
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--color-gray-100);
+  cursor: pointer;
+  text-align: left;
+  transition: background var(--transition-fast);
+}
+.menuItem:hover {
+  background: var(--color-gray-50);
+}
+.menuItem:last-child {
+  border-bottom: none;
+}
+
+/* Empty steps */
+.emptySteps {
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-400);
+  text-align: center;
+  padding: var(--spacing-4);
+}
+
+/* Step card */
+.stepCard {
+  background: var(--color-white);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-lg);
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+.stepCard:hover {
+  box-shadow: var(--shadow-sm);
+}
+.stepExpanded {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px var(--color-primary-light);
+}
+
+.stepHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  padding: var(--spacing-3) var(--spacing-4);
+  cursor: pointer;
+}
+.stepIcon {
+  width: 34px;
+  height: 34px;
+  border-radius: var(--border-radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.stepInfo {
+  flex: 1;
+  min-width: 0;
+}
+.stepLabel {
+  display: block;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-gray-800);
+}
+.stepSummary {
+  display: block;
+  font-size: var(--font-size-xs);
+  color: var(--color-gray-400);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 1px;
+}
+.stepActions {
+  display: flex;
+  gap: 2px;
+  flex-shrink: 0;
+}
+.stepBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: none;
+  color: var(--color-gray-400);
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+  transition:
+    background var(--transition-fast),
+    color var(--transition-fast);
+}
+.stepBtn:hover {
+  background: var(--color-gray-100);
+  color: var(--color-gray-700);
+}
+.stepBtn:disabled {
+  opacity: 0.25;
+  cursor: not-allowed;
+}
+.stepBtnDanger:hover {
+  background: var(--color-danger-light);
+  color: var(--color-danger);
+}
+.chevron {
+  color: var(--color-gray-400);
+  flex-shrink: 0;
+}
+
+.stepBody {
+  border-top: 1px solid var(--border-color);
+  padding: var(--spacing-4) var(--spacing-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1);
+  background: var(--color-gray-50);
+  border-radius: 0 0 var(--border-radius-lg) var(--border-radius-lg);
+}
+
+/* End node */
+.endNode {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-3);
+  background: var(--color-gray-50);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-lg);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-gray-400);
+}
+
+/* ─── Settings panel ──────────────────────────────────────── */
+.settingsPanel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+.extItem {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  padding: var(--spacing-3);
+  background: var(--color-gray-50);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+}
+.extMeta {
+  flex: 1;
+  min-width: 0;
+}
+.extName {
+  display: block;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-gray-800);
+}
+.extUrl {
+  display: block;
+  font-size: var(--font-size-xs);
+  color: var(--color-gray-500);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.extAuth {
+  font-size: var(--font-size-xs);
+  background: var(--color-gray-200);
+  color: var(--color-gray-600);
+  padding: 2px var(--spacing-2);
+  border-radius: var(--border-radius-sm);
+  flex-shrink: 0;
+}
+
+/* ─── Merge field input ───────────────────────────────────── */
+.mergeInputWrap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1);
+  width: 100%;
+}
+.mergePickerWrap {
+  position: relative;
+  display: inline-flex;
+}
+.mergeBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px var(--spacing-2);
+  border: 1px dashed var(--border-color);
+  border-radius: var(--border-radius-sm);
+  background: var(--color-white);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  font-family: var(--font-mono);
+  color: var(--color-gray-500);
+  cursor: pointer;
+  align-self: flex-start;
+  transition:
+    border-color var(--transition-fast),
+    color var(--transition-fast),
+    background var(--transition-fast);
+}
+.mergeBtn:hover {
+  border-color: #7c3aed;
+  color: #7c3aed;
+  background: #f5f3ff;
+}
+.mergeMenu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  min-width: 260px;
+  max-height: 220px;
+  overflow-y: auto;
+  background: var(--color-white);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-xl);
+  z-index: calc(var(--z-dropdown) + 20);
+  animation: fadeDown 150ms ease;
+}
+.mergeMenu::-webkit-scrollbar {
+  width: 4px;
+}
+.mergeMenu::-webkit-scrollbar-thumb {
+  background: var(--color-gray-200);
+  border-radius: 2px;
+}
+.mergeHeader {
+  padding: var(--spacing-2) var(--spacing-3);
+  font-size: 10px;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-gray-400);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: var(--color-gray-50);
+  border-bottom: 1px solid var(--border-color);
+  position: sticky;
+  top: 0;
+}
+.mergeItem {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  width: 100%;
+  padding: var(--spacing-2) var(--spacing-3);
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--color-gray-100);
+  font-size: var(--font-size-xs);
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+.mergeItem:hover {
+  background: var(--color-gray-50);
+}
+.mergeItem:last-child {
+  border-bottom: none;
+}
+.mergeItem code {
+  font-family: var(--font-mono);
+  color: #7c3aed;
+  background: #f5f3ff;
+  padding: 1px 4px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+.mergeItem span {
+  color: var(--color-gray-500);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ─── Key-value / field mapping ──────────────────────────── */
+.kvList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1);
+  width: 100%;
+}
+.kvRow {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+}
+.kvRow .inp {
+  flex: 1;
+}
+.pairField {
+  font-size: var(--font-size-xs);
+  font-family: var(--font-mono);
+  color: #7c3aed;
+  background: #f5f3ff;
+  padding: 2px 6px;
+  border-radius: 3px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  min-width: 80px;
+}
+
+/* ─── Screen step ─────────────────────────────────────────── */
+.subSection {
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  margin-top: var(--spacing-2);
+}
+.subSectionTitle {
+  padding: var(--spacing-2) var(--spacing-3);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-gray-600);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: var(--color-gray-50);
+  border-bottom: 1px solid var(--border-color);
+}
+.sourceRow {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-2) var(--spacing-3);
+  border-bottom: 1px solid var(--color-gray-100);
+}
+.sourceRow:last-of-type {
+  border-bottom: none;
+}
+.sourceRow .inp {
+  flex: 1;
+}
+.screenComp {
+  border-bottom: 1px solid var(--color-gray-100);
+}
+.screenComp:last-child {
+  border-bottom: none;
+}
+.compHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-2) var(--spacing-3);
+  background: var(--color-gray-50);
+}
+.compHeader .inp {
+  flex: 1;
+}
+.compCfg {
+  padding: var(--spacing-2) var(--spacing-3);
+}
+
+/* ─── Flow type pill in header (read-only indicator) ─────── */
+.flowTypePill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px var(--spacing-3);
+  border-radius: var(--border-radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* ─── Locked flow type block in Trigger panel ─────────────── */
+.flowTypeLocked {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  padding: var(--spacing-3) var(--spacing-4);
+  border: 2px solid;
+  border-radius: var(--border-radius-lg);
+}
+.flowTypeLockedIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: var(--border-radius-md);
+  background: rgba(255, 255, 255, 0.7);
+  flex-shrink: 0;
+}
+.flowTypeLockedMeta {
+  flex: 1;
+  min-width: 0;
+}
+.flowTypeLockedLabel {
+  display: block;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+}
+.flowTypeLockedHint {
+  display: block;
+  font-size: var(--font-size-xs);
+  color: var(--color-gray-500);
+  margin-top: 2px;
+}
+.lockIcon {
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+/* ─── Shared button classes referenced by inline configs ─── */
+.delBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-sm);
+  background: none;
+  color: var(--color-gray-400);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition:
+    background var(--transition-fast),
+    color var(--transition-fast);
+}
+.delBtn:hover {
+  background: var(--color-danger-light);
+  color: var(--color-danger);
+  border-color: var(--color-danger);
+}
+.addCondBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-primary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  margin-top: var(--spacing-1);
+}
+.addCondBtn:hover {
+  text-decoration: underline;
+}
+
+/* ─── Scheduled paths section ────────────────────────────── */
+.scheduledSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+  margin-top: var(--spacing-2);
+}
+
+.scheduledDivider {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  margin: var(--spacing-2) 0;
+}
+
+.scheduledDividerLine {
+  flex: 1;
+  height: 2px;
+  background: repeating-linear-gradient(
+    to right,
+    #fde68a 0,
+    #fde68a 6px,
+    transparent 6px,
+    transparent 12px
+  );
+  border-radius: 1px;
+}
+
+.scheduledDividerBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: var(--spacing-1) var(--spacing-3);
+  background: #fffbeb;
+  border: 1.5px solid #f59e0b;
+  border-radius: var(--border-radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  color: #b45309;
+  white-space: nowrap;
+}
+
+.scheduledHint {
+  font-size: var(--font-size-xs);
+  color: var(--color-gray-500);
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  border-radius: var(--border-radius);
+  padding: var(--spacing-2) var(--spacing-3);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.scheduledEmpty {
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-400);
+  text-align: center;
+  padding: var(--spacing-4);
+  background: #fffdf5;
+  border: 1px dashed #fde68a;
+  border-radius: var(--border-radius-lg);
+}
+
+.addScheduledBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-2) var(--spacing-4);
+  border: 1.5px dashed #f59e0b;
+  border-radius: var(--border-radius-full);
+  background: #fffbeb;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: #b45309;
+  cursor: pointer;
+  align-self: flex-start;
+  transition:
+    background 0.15s,
+    border-color 0.15s;
+}
+.addScheduledBtn:hover {
+  background: #fef3c7;
+  border-color: #d97706;
+}
+
+/* ─── Loading ─────────────────────────────────────────────── */
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+}
+.spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--color-gray-200);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

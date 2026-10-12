@@ -1,0 +1,193 @@
+---
+import MainLayout from '../../layouts/MainLayout.astro';
+
+const FUNCTIONS = [
+  ['IF(condition, whenTrue, whenFalse)', 'branches', 'Only the taken branch is evaluated, so IF can guard against nulls and division by zero.'],
+  ['ISBLANK(field)', 'boolean', 'True when null or empty string.'],
+  ['ISNULL(field)', 'boolean', 'True when null.'],
+  ['CONTAINS(field, "text")', 'boolean', 'Substring test.'],
+  ['REGEX(field, "pattern")', 'boolean', 'Pattern test. Patterns over 200 characters are rejected.'],
+  ['LENGTH(field)', 'number', 'Character count. Null counts as 0.'],
+  ['ABS(number)', 'number', 'Absolute value.'],
+  ['ROUND(number, decimals)', 'number', 'Round to N decimal places.'],
+  ['YEAR(date) · MONTH(date) · DAY(date)', 'number', 'Date parts. MONTH is 1–12.'],
+  ['DAYS_BETWEEN(from, to)', 'number', 'Whole days between two dates; null if either is missing.'],
+  ['DAYS_UNTIL(date)', 'number', 'Days from today, negative once past; null with no date.'],
+  ['UPPER(field) · LOWER(field) · TRIM(field)', 'text', 'Case and whitespace.'],
+  ['TODAY()', 'date', 'Today at midnight.'],
+  ['NOW()', 'date', 'Current date and time.'],
+  ['DATEVALUE(field)', 'date', 'Coerce a text or number value to a date.'],
+];
+
+const TYPES = [
+  ['number', 'A plain number — counts, quantities, day differences.'],
+  ['currency', 'A number rendered with the currency symbol.'],
+  ['percent', 'A number rendered with a % suffix.'],
+  ['text', 'Text — joined names, labels, formatted strings.'],
+  ['date', 'A date value.'],
+  ['boolean', 'True or false, rendered as a checkbox.'],
+];
+
+const examples = `ROUND(quantity * unit_price, 2)            → currency
+TRIM(first_name + " " + last_name)        → text
+DAYS_UNTIL(closing_date)                  → number
+IF(ISBLANK(nickname), first_name, nickname)  → text
+IF(amount > 0, ROUND(discount / amount * 100, 1), 0)  → percent`;
+
+const validateCall = `POST /api/v1/records/validate-formula
+{
+  "objectApiName": "deal_line_item",
+  "expression": "ROUND(quantity * unit_price, 2)",
+  "returnType": "currency"
+}
+
+→ { "success": true, "data": { "valid": true, "returnType": "number" } }`;
+
+const mismatch = `{
+  "valid": false,
+  "error": "This formula returns text, but the field's return type is currency. Either change the return type to text, or adjust the formula to return currency.",
+  "returnType": "text"
+}`;
+---
+
+<MainLayout
+  title="Formula Fields"
+  description="Expression syntax, functions, return types and evaluation order for formula fields."
+>
+  <h1>Formula Fields</h1>
+  <p class="lead">
+    A formula field computes its value from other fields on the same record. The
+    value is calculated and stored on every save, so list views, filters and sorts
+    read it straight from the record.
+  </p>
+
+  <h2>Return types</h2>
+  <p>
+    Every formula field declares a return type. It decides how the computed value
+    is <strong>stored</strong> and <strong>rendered</strong>, and which functions
+    and examples the formula editor offers.
+  </p>
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th>Return type</th><th>Meaning</th></tr></thead>
+      <tbody>
+        {TYPES.map(([t, meaning]) => (
+          <tr><td><code>{t}</code></td><td>{meaning}</td></tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="note">
+    <strong>The declared type is enforced.</strong> On save, the expression's return
+    type is inferred and compared against what you declared; a definite mismatch is
+    rejected. <code>currency</code>, <code>percent</code> and <code>number</code> are
+    interchangeable at this level — they are all numbers and differ only in
+    presentation.
+  </div>
+
+  <p>
+    Where the type can't be pinned down — a reference to a field that doesn't
+    exist, or an <code>IF</code> whose branches return different kinds — inference
+    yields <em>unknown</em> and the check passes. Rejecting on a guess would block
+    legitimate formulas.
+  </p>
+
+  <h2>Syntax</h2>
+  <p>
+    Expressions reference fields by API name. Arithmetic
+    (<code>+ - * /</code>), comparison (<code>== != &gt; &gt;= &lt; &lt;=</code>)
+    and logic (<code>AND OR NOT</code>, or <code>&amp;&amp; || !</code>) all work.
+    Strings take double or single quotes.
+  </p>
+  <pre><code>{examples}</code></pre>
+
+  <div class="note">
+    <strong><code>+</code> is overloaded.</strong> If either side is text it
+    concatenates; otherwise it adds. So <code>amount + 1</code> is a number but
+    <code>name + amount</code> is text — which is also how the return type is
+    inferred.
+  </div>
+
+  <h2>Functions</h2>
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th>Function</th><th>Returns</th><th>Notes</th></tr></thead>
+      <tbody>
+        {FUNCTIONS.map(([sig, returns, notes]) => (
+          <tr>
+            <td><code>{sig}</code></td>
+            <td><code>{returns}</code></td>
+            <td>{notes}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Coalescing</h3>
+  <p>
+    <code>&amp;&amp;</code> and <code>||</code> return the operand rather than a
+    boolean, so <code>nickname || first_name</code> is a text fallback — the same
+    idiom as JavaScript.
+  </p>
+
+  <h2>Evaluation order</h2>
+  <p>On save, values are produced in this order:</p>
+  <ol>
+    <li><strong>Field validation</strong> — types, required, uniqueness.</li>
+    <li><strong>Validation rules</strong> — evaluated against the incoming data
+      <em>plus</em> freshly computed formula values, so a rule can reference a formula.</li>
+    <li><strong>Auto-numbers</strong> — allocated atomically.</li>
+    <li><strong>Rollup summaries</strong> — aggregated from child records.</li>
+    <li><strong>Formulas</strong> — computed last, so they can read rollups.</li>
+  </ol>
+
+  <div class="warning">
+    <strong>Formulas are evaluated in a single pass, in field order.</strong> A
+    formula that reads another formula field is not guaranteed to see the other's
+    fresh value in the same save. Where one calculation feeds another, prefer a
+    single combined expression, or a hidden helper field that doesn't itself depend
+    on a formula.
+  </div>
+
+  <h2>Nulls and errors</h2>
+  <ul>
+    <li>A missing field reference evaluates to <code>null</code>.</li>
+    <li>Arithmetic on <code>null</code> coerces it to <code>0</code>. Guard with
+      <code>IF(ISBLANK(x), …)</code> when zero is the wrong answer.</li>
+    <li>Division by zero raises an error; the field is stored as
+      <code>null</code> and the failure is logged. Guard it:
+      <code>IF(qty &gt; 0, total / qty, 0)</code>.</li>
+    <li>Expressions are capped at 1000 characters, 24 levels of nesting and
+      10,000 evaluation steps.</li>
+  </ul>
+
+  <h2>Checking an expression</h2>
+  <p>
+    <code>POST /records/validate-formula</code> parses and dry-runs an expression
+    against the object's fields, and reports the inferred return type:
+  </p>
+  <pre><code>{validateCall}</code></pre>
+  <p>A type mismatch comes back with an actionable message:</p>
+  <pre><code>{mismatch}</code></pre>
+
+  <h2>Constraints</h2>
+  <ul>
+    <li>A formula cannot reference itself.</li>
+    <li>Formula values are read-only over the API — sending one is ignored.</li>
+    <li>Formula fields are excluded from CSV export.</li>
+    <li>The expression evaluator has no <code>eval</code>: it is a
+      recursive-descent parser and tree-walking interpreter, and only whitelisted
+      functions and string methods can be called.</li>
+  </ul>
+
+  <h2>Safety</h2>
+  <p>
+    Only these string methods are callable on a field value:
+    <code>includes</code>, <code>startsWith</code>, <code>endsWith</code>,
+    <code>toLowerCase</code>, <code>toUpperCase</code>, <code>trim</code>. The only
+    readable property is <code>length</code>. Anything else raises an error rather
+    than reaching into the runtime.
+  </p>
+</MainLayout>

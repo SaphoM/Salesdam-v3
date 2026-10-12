@@ -1,0 +1,443 @@
+/* ═══════════════════════════════════════════════════════════
+   BUTTON COMPONENT VARIANTS & STYLES GUIDE
+   ═══════════════════════════════════════════════════════════
+
+   VARIANTS (use variant prop):
+   ────────────────────────────────────────────────────────────
+   • primary      - Main call-to-action (solid blue background)
+   • secondary    - Alternative action (white with gray border)
+   • ghost        - Subtle text button (transparent, no border)
+   • danger       - Destructive actions (solid red background)
+   • danger-outline - Destructive text button (transparent red text)
+   • success      - Affirmative actions (solid green background)
+   • link         - Inline link style (text only, underlines on hover)
+
+   SIZES (use size prop):
+   ────────────────────────────────────────────────────────────
+   • xs  - Extra small: 1.5rem height (minimal UI elements)
+   • sm  - Small: 1.75rem height (compact layouts, sidebars)
+   • md  - Medium: 1.875rem height (default, most common)
+   • lg  - Large: 2.5rem height (prominent actions, calls-to-action)
+
+   STATES (automatic):
+   ────────────────────────────────────────────────────────────
+   • :hover       - Color darkens, visual feedback
+   • :active      - More pronounced darkening
+   • :focus-visible - Blue focus ring for accessibility
+   • :disabled    - Grayed out, cursor not-allowed
+   • loading      - Shows spinner, prevents interaction
+
+   PROPERTIES (add loading, disabled, icon, iconRight, fullWidth):
+   ────────────────────────────────────────────────────────────
+   • loading={true}  - Shows spinner, auto-disables
+   • disabled={true} - Grayed out, prevents clicks
+   • icon={<Icon />} - Icon on left (hidden during loading)
+   • iconRight={<Icon />} - Icon on right (hidden during loading)
+   • fullWidth       - Expands to 100% parent width
+
+   ═══════════════════════════════════════════════════════════ */
+
+/* ═══════════════════════════════════════════════════════════
+   VARIANT CLASS REFERENCE
+   ═══════════════════════════════════════════════════════════
+
+   PRIMARY (.primary)
+   ─────────────────────────────────────────────────────────
+   Use for: Main actions, CTAs, form submissions
+   Background: Solid blue (--color-primary)
+   Text: White
+   Hover: Darker blue
+   Active: Even darker blue
+
+   SECONDARY (.secondary)
+   ─────────────────────────────────────────────────────────
+   Use for: Alternative actions, non-critical buttons
+   Background: White
+   Text: Blue (--color-primary)
+   Border: Light gray (#dddbda)
+   Hover: Very light blue background + darker text
+
+   GHOST (.ghost)
+   ─────────────────────────────────────────────────────────
+   Use for: Navigation, subtle actions, less prominent
+   Background: Transparent
+   Text: Blue (--color-primary)
+   Border: None
+   Hover: Light blue background + underline + darker text
+
+   DANGER (.danger)
+   ─────────────────────────────────────────────────────────
+   Use for: Destructive actions (delete, remove, clear)
+   Background: Solid red (#ba0517)
+   Text: White
+   Hover: Darker red
+   Active: Even darker red
+   ⚠️  Use cautiously - requires user confirmation
+
+   DANGER-OUTLINE (.danger-outline)
+   ─────────────────────────────────────────────────────────
+   Use for: Destructive text actions (subtle delete options)
+   Background: Transparent
+   Text: Red (#c23934)
+   Border: Light gray (#dddbda)
+   Hover: Light pink background + darker red text
+
+   SUCCESS (.success)
+   ─────────────────────────────────────────────────────────
+   Use for: Affirmative actions, confirmations, approvals
+   Background: Solid green (#2e844a)
+   Text: White
+   Hover: Darker green
+   Active: Even darker green
+
+   LINK (.link)
+   ─────────────────────────────────────────────────────────
+   Use for: Inline links, less prominent navigation
+   Background: None
+   Text: Blue (--color-primary)
+   Border: None (minimal padding)
+   Hover: Underline + darker text
+
+   SIZE CLASS REFERENCE
+   ─────────────────────────────────────────────────────────
+   .size_xs  - 1.5rem height, 0.75rem font, 2px 8px padding
+   .size_sm  - 1.75rem height, 0.8125rem font, 4px 12px padding
+   .size_md  - 1.875rem height, 0.8125rem font, 6px 16px padding
+   .size_lg  - 2.5rem height, 0.875rem font, 9px 20px padding
+
+   STATE CLASSES
+   ─────────────────────────────────────────────────────────
+   .loading    - Shows spinner, disabled interaction, cursor: wait
+   .fullWidth  - width: 100%, expands to fill parent
+   :disabled   - Grayed out, cursor: not-allowed
+   :focus-visible - Blue focus ring (accessibility)
+
+   ═══════════════════════════════════════════════════════════ */
+
+/* ─── Base ────────────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue',
+    Arial, sans-serif;
+  font-weight: 400;
+  letter-spacing: normal;
+  cursor: pointer;
+  white-space: nowrap;
+  text-decoration: none;
+  outline: none;
+  position: relative;
+  overflow: visible;
+  user-select: none;
+  transition:
+    background 100ms linear,
+    color 100ms linear,
+    border-color 100ms linear,
+    box-shadow 100ms linear,
+    opacity 100ms linear;
+}
+
+.btn::after {
+  content: none;
+}
+
+.btn:focus-visible {
+  border-color: var(--color-primary);
+  box-shadow:
+    0 0 0 1px var(--color-primary),
+    0 0 3px 2px rgba(0, 112, 210, 0.3);
+}
+
+/* ─── Label ──────────────────────────────────────────────── */
+.label {
+  line-height: 1;
+  display: flex;
+  align-items: center;
+}
+
+/* ─── Primary (SLDS "Brand") ─────────────────────────────── */
+.primary {
+  background: var(--color-primary);
+  color: #ffffff;
+  border-color: var(--color-primary);
+  box-shadow: none;
+}
+
+.primary:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--color-primary) 80%, black);
+  border-color: color-mix(in srgb, var(--color-primary) 80%, black);
+  box-shadow: none;
+  transform: none;
+}
+
+.primary:active:not(:disabled) {
+  background: color-mix(in srgb, var(--color-primary) 60%, black);
+  border-color: color-mix(in srgb, var(--color-primary) 60%, black);
+  box-shadow: none;
+  transform: none;
+}
+
+.primary:focus-visible {
+  border-color: var(--color-primary);
+  box-shadow:
+    0 0 0 1px var(--color-primary),
+    0 0 3px 2px rgba(0, 112, 210, 0.3);
+}
+
+/* ─── Secondary (SLDS "Neutral") ─────────────────────────── */
+.secondary {
+  background: #ffffff;
+  color: var(--color-primary);
+  border-color: #dddbda;
+  box-shadow: none;
+}
+
+.secondary:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--color-primary) 8%, white);
+  color: color-mix(in srgb, var(--color-primary) 80%, black);
+  border-color: #dddbda;
+  box-shadow: none;
+  transform: none;
+}
+
+.secondary:active:not(:disabled) {
+  background: color-mix(in srgb, var(--color-primary) 12%, white);
+  border-color: #dddbda;
+  box-shadow: none;
+  transform: none;
+}
+
+.secondary:focus-visible {
+  border-color: var(--color-primary);
+  box-shadow:
+    0 0 0 1px var(--color-primary),
+    0 0 3px 2px rgba(0, 112, 210, 0.3);
+}
+
+/* ─── Ghost (SLDS "Base"/text button) ────────────────────── */
+.ghost {
+  background: transparent;
+  color: var(--color-primary);
+  border-color: transparent;
+}
+
+.ghost:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--color-primary) 8%, transparent);
+  color: color-mix(in srgb, var(--color-primary) 80%, black);
+  border-color: transparent;
+  text-decoration: underline;
+}
+
+.ghost:active:not(:disabled) {
+  background: color-mix(in srgb, var(--color-primary) 12%, transparent);
+}
+
+.ghost:focus-visible {
+  border-color: var(--color-primary);
+  box-shadow:
+    0 0 0 1px var(--color-primary),
+    0 0 3px 2px rgba(0, 112, 210, 0.3);
+}
+
+/* ─── Danger (SLDS "Destructive") ─────────────────────────── */
+.danger {
+  background: #ba0517;
+  color: #ffffff;
+  border-color: #ba0517;
+  box-shadow: none;
+}
+
+.danger:hover:not(:disabled) {
+  background: #870310;
+  border-color: #870310;
+  box-shadow: none;
+  transform: none;
+}
+
+.danger:active:not(:disabled) {
+  background: #5c020b;
+  border-color: #5c020b;
+  box-shadow: none;
+  transform: none;
+}
+
+.danger:focus-visible {
+  border-color: #ba0517;
+  box-shadow:
+    0 0 0 1px #ba0517,
+    0 0 3px 2px rgba(186, 5, 23, 0.3);
+}
+
+/* ─── Danger Outline (SLDS "Destructive text") ───────────── */
+.danger-outline {
+  background: transparent;
+  color: #c23934;
+  border-color: #dddbda;
+}
+
+.danger-outline:hover:not(:disabled) {
+  background: #fdf2f2;
+  color: #870310;
+  border-color: #dddbda;
+  box-shadow: none;
+  transform: none;
+}
+
+.danger-outline:active:not(:disabled) {
+  background: #fbe5e4;
+}
+
+.danger-outline:focus-visible {
+  border-color: #c23934;
+  box-shadow:
+    0 0 0 1px #c23934,
+    0 0 3px 2px rgba(194, 57, 52, 0.3);
+}
+
+/* ─── Success ─────────────────────────────────────────────
+   SLDS has no default "success" semantic button — modeled
+   on the same flat pattern as Brand, using SLDS's success green.
+──────────────────────────────────────────────────────────── */
+.success {
+  background: #2e844a;
+  color: #ffffff;
+  border-color: #2e844a;
+  box-shadow: none;
+}
+
+.success:hover:not(:disabled) {
+  background: #1b5e2c;
+  border-color: #1b5e2c;
+  box-shadow: none;
+  transform: none;
+}
+
+.success:active:not(:disabled) {
+  background: #16481f;
+  border-color: #16481f;
+  box-shadow: none;
+  transform: none;
+}
+
+.success:focus-visible {
+  border-color: #2e844a;
+  box-shadow:
+    0 0 0 1px #2e844a,
+    0 0 3px 2px rgba(46, 132, 74, 0.3);
+}
+
+/* ─── Link ───────────────────────────────────────────────── */
+.link {
+  background: none;
+  border-color: transparent;
+  color: var(--color-primary);
+  padding-left: 2px;
+  padding-right: 2px;
+  border-radius: 2px;
+}
+
+.link:hover:not(:disabled) {
+  color: color-mix(in srgb, var(--color-primary) 80%, black);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.link:focus-visible {
+  border-color: var(--color-primary);
+  box-shadow:
+    0 0 0 1px var(--color-primary),
+    0 0 3px 2px rgba(0, 112, 210, 0.3);
+}
+
+/* ─── Sizes ──────────────────────────────────────────────── */
+.size_xs {
+  padding: 2px 8px;
+  font-size: 0.75rem;
+  border-radius: 4px;
+  gap: 4px;
+  min-height: 1.5rem;
+}
+
+.size_sm {
+  padding: 4px 12px;
+  font-size: 0.8125rem;
+  border-radius: 4px;
+  gap: 5px;
+  min-height: 1.75rem;
+}
+
+.size_md {
+  padding: 6px 16px;
+  font-size: 0.8125rem;
+  border-radius: 4px;
+  min-height: 1.875rem;
+}
+
+.size_lg {
+  padding: 9px 20px;
+  font-size: 0.875rem;
+  border-radius: 4px;
+  gap: 8px;
+  min-height: 2.5rem;
+}
+
+/* ─── States ─────────────────────────────────────────────── */
+.btn:disabled {
+  opacity: 1;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+  background: #c9c7c5 !important;
+  border-color: #c9c7c5 !important;
+  color: #ffffff !important;
+}
+
+.secondary:disabled,
+.ghost:disabled,
+.danger-outline:disabled,
+.link:disabled {
+  background: transparent !important;
+  border-color: #dddbda !important;
+  color: #c9c7c5 !important;
+}
+
+.fullWidth {
+  width: 100%;
+}
+
+/* ─── Loading ────────────────────────────────────────────── */
+.loading {
+  cursor: wait;
+}
+
+/* ─── Spinner ────────────────────────────────────────────── */
+.spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  flex-shrink: 0;
+  opacity: 0.9;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ─── Icons ──────────────────────────────────────────────── */
+.icon,
+.iconRight {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  opacity: 1;
+}

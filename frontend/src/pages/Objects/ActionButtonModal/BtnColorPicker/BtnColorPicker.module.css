@@ -1,0 +1,83 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+.label {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.hint {
+  font-size: 10px;
+  color: var(--color-gray-400);
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.swatchGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.swatch {
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+  cursor: pointer;
+  flex-shrink: 0;
+  border: 1px solid transparent;
+  background: var(--swatch-color);
+  transition: all 0.15s ease;
+}
+
+/* None (checkerboard) swatch */
+.noneSwatch {
+  background: repeating-conic-gradient(#ccc 0% 25%, white 0% 50%) 0 0 / 10px
+    10px;
+  border: 1px solid var(--border-color);
+}
+
+.activeNone {
+  border: 2px solid var(--color-primary);
+}
+
+/* Active color swatch */
+.active {
+  border: 2px solid var(--color-gray-900);
+  box-shadow:
+    0 0 0 2px white,
+    0 0 0 4px var(--swatch-color);
+}
+
+/* Custom picker row */
+.customRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.customLabel {
+  font-size: 11px;
+  color: var(--color-gray-500);
+}
+
+.colorInput {
+  width: 32px;
+  height: 28px;
+  padding: 2px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.value {
+  font-size: 11px;
+  color: var(--color-gray-500);
+  font-family: monospace;
+}

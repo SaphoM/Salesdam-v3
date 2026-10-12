@@ -1,0 +1,325 @@
+---
+import MainLayout from '../../layouts/MainLayout.astro';
+---
+
+<MainLayout title="Invoicing | Salesdam Docs" description="Generate and manage customer invoices">
+  <div class="content-wrapper">
+    <h1>Generating Invoices</h1>
+
+    <p class="intro">Generate professional invoices from delivered orders to request payment from customers.</p>
+
+    <h2>Invoice Workflow</h2>
+
+    <div class="workflow">
+      <div class="step">Order Delivered</div>
+      <div class="connector">→</div>
+      <div class="step">Generate Invoice</div>
+      <div class="connector">→</div>
+      <div class="step">Send to Client</div>
+      <div class="connector">→</div>
+      <div class="step">Track Payment</div>
+    </div>
+
+    <h2>Invoice Fields</h2>
+
+    <table>
+      <tr>
+        <th>Field</th>
+        <th>Description</th>
+      </tr>
+      <tr>
+        <td>Invoice Number</td>
+        <td>Auto-generated (e.g., INV-001234)</td>
+      </tr>
+      <tr>
+        <td>Invoice Date</td>
+        <td>Date invoice created</td>
+      </tr>
+      <tr>
+        <td>Due Date</td>
+        <td>Payment due date</td>
+      </tr>
+      <tr>
+        <td>Client</td>
+        <td>Billing client</td>
+      </tr>
+      <tr>
+        <td>Line Items</td>
+        <td>Items from order</td>
+      </tr>
+      <tr>
+        <td>Subtotal</td>
+        <td>Sum before tax</td>
+      </tr>
+      <tr>
+        <td>Tax</td>
+        <td>Tax amount</td>
+      </tr>
+      <tr>
+        <td>Total</td>
+        <td>Final amount due</td>
+      </tr>
+      <tr>
+        <td>Status</td>
+        <td>Draft, Sent, Paid, Overdue, Cancelled</td>
+      </tr>
+    </table>
+
+    <h2>Generating Invoice</h2>
+
+    <h3>From Delivered Order</h3>
+
+    <ol>
+      <li>Open order with status "Delivered"</li>
+      <li>Click "Generate Invoice" button</li>
+      <li>Invoice form appears with pre-filled data:
+        <ul>
+          <li>Client information</li>
+          <li>Line items from order</li>
+          <li>Pricing and totals</li>
+          <li>Company branding</li>
+        </ul>
+      </li>
+      <li>Review and adjust as needed</li>
+      <li>Confirm payment terms (Net 30, Due Immediately, etc.)</li>
+      <li>Add payment instructions</li>
+      <li>Click "Create Invoice"</li>
+    </ol>
+
+    <h3>Manual Invoice</h3>
+
+    <ol>
+      <li>Navigate to Invoices object</li>
+      <li>Click "New Invoice"</li>
+      <li>Select client</li>
+      <li>Enter invoice date</li>
+      <li>Add line items manually</li>
+      <li>Set payment terms</li>
+      <li>Click "Save"</li>
+    </ol>
+
+    <h2>Invoice Configuration</h2>
+
+    <h3>Company Settings</h3>
+
+    <p>Go to Settings → Invoice & Quote Settings:</p>
+
+    <ul>
+      <li>Company name and logo</li>
+      <li>Invoice prefix (INV, SINV, etc.)</li>
+      <li>Invoice starting number</li>
+      <li>Default payment terms</li>
+      <li>Payment instructions</li>
+      <li>Bank details for payment</li>
+      <li>Footer text</li>
+      <li>Terms & conditions</li>
+    </ul>
+
+    <h2>Invoice Statuses</h2>
+
+    <table>
+      <tr>
+        <th>Status</th>
+        <th>Description</th>
+        <th>Action</th>
+      </tr>
+      <tr>
+        <td>Draft</td>
+        <td>Invoice being prepared</td>
+        <td>Send or modify</td>
+      </tr>
+      <tr>
+        <td>Sent</td>
+        <td>Invoice sent to client</td>
+        <td>Track payment</td>
+      </tr>
+      <tr>
+        <td>Paid</td>
+        <td>Payment received</td>
+        <td>Close invoice</td>
+      </tr>
+      <tr>
+        <td>Overdue</td>
+        <td>Payment past due date</td>
+        <td>Send reminder</td>
+      </tr>
+      <tr>
+        <td>Cancelled</td>
+        <td>Invoice cancelled</td>
+        <td>Archive</td>
+      </tr>
+    </table>
+
+    <h2>Invoice Actions</h2>
+
+    <h3>Send Invoice</h3>
+
+    <ol>
+      <li>Open invoice in Draft status</li>
+      <li>Click "Send Invoice" button</li>
+      <li>Enter recipient email (auto-filled)</li>
+      <li>Optional: Add cover message</li>
+      <li>Click "Send"</li>
+      <li>Email sent with invoice PDF</li>
+      <li>Status changes to "Sent"</li>
+    </ol>
+
+    <h3>Record Payment</h3>
+
+    <ol>
+      <li>Open invoice</li>
+      <li>Click "Record Payment"</li>
+      <li>Enter payment amount</li>
+      <li>Enter payment date</li>
+      <li>Select payment method (Bank Transfer, Check, Credit Card, etc.)</li>
+      <li>Add reference number (optional)</li>
+      <li>Click "Record"</li>
+      <li>Invoice status updates to "Paid" if fully paid</li>
+    </ol>
+
+    <h3>Download/Print</h3>
+
+    <ol>
+      <li>Open invoice</li>
+      <li>Click "Download PDF" button</li>
+      <li>Professional PDF generated</li>
+      <li>Save to computer or print</li>
+    </ol>
+
+    <h2>Payment Tracking</h2>
+
+    <p>Track invoice payment status:</p>
+
+    <ul>
+      <li>View payment history</li>
+      <li>See partial payments</li>
+      <li>Calculate days overdue</li>
+      <li>Track payment method</li>
+      <li>Add notes on payment</li>
+    </ul>
+
+    <h2>Invoice Templates</h2>
+
+    <p>Customize invoice appearance:</p>
+
+    <ol>
+      <li>Go to Settings → Invoice Templates</li>
+      <li>Choose layout (Standard, Detailed, Minimal)</li>
+      <li>Upload company logo</li>
+      <li>Set colors and fonts</li>
+      <li>Configure sections to display</li>
+      <li>Preview before saving</li>
+    </ol>
+
+    <h2>Late Payment Management</h2>
+
+    <h3>Payment Reminders</h3>
+
+    <ol>
+      <li>Open overdue invoice</li>
+      <li>Click "Send Reminder"</li>
+      <li>Choose reminder type:
+        <ul>
+          <li>First reminder (1 day overdue)</li>
+          <li>Second reminder (7 days overdue)</li>
+          <li>Final reminder (14 days overdue)</li>
+        </ul>
+      </li>
+      <li>Customize message</li>
+      <li>Send to client</li>
+    </ol>
+
+    <h2>Invoice Analytics</h2>
+
+    <ul>
+      <li>Total invoices issued</li>
+      <li>Total outstanding</li>
+      <li>Total paid</li>
+      <li>Average days to payment</li>
+      <li>Overdue invoices count</li>
+      <li>Collection rate %</li>
+      <li>Average invoice value</li>
+    </ul>
+
+    <h2>Best Practices</h2>
+
+    <ul>
+      <li>✓ Generate invoice immediately after delivery</li>
+      <li>✓ Include clear payment terms</li>
+      <li>✓ Add payment instructions and bank details</li>
+      <li>✓ Send professional formatted invoices</li>
+      <li>✓ Track payment status promptly</li>
+      <li>✓ Follow up on overdue invoices</li>
+      <li>✓ Keep payment records organized</li>
+      <li>✗ Don't invoice before delivery</li>
+      <li>✗ Don't miss payment due dates</li>
+      <li>✗ Don't forget follow-ups on late payments</li>
+    </ul>
+
+    <div class="note">
+      <strong>💡 Tip:</strong> Integrate with accounting software for automatic reconciliation and financial reporting.
+    </div>
+
+    <h2>Integration with Accounting</h2>
+
+    <ul>
+      <li>Export invoices to accounting system</li>
+      <li>Track accounts receivable</li>
+      <li>Generate financial reports</li>
+      <li>Monitor cash flow</li>
+      <li>Tax compliance reporting</li>
+    </ul>
+
+    <div class="success">
+      <strong>✓ Invoice Created!</strong> Your invoice is ready to send. Track payment and manage your cash flow effectively.
+    </div>
+  </div>
+</MainLayout>
+
+<style>
+  .workflow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin: 30px 0;
+    padding: 24px;
+    background: linear-gradient(135deg, var(--color-gray-50) 0%, var(--color-gray-100) 100%);
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+  }
+
+  .step {
+    background: var(--surface);
+    border: 2px solid var(--color-primary);
+    padding: 12px 18px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    white-space: nowrap;
+    color: var(--color-primary);
+  }
+
+  .connector {
+    color: var(--color-gray-400);
+    font-size: 20px;
+    font-weight: 300;
+  }
+
+  @media (max-width: 768px) {
+    .workflow {
+      gap: 8px;
+      padding: 16px;
+    }
+
+    .step {
+      font-size: 12px;
+      padding: 10px 14px;
+    }
+
+    .connector {
+      font-size: 16px;
+    }
+  }
+</style>

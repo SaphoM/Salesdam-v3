@@ -1,0 +1,67 @@
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.card {
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-lg);
+  padding: 12px;
+  background: white;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.icon {
+  width: 36px;
+  height: 36px;
+  background: #0ea5e920;
+  color: #0ea5e9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+}
+
+.info {
+  flex: 1;
+}
+
+.name {
+  font-weight: 600;
+}
+
+.url {
+  font-size: 12px;
+  color: var(--color-gray-500);
+}
+
+.actions {
+  display: flex;
+  gap: 6px;
+}
+
+.actions button,
+.actions a {
+  border: 1px solid var(--border-color);
+  background: none;
+  padding: 5px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.center {
+  text-align: center;
+  padding: 40px;
+}
+
+.empty {
+  text-align: center;
+  padding: 60px;
+  border: 1px dashed var(--border-color);
+}

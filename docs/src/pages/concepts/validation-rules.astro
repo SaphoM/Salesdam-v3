@@ -1,0 +1,174 @@
+---
+import MainLayout from '../../layouts/MainLayout.astro';
+
+const shape = `{
+  "name": "Client number is required",
+  "description": "Every client must carry an account number.",
+  "expression": "ISBLANK(client_number)",
+  "errorMessage": "Client Number cannot be blank",
+  "isActive": true
+}`;
+
+const saveRules = `PUT /api/v1/objects/client
+{
+  "validationRules": [
+    {
+      "name": "Client number is required",
+      "expression": "ISBLANK(client_number)",
+      "errorMessage": "Client Number cannot be blank",
+      "isActive": true
+    }
+  ]
+}`;
+
+const failure = `{
+  "success": false,
+  "message": "Client Number cannot be blank",
+  "errors": ["Client Number cannot be blank"]
+}`;
+
+const EXAMPLES = [
+  ['ISBLANK(client_number)', 'Client Number is required'],
+  ['amount <= 0', 'Amount must be positive'],
+  ['amount <= discount', 'Amount must exceed the discount'],
+  ['ISBLANK(phone) AND ISBLANK(email)', 'At least one contact method is required'],
+  ['start_date >= end_date', 'Start date must be before the end date'],
+  ['close_date <= TODAY()', 'Close date must be in the future'],
+  ['NOT CONTAINS(email, "@")', 'Email address must be valid'],
+  ['status == "Active" AND probability < 50', 'Active deals need a probability of 50 or more'],
+  ['subtotal > credit_limit', 'Order exceeds the client credit limit'],
+];
+---
+
+<MainLayout
+  title="Validation Rules"
+  description="Cross-field rules that block a save, how they are evaluated, and the direction of the expression."
+>
+  <h1>Validation Rules</h1>
+  <p class="lead">
+    A validation rule is a cross-field check evaluated every time a record is
+    saved. Rules live on the object, alongside its fields.
+  </p>
+
+  <div class="warning">
+    <strong>The expression describes what to reject.</strong> A rule
+    <em>triggers</em> — blocking the save — when its expression evaluates to
+    <strong>true</strong>. So <code>ISBLANK(client_number)</code> means "reject a
+    blank client number", not "require it to be blank". Writing the condition you
+    want to <em>permit</em> is the single easiest mistake to make here, and it fails
+    silently: the rule simply never fires.
+  </div>
+
+  <h2>Shape</h2>
+  <pre><code>{shape}</code></pre>
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th>Field</th><th>Required</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td><code>name</code></td><td>Yes</td><td>Max 80 characters. Identifies the rule in errors when no message is set.</td></tr>
+        <tr><td><code>description</code></td><td>No</td><td>Max 255 characters. For whoever maintains the rule.</td></tr>
+        <tr><td><code>expression</code></td><td>Yes</td><td>Max 1000 characters. Same syntax as <a href="/concepts/formula-fields">formula fields</a>.</td></tr>
+        <tr><td><code>errorMessage</code></td><td>Yes</td><td>Max 255 characters. Returned verbatim — it is what the user reads.</td></tr>
+        <tr><td><code>isActive</code></td><td>No</td><td>Defaults to <code>true</code>. Only an explicit <code>false</code> disables a rule.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>Examples</h2>
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th>Expression (blocks when true)</th><th>Intent</th></tr></thead>
+      <tbody>
+        {EXAMPLES.map(([expr, intent]) => (
+          <tr><td><code>{expr}</code></td><td>{intent}</td></tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+
+  <h2>When rules run</h2>
+  <p>Rules are enforced on every write path:</p>
+  <ul>
+    <li><code>POST /records/:objectApiName</code> — create</li>
+    <li><code>PUT</code> and <code>PATCH /records/:objectApiName/:id</code> — update</li>
+    <li>CSV import — per row; failures are reported per row and don't abort the import</li>
+  </ul>
+  <p>
+    On a partial (<code>PATCH</code>) update the rules run against the
+    <strong>merged</strong> record, not just the submitted fields — so a partial
+    update can't move a record into a state a rule forbids.
+  </p>
+
+  <div class="note">
+    <strong>Rules can reference formula fields.</strong> Formula values are computed
+    into the evaluation context before rules run, and recomputed from the incoming
+    data on update — so <code>subtotal &gt; credit_limit</code> is checked against
+    the subtotal this save will produce, not the one already stored.
+  </div>
+
+  <h2>Failure response</h2>
+  <p>
+    A triggered rule returns <code>400</code> with its message. All triggered rules
+    and all field errors are collected first, so the response lists everything
+    wrong at once:
+  </p>
+  <pre><code>{failure}</code></pre>
+
+  <h2>Active and inactive</h2>
+  <p>
+    An inactive rule is kept but skipped on save. <code>isActive</code> defaults to
+    <code>true</code>, and only an explicit <code>false</code> disables — a rule
+    saved without the flag is still enforced.
+  </p>
+  <p>
+    Only <strong>active</strong> rules must parse when you save the object. You can
+    therefore park a half-finished rule as inactive; it is validated when you
+    activate it.
+  </p>
+
+  <h2>Managing rules over the API</h2>
+  <p>
+    Rules are a property of the object. Sending <code>validationRules</code>
+    <strong>replaces the entire array</strong> — read, modify, write back, or you
+    will drop the rules you didn't send:
+  </p>
+  <pre><code>{saveRules}</code></pre>
+  <p>
+    An object may carry a bounded number of rules, and every active rule's
+    expression must parse or the whole update is rejected with the offending rule
+    named.
+  </p>
+
+  <h2>Pitfalls</h2>
+  <ul>
+    <li>
+      <strong>Direction.</strong> Say what to reject. If a rule never seems to fire,
+      try inverting it — that is nearly always the cause.
+    </li>
+    <li>
+      <strong>Blank values.</strong> A missing field is <code>null</code>, and
+      <code>null</code> coerces to <code>0</code> in comparisons. A rule like
+      <code>amount &lt;= 0</code> will therefore reject a record where amount was
+      never supplied. Guard with <code>NOT ISBLANK(amount) AND amount &lt;= 0</code>
+      if that isn't what you want.
+    </li>
+    <li>
+      <strong>Required fields.</strong> For "this one field must be filled in", the
+      field's own <code>isRequired</code> flag is the better tool — it marks the
+      input as required in the UI and reports against that specific field. Reserve
+      rules for conditions that span fields.
+    </li>
+    <li>
+      <strong>Broken expressions.</strong> A rule that fails to parse or throws is
+      reported as a validation error naming the rule, not a <code>500</code>. The
+      save is still blocked.
+    </li>
+  </ul>
+
+  <h2>Previewing without saving</h2>
+  <p>
+    <code>POST /records/validate</code> runs field validation and the object's rules
+    against a payload and returns what would fail — useful for validating a form
+    before submit.
+  </p>
+</MainLayout>

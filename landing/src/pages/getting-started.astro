@@ -1,0 +1,562 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<BaseLayout
+  title="Getting Started - Mini CRM"
+  description="Learn how to set up and start using Mini CRM in minutes"
+>
+  <Header />
+
+  <main class="getting-started">
+    <section class="hero-small">
+      <div class="container">
+        <div class="hero-content">
+          <h1>Getting Started with Mini CRM</h1>
+          <p>Follow this guide to set up your workspace and start managing customer relationships in minutes.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="content-section">
+      <div class="container">
+        <div class="content">
+          <div class="intro">
+            <h2>Welcome to Mini CRM</h2>
+            <p>
+              This guide will walk you through everything you need to know to get started with Mini CRM.
+              From creating your workspace to building automation flows, we'll help you become productive
+              quickly.
+            </p>
+          </div>
+
+          <div class="step-section">
+            <div class="step-header">
+              <span class="step-badge">Step 1</span>
+              <h2>Create Your Workspace</h2>
+            </div>
+            <p>
+              Your workspace is your isolated environment where all your data lives. Each workspace is
+              completely separate from others, making Mini CRM perfect for multi-tenant applications.
+            </p>
+            <ol>
+              <li>Go to <a href="http://localhost:3000/register">http://localhost:3000/register</a></li>
+              <li>Enter your workspace name (e.g., "Acme Corp")</li>
+              <li>Provide your email address and create a password</li>
+              <li>Enter your full name</li>
+              <li>Click "Create Workspace" to complete registration</li>
+            </ol>
+            <div class="note">
+              <strong>Note:</strong> The workspace name will be used throughout the application. Choose
+              something that represents your organization or project.
+            </div>
+            <p>
+              After registration, you'll be automatically logged in as the workspace administrator with
+              full permissions to all features.
+            </p>
+          </div>
+
+          <div class="step-section">
+            <div class="step-header">
+              <span class="step-badge">Step 2</span>
+              <h2>Set Up Custom Objects</h2>
+            </div>
+            <p>
+              Objects are the foundation of your data model. Think of them like database tables or
+              spreadsheet tabs. Mini CRM comes with flexibility to create any object you need.
+            </p>
+            <h3>Creating Your First Object</h3>
+            <ol>
+              <li>Navigate to <strong>Object Settings</strong> from the main menu</li>
+              <li>Click <strong>"New Object"</strong></li>
+              <li>Enter the object details:
+                <ul>
+                  <li><strong>Label:</strong> Display name (e.g., "Customer")</li>
+                  <li><strong>API Name:</strong> Internal name (e.g., "customer")</li>
+                  <li><strong>Plural Label:</strong> For lists (e.g., "Customers")</li>
+                </ul>
+              </li>
+              <li>Click <strong>Save</strong></li>
+            </ol>
+
+            <h3>Adding Fields</h3>
+            <p>Once your object is created, add fields to store data:</p>
+            <ol>
+              <li>Click on your object to open the detail page</li>
+              <li>Scroll to the <strong>Fields</strong> section</li>
+              <li>Click <strong>"New Field"</strong></li>
+              <li>Select a field type:
+                <ul>
+                  <li><strong>Text:</strong> Short text values (names, IDs)</li>
+                  <li><strong>Number:</strong> Numeric values with optional decimals</li>
+                  <li><strong>Date:</strong> Date values</li>
+                  <li><strong>Boolean:</strong> True/false checkboxes</li>
+                  <li><strong>Picklist:</strong> Dropdown with predefined options</li>
+                  <li><strong>Lookup:</strong> Reference to another record</li>
+                  <li><strong>Master-Detail:</strong> Parent-child relationship</li>
+                </ul>
+              </li>
+              <li>Configure field properties (required, unique, default value)</li>
+              <li>Click <strong>Save</strong></li>
+            </ol>
+
+            <h3>Using the Schema Builder</h3>
+            <p>
+              The visual schema builder helps you understand relationships between objects:
+            </p>
+            <ul>
+              <li>Navigate to <strong>Schema Builder</strong> from Object Settings</li>
+              <li>See all objects and their fields in a visual diagram</li>
+              <li>Lookup and master-detail relationships are shown as connecting lines</li>
+              <li>Drag objects to rearrange the layout</li>
+            </ul>
+
+            <div class="note">
+              <strong>Example:</strong> Create a "Customer" object with fields like "Company Name" (Text),
+              "Revenue" (Number), "Industry" (Picklist), and "Account Manager" (Lookup to User).
+            </div>
+          </div>
+
+          <div class="step-section">
+            <div class="step-header">
+              <span class="step-badge">Step 3</span>
+              <h2>Add Users & Configure Roles</h2>
+            </div>
+            <p>
+              Invite team members and control what they can access with role-based permissions.
+            </p>
+
+            <h3>Inviting Users</h3>
+            <ol>
+              <li>Go to <strong>Settings</strong> → <strong>Users</strong></li>
+              <li>Click <strong>"New User"</strong></li>
+              <li>Enter email, name, and initial password</li>
+              <li>Assign a role (create custom roles first if needed)</li>
+              <li>Click <strong>Save</strong></li>
+            </ol>
+
+            <h3>Creating Custom Roles</h3>
+            <ol>
+              <li>Go to <strong>Settings</strong> → <strong>Roles</strong></li>
+              <li>Click <strong>"New Role"</strong></li>
+              <li>Enter role name (e.g., "Sales Rep", "Manager")</li>
+              <li>Configure permissions for each object:
+                <ul>
+                  <li><strong>View All:</strong> See all records</li>
+                  <li><strong>Create:</strong> Create new records</li>
+                  <li><strong>Edit All:</strong> Modify any record</li>
+                  <li><strong>Delete All:</strong> Remove records</li>
+                </ul>
+              </li>
+              <li>Set field-level permissions if needed</li>
+              <li>Click <strong>Save</strong></li>
+            </ol>
+
+            <div class="warning">
+              <strong>Security Tip:</strong> Follow the principle of least privilege. Only grant permissions
+              that users absolutely need for their job function.
+            </div>
+          </div>
+
+          <div class="step-section">
+            <div class="step-header">
+              <span class="step-badge">Step 4</span>
+              <h2>Create and Manage Records</h2>
+            </div>
+            <p>
+              Now that your objects are set up, start creating records to store your data.
+            </p>
+
+            <h3>Creating Records</h3>
+            <ol>
+              <li>Navigate to the object (e.g., "Customers") from the main menu</li>
+              <li>Click <strong>"New"</strong></li>
+              <li>Fill in the field values</li>
+              <li>For lookup fields, use the search to find related records</li>
+              <li>Click <strong>Save</strong></li>
+            </ol>
+
+            <h3>Viewing Records</h3>
+            <p>The list view shows all records in a table format:</p>
+            <ul>
+              <li>Search by any field value</li>
+              <li>Sort by clicking column headers</li>
+              <li>Click a record to see full details</li>
+              <li>Use bulk actions to update multiple records at once</li>
+            </ul>
+
+            <h3>Related Lists</h3>
+            <p>
+              When viewing a record, related lists show child records in master-detail or lookup relationships.
+              For example, a Customer record might show related Opportunities, Contacts, and Cases.
+            </p>
+          </div>
+
+          <div class="step-section">
+            <div class="step-header">
+              <span class="step-badge">Step 5</span>
+              <h2>Set Up Automation</h2>
+            </div>
+            <p>
+              Automation flows help you streamline processes and reduce manual work.
+            </p>
+
+            <h3>Creating an Automation Flow</h3>
+            <ol>
+              <li>Navigate to <strong>Automation</strong></li>
+              <li>Click <strong>"New Flow"</strong></li>
+              <li>Enter flow name and description</li>
+              <li>Configure the trigger:
+                <ul>
+                  <li><strong>Record Created:</strong> When a new record is created</li>
+                  <li><strong>Record Updated:</strong> When a record is modified</li>
+                  <li><strong>Field Changed:</strong> When specific field values change</li>
+                  <li><strong>Scheduled:</strong> Run on a recurring schedule</li>
+                </ul>
+              </li>
+              <li>Add conditions (optional):
+                <ul>
+                  <li>Filter which records trigger the flow</li>
+                  <li>Use field values, formulas, and logical operators</li>
+                </ul>
+              </li>
+              <li>Add actions:
+                <ul>
+                  <li><strong>Create Record:</strong> Create related records automatically</li>
+                  <li><strong>Update Record:</strong> Modify field values</li>
+                  <li><strong>Send Email:</strong> Use email templates</li>
+                  <li><strong>Call Webhook:</strong> Integrate with external systems</li>
+                </ul>
+              </li>
+              <li>Test your flow with sample data</li>
+              <li>Activate the flow</li>
+            </ol>
+
+            <div class="note">
+              <strong>Example:</strong> Create a flow that sends a welcome email when a new Customer is
+              created, then creates a follow-up Task for the Account Manager 3 days later.
+            </div>
+          </div>
+
+          <div class="step-section">
+            <div class="step-header">
+              <span class="step-badge">Step 6</span>
+              <h2>Build Dashboards</h2>
+            </div>
+            <p>
+              Dashboards provide real-time insights into your business with charts, metrics, and tables.
+            </p>
+
+            <h3>Creating a Dashboard</h3>
+            <ol>
+              <li>Navigate to <strong>Dashboards</strong></li>
+              <li>Click <strong>"New Dashboard"</strong></li>
+              <li>Enter dashboard name</li>
+              <li>Click <strong>"Add Widget"</strong></li>
+              <li>Select widget type:
+                <ul>
+                  <li><strong>Metric:</strong> Display a single number (count, sum, avg)</li>
+                  <li><strong>Chart:</strong> Bar, line, pie, or donut charts</li>
+                  <li><strong>Table:</strong> List of records with columns</li>
+                  <li><strong>Text:</strong> Custom text and instructions</li>
+                </ul>
+              </li>
+              <li>Configure data source and filters</li>
+              <li>Arrange widgets by dragging</li>
+              <li>Share with users or roles</li>
+            </ol>
+
+            <h3>Dashboard Best Practices</h3>
+            <ul>
+              <li>Keep dashboards focused on specific metrics or departments</li>
+              <li>Use filters to let users customize their view</li>
+              <li>Refresh data regularly for accuracy</li>
+              <li>Share role-specific dashboards with appropriate teams</li>
+            </ul>
+          </div>
+
+          <div class="step-section">
+            <div class="step-header">
+              <span class="step-badge">Tips & Common Mistakes</span>
+              <h2>Pro Tips for Success</h2>
+            </div>
+
+            <h3>Best Practices</h3>
+            <ul>
+              <li><strong>Plan your data model first:</strong> Sketch out objects and relationships before building</li>
+              <li><strong>Use meaningful API names:</strong> Keep them lowercase and use underscores (e.g., "account_manager")</li>
+              <li><strong>Start simple:</strong> Begin with core objects and add complexity as needed</li>
+              <li><strong>Test automations thoroughly:</strong> Use test records before activating flows</li>
+              <li><strong>Document your setup:</strong> Add descriptions to objects, fields, and flows</li>
+              <li><strong>Regular backups:</strong> Export important data regularly</li>
+            </ul>
+
+            <h3>Common Mistakes to Avoid</h3>
+            <ul>
+              <li><strong>Too many required fields:</strong> Makes data entry tedious for users</li>
+              <li><strong>Overly complex automation:</strong> Start with simple flows and iterate</li>
+              <li><strong>Ignoring permissions:</strong> Always test with non-admin users</li>
+              <li><strong>Not using lookup fields:</strong> They're powerful for relationships</li>
+              <li><strong>Skipping validation rules:</strong> Add them to maintain data quality</li>
+              <li><strong>Creating duplicate objects:</strong> Consolidate when possible</li>
+            </ul>
+
+            <h3>Getting Help</h3>
+            <p>If you need assistance:</p>
+            <ul>
+              <li>Check the <a href="/user-guide">User Guide</a> for detailed documentation</li>
+              <li>Review <a href="/user-guide/automation">automation examples</a></li>
+              <li>Contact support at support@minicrm.com</li>
+              <li>Join our community forum</li>
+            </ul>
+          </div>
+
+          <div class="next-steps">
+            <h2>Next Steps</h2>
+            <p>Now that you're set up, explore these features:</p>
+            <div class="next-steps-grid">
+              <a href="/user-guide/objects" class="next-step-card">
+                <h3>Object Settings</h3>
+                <p>Learn advanced object configuration and schema building</p>
+              </a>
+              <a href="/user-guide/automation" class="next-step-card">
+                <h3>Automation Flows</h3>
+                <p>Master triggers, conditions, and actions</p>
+              </a>
+              <a href="/user-guide/dashboards" class="next-step-card">
+                <h3>Analytics</h3>
+                <p>Build powerful dashboards and reports</p>
+              </a>
+              <a href="/user-guide/integrations" class="next-step-card">
+                <h3>Integrations</h3>
+                <p>Connect to external systems with APIs</p>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <Footer />
+</BaseLayout>
+
+<style>
+  .hero-small {
+    padding: 120px 0 60px;
+    background: linear-gradient(135deg, #0066FF 0%, #0052CC 100%);
+    color: white;
+  }
+
+  .hero-content {
+    text-align: center;
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  .hero-small h1 {
+    font-size: clamp(2rem, 5vw, 3rem);
+    margin-bottom: 16px;
+    font-weight: 800;
+  }
+
+  .hero-small p {
+    font-size: clamp(1rem, 2vw, 1.25rem);
+    opacity: 0.95;
+  }
+
+  .content-section {
+    padding: 80px 0;
+  }
+
+  .content {
+    max-width: 900px;
+    margin: 0 auto;
+    background: white;
+    padding: 60px;
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+  }
+
+  .intro {
+    margin-bottom: 60px;
+  }
+
+  .intro h2 {
+    font-size: 2rem;
+    margin-bottom: 16px;
+    color: var(--text);
+  }
+
+  .intro p {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    line-height: 1.8;
+  }
+
+  .step-section {
+    margin-bottom: 60px;
+    padding-bottom: 60px;
+    border-bottom: 2px solid var(--border);
+  }
+
+  .step-section:last-of-type {
+    border-bottom: none;
+  }
+
+  .step-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .step-badge {
+    background: var(--primary);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+
+  .step-section h2 {
+    font-size: 2rem;
+    color: var(--text);
+  }
+
+  .step-section h3 {
+    font-size: 1.5rem;
+    margin-top: 32px;
+    margin-bottom: 16px;
+    color: var(--text);
+  }
+
+  .step-section p {
+    color: var(--text-secondary);
+    margin-bottom: 16px;
+    line-height: 1.7;
+    font-size: 1.05rem;
+  }
+
+  .step-section ol,
+  .step-section ul {
+    margin-bottom: 24px;
+    padding-left: 24px;
+    color: var(--text-secondary);
+  }
+
+  .step-section li {
+    margin-bottom: 12px;
+    line-height: 1.6;
+  }
+
+  .step-section a {
+    color: var(--primary);
+    text-decoration: underline;
+  }
+
+  .step-section a:hover {
+    color: var(--primary-dark);
+  }
+
+  .note {
+    background: #eff6ff;
+    border-left: 4px solid var(--primary);
+    padding: 20px;
+    margin: 24px 0;
+    border-radius: 4px;
+    color: var(--text-secondary);
+  }
+
+  .note strong {
+    color: var(--primary);
+  }
+
+  .warning {
+    background: #fef3c7;
+    border-left: 4px solid #f59e0b;
+    padding: 20px;
+    margin: 24px 0;
+    border-radius: 4px;
+    color: var(--text-secondary);
+  }
+
+  .warning strong {
+    color: #f59e0b;
+  }
+
+  .next-steps {
+    margin-top: 60px;
+    padding-top: 40px;
+    border-top: 2px solid var(--border);
+  }
+
+  .next-steps h2 {
+    font-size: 2rem;
+    margin-bottom: 16px;
+    color: var(--text);
+  }
+
+  .next-steps > p {
+    color: var(--text-secondary);
+    margin-bottom: 32px;
+    font-size: 1.1rem;
+  }
+
+  .next-steps-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+  }
+
+  .next-step-card {
+    background: var(--bg);
+    padding: 24px;
+    border-radius: 8px;
+    transition: all 0.2s;
+    border: 2px solid var(--border);
+  }
+
+  .next-step-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--primary);
+  }
+
+  .next-step-card h3 {
+    color: var(--primary);
+    margin-bottom: 8px;
+    font-size: 1.25rem;
+  }
+
+  .next-step-card p {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+  }
+
+  @media (max-width: 768px) {
+    .hero-small {
+      padding: 100px 0 40px;
+    }
+
+    .hero-small h1 {
+      font-size: 2rem;
+    }
+
+    .content {
+      padding: 40px 24px;
+    }
+
+    .step-header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .next-steps-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

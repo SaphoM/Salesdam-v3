@@ -1,0 +1,482 @@
+.page {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.backButton {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--color-gray-100);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--color-gray-700);
+  transition: all var(--transition-fast);
+  width: fit-content;
+}
+
+.backButton:hover {
+  background: var(--color-gray-200);
+  color: var(--color-gray-900);
+}
+
+.title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--color-gray-900);
+  margin: 0 0 8px 0;
+}
+
+.description {
+  color: var(--color-gray-600);
+  font-size: 15px;
+  margin: 0;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.loading,
+.error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  background: var(--color-white);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-lg);
+  gap: 16px;
+  min-height: 300px;
+}
+
+.error {
+  color: var(--color-danger);
+}
+
+.spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--color-gray-200);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loading p,
+.error h2,
+.error p {
+  margin: 0;
+}
+
+.error h2 {
+  font-size: 18px;
+}
+
+.error p {
+  font-size: 14px;
+  margin-top: 8px;
+}
+
+.retryButton {
+  margin-top: 16px;
+  padding: 8px 16px;
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background var(--transition-fast);
+}
+
+.retryButton:hover {
+  background: var(--color-primary-hover);
+}
+
+/* Summary Card */
+.summaryCard {
+  background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-lg);
+  padding: 40px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.summaryGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 32px;
+  margin-bottom: 40px;
+}
+
+.summaryItem {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.summaryItem label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--color-gray-500);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+
+.summaryValue {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--color-gray-900);
+  line-height: 1.2;
+}
+
+.progressContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.progressBar {
+  width: 100%;
+  height: 16px;
+  background: var(--color-gray-200);
+  border-radius: 999px;
+  overflow: hidden;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.progressFill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.3s ease, background-color 0.3s ease;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+}
+
+.warning {
+  padding: 14px 16px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: var(--border-radius);
+  color: #dc2626;
+  font-size: 13px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Breakdown Card */
+.breakdownCard {
+  background: var(--color-white);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-lg);
+  padding: 40px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.breakdownTitle {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--color-gray-900);
+  margin: 0 0 28px 0;
+}
+
+.breakdownTable {
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-lg);
+  overflow: hidden;
+  background: var(--color-white);
+}
+
+.tableHeader {
+  display: grid;
+  grid-template-columns: 2.5fr 1.1fr 1.1fr 1.3fr;
+  gap: 0;
+  padding: 16px 24px;
+  background: var(--color-gray-50);
+  border-bottom: 2px solid var(--border-color);
+  font-weight: 700;
+  font-size: 11px;
+  color: var(--color-gray-600);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+
+.tableHeader > div {
+  padding-right: 12px;
+}
+
+.tableHeader > div:nth-child(2),
+.tableHeader > div:nth-child(3),
+.tableHeader > div:nth-child(4) {
+  text-align: right;
+}
+
+.tableBody {
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.tableRow {
+  display: grid;
+  grid-template-columns: 2.5fr 1.1fr 1.1fr 1.3fr;
+  gap: 0;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--border-color);
+  align-items: center;
+  font-size: 14px;
+  transition: background var(--transition-fast);
+}
+
+.tableRow:hover {
+  background: var(--color-gray-50);
+}
+
+.tableRow:last-child {
+  border-bottom: none;
+}
+
+.objectName {
+  color: var(--color-gray-900);
+  font-weight: 600;
+  text-transform: capitalize;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.recordCount {
+  color: var(--color-gray-700);
+  text-align: right;
+  font-weight: 500;
+  padding-right: 12px;
+}
+
+.deletedCount {
+  color: var(--color-gray-700);
+  text-align: right;
+  font-weight: 500;
+  padding-right: 12px;
+}
+
+.deletedBadge {
+  display: inline-block;
+  background: #fee2e2;
+  color: #dc2626;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.storageSize {
+  color: var(--color-gray-700);
+  text-align: right;
+  font-weight: 500;
+  padding-right: 12px;
+}
+
+.smallProgressBar {
+  width: 50px;
+  height: 6px;
+  background: var(--color-gray-200);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.smallProgressFill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
+  border-radius: 999px;
+}
+
+.emptyState {
+  padding: 60px 20px;
+  text-align: center;
+  color: var(--color-gray-400);
+  font-size: 15px;
+}
+
+/* Information Box */
+.infoBox {
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+  border: 1px solid #7dd3fc;
+  border-radius: var(--border-radius-lg);
+  padding: 28px 32px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.infoContent h3 {
+  margin: 0 0 16px 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-gray-900);
+}
+
+.infoContent ul {
+  margin: 0;
+  padding-left: 20px;
+  list-style: disc;
+}
+
+.infoContent li {
+  margin-bottom: 10px;
+  color: var(--color-gray-700);
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.infoContent li:last-child {
+  margin-bottom: 0;
+}
+
+@media (max-width: 900px) {
+  .summaryCard,
+  .breakdownCard {
+    padding: 28px;
+  }
+
+  .summaryGrid {
+    gap: 20px;
+  }
+
+  .tableHeader,
+  .tableRow {
+    grid-template-columns: 2.2fr 1fr 1fr 1.2fr;
+    padding: 14px 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .page {
+    padding: 0 16px;
+  }
+
+  .title {
+    font-size: 24px;
+  }
+
+  .summaryCard,
+  .breakdownCard {
+    padding: 24px;
+  }
+
+  .summaryGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .summaryValue {
+    font-size: 22px;
+  }
+
+  .tableHeader,
+  .tableRow {
+    grid-template-columns: 1.8fr 0.9fr 0.9fr 1.1fr;
+    padding: 13px 16px;
+    font-size: 13px;
+  }
+
+  .objectName {
+    font-size: 13px;
+  }
+
+  .recordCount,
+  .deletedCount,
+  .storageSize {
+    font-size: 12px;
+  }
+
+  .deletedBadge {
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 640px) {
+  .title {
+    font-size: 20px;
+    gap: 8px;
+  }
+
+  .summaryCard,
+  .breakdownCard,
+  .infoBox {
+    padding: 20px;
+  }
+
+  .summaryGrid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .summaryValue {
+    font-size: 18px;
+  }
+
+  .breakdownTitle {
+    font-size: 16px;
+    margin-bottom: 16px;
+  }
+
+  .tableHeader {
+    grid-template-columns: 1.5fr 0.7fr 0.7fr;
+    padding: 12px 14px;
+    font-size: 10px;
+  }
+
+  .tableRow {
+    grid-template-columns: 1.5fr 0.7fr 0.7fr;
+    padding: 12px 14px;
+  }
+
+  .tableHeader > div:nth-child(4),
+  .tableRow > div:nth-child(4) {
+    display: none;
+  }
+
+  .recordCount,
+  .deletedCount {
+    font-size: 11px;
+  }
+
+  .deletedBadge {
+    font-size: 10px;
+    padding: 3px 6px;
+  }
+
+  .infoContent h3 {
+    font-size: 14px;
+    margin-bottom: 12px;
+  }
+
+  .infoContent li {
+    font-size: 13px;
+  }
+}

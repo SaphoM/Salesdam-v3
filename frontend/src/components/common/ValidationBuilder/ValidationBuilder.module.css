@@ -1,0 +1,313 @@
+/* ─── Wrapper ─────────────────────────────────────────────────── */
+.builder {
+  margin-top: var(--spacing-4);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  background: var(--color-white);
+  overflow: hidden;
+}
+
+/* ─── Header ──────────────────────────────────────────────────── */
+.header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-3) var(--spacing-4);
+  background: var(--color-gray-50);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.headerTitle {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-gray-600);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  flex: 1;
+}
+
+/* Shown when the panel is display-only (system fields). */
+.readOnlyNote {
+  font-size: 11px;
+  color: var(--color-gray-500);
+  font-style: italic;
+  white-space: nowrap;
+}
+
+/* Values stay legible rather than greyed to near-invisible — the surrounding
+   disabled fieldset already blocks interaction. */
+.builder[data-readonly] .body {
+  background: var(--color-gray-50);
+}
+
+.builder[data-readonly] input:disabled {
+  opacity: 1;
+  color: var(--color-gray-700);
+  cursor: not-allowed;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px var(--spacing-2);
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  border-radius: var(--border-radius-sm);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+}
+
+/* ─── Body (rule rows) ────────────────────────────────────────── */
+.body {
+  padding: var(--spacing-1) 0;
+}
+
+/* ─── Row ─────────────────────────────────────────────────────── */
+.row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--spacing-4);
+  padding: var(--spacing-2) var(--spacing-4);
+  border-bottom: 1px solid var(--color-gray-100);
+  min-height: 44px;
+}
+
+.row:last-child {
+  border-bottom: none;
+}
+
+.rowMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+  padding-top: 6px;
+}
+
+.rowLabel {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-gray-700);
+}
+
+.rowHint {
+  font-size: var(--font-size-xs);
+  color: var(--color-gray-400);
+  line-height: 1.3;
+}
+
+.rowControl {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  max-width: 220px;
+  width: 100%;
+}
+
+/* ─── Toggle ──────────────────────────────────────────────────── */
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  cursor: pointer;
+  user-select: none;
+}
+
+.toggle input {
+  display: none;
+}
+
+.toggleTrack {
+  position: relative;
+  display: inline-block;
+  width: 36px;
+  height: 20px;
+  border-radius: 10px;
+  background: var(--color-gray-200);
+  transition: background var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.toggleTrack[data-on='true'] {
+  background: var(--color-primary);
+}
+
+.toggleThumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  transition: transform var(--transition-fast);
+}
+
+.toggleTrack[data-on='true'] .toggleThumb {
+  transform: translateX(16px);
+}
+
+.toggleLabel {
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-700);
+}
+
+/* ─── Inputs ──────────────────────────────────────────────────── */
+.numInput,
+.textInput {
+  width: 100%;
+  padding: var(--spacing-1) var(--spacing-2);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  font-family: var(--font-family);
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-800);
+  background: var(--color-gray-50);
+  outline: none;
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
+  box-sizing: border-box;
+}
+
+.numInput:focus,
+.textInput:focus {
+  border-color: var(--color-primary);
+  background: var(--color-white);
+  box-shadow: 0 0 0 3px var(--color-primary-light);
+}
+
+.numInput::placeholder,
+.textInput::placeholder {
+  color: var(--color-gray-400);
+}
+
+.mono {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+}
+
+/* ─── Tag list ────────────────────────────────────────────────── */
+.tagList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1);
+  width: 100%;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px var(--spacing-2);
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  border-radius: var(--border-radius-sm);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+}
+
+.tagRemove {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+  padding: 0;
+  opacity: 0.7;
+}
+.tagRemove:hover {
+  opacity: 1;
+}
+
+.tagInput {
+  display: flex;
+  gap: var(--spacing-1);
+}
+
+.tagAdd {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  background: var(--color-gray-50);
+  color: var(--color-gray-500);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition:
+    background var(--transition-fast),
+    color var(--transition-fast);
+}
+.tagAdd:hover {
+  background: var(--color-gray-100);
+  color: var(--color-gray-700);
+}
+
+/* ─── Formula section ─────────────────────────────────────────── */
+.formulaSection {
+  border-top: 1px solid var(--border-color);
+}
+
+.formulaToggle {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  width: 100%;
+  padding: var(--spacing-3) var(--spacing-4);
+  background: none;
+  border: none;
+  font-family: var(--font-family);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-gray-700);
+  cursor: pointer;
+  text-align: left;
+  transition: background var(--transition-fast);
+}
+.formulaToggle:hover {
+  background: var(--color-gray-50);
+}
+
+.formulaActiveBadge {
+  display: inline-flex;
+  padding: 1px var(--spacing-2);
+  background: #dcfce7;
+  color: #16a34a;
+  border-radius: var(--border-radius-sm);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+}
+
+.formulaBody {
+  padding: var(--spacing-3) var(--spacing-4) var(--spacing-4);
+  border-top: 1px solid var(--border-color);
+  background: var(--color-gray-50);
+}
+
+.formulaHint {
+  font-size: var(--font-size-xs);
+  color: var(--color-gray-500);
+  margin: 0 0 var(--spacing-3);
+  line-height: 1.5;
+}
+
+.formulaHint code {
+  background: var(--color-gray-200);
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-family: var(--font-mono);
+}

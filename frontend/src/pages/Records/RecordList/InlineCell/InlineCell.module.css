@@ -1,0 +1,144 @@
+.inlineCell {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-1);
+  min-height: 24px;
+  padding: 2px 0;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.editableCell {
+  cursor: pointer;
+  border-radius: var(--border-radius-sm);
+}
+.editableCell:hover {
+  background: var(--color-primary-light);
+}
+.editableCell:hover .editIconBtn {
+  opacity: 1;
+}
+
+/* --cell-* are set by Table.module.css from the list's clip/wrap toggle and
+   inherit down to here; the fallbacks keep this cell clipping on its own. */
+.cellValue {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: var(--cell-white-space, nowrap);
+  overflow-wrap: var(--cell-overflow-wrap, normal);
+}
+
+.editIconBtn {
+  opacity: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: var(--border-radius-sm);
+  border: 1px solid transparent;
+  background: none;
+  color: var(--color-primary);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition:
+    opacity var(--transition-fast),
+    background var(--transition-fast);
+  padding: 0;
+}
+.editIconBtn:hover {
+  background: var(--color-primary-light);
+  border-color: var(--color-primary);
+}
+
+.inlineEditor {
+  display: flex;
+  align-items: center;
+  min-width: 120px;
+  width: 100%;
+}
+
+/* A rejected save keeps the editor open, so it stacks the message under the
+   input instead of sitting beside it. */
+.inlineEditor[data-error] {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 2px;
+}
+
+/* Recolour whichever control the field type rendered. */
+.inlineEditor[data-error] .inlineInput {
+  border-color: var(--color-danger);
+  box-shadow: 0 0 0 3px var(--color-danger-light);
+}
+
+.inlineError {
+  font-size: var(--font-size-xs);
+  line-height: 1.3;
+  color: var(--color-danger);
+  /* Long messages ("… must be unique. This value already exists.") would
+     otherwise stretch the column; clamp and expose the rest via the title. */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  white-space: normal;
+}
+
+.inlineInput {
+  width: 100%;
+  padding: 3px var(--spacing-2);
+  border: 2px solid var(--color-primary);
+  border-radius: var(--border-radius-sm);
+  font-size: var(--font-size-sm);
+  font-family: var(--font-family);
+  background: var(--color-white);
+  box-shadow: 0 0 0 3px var(--color-primary-light);
+  outline: none;
+}
+
+.cellSaving {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  color: var(--color-primary);
+  font-size: var(--font-size-xs);
+}
+
+.cellSpinner {
+  width: 12px;
+  height: 12px;
+  border: 2px solid var(--color-primary-light);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+  display: inline-block;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.badge {
+  display: inline-block;
+  max-width: 100%;
+  padding: 2px var(--spacing-2);
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  border-radius: var(--border-radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: middle;
+}
+
+.empty {
+  color: var(--color-gray-400);
+}

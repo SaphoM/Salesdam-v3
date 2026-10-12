@@ -1,0 +1,42 @@
+.card {
+  background: var(--color-white);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-lg);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-3) var(--spacing-5);
+  border-bottom: 1px solid var(--border-color);
+  background: var(--color-gray-50);
+}
+
+.cardIcon {
+  color: var(--color-primary);
+  flex-shrink: 0;
+}
+
+.cardTitle {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  margin: 0;
+  flex: 1;
+}
+
+.chartBody {
+  padding: var(--spacing-5);
+  flex: 1;
+}
+
+.empty {
+  text-align: center;
+  color: var(--color-gray-400);
+  font-size: var(--font-size-sm);
+  margin: 0;
+  padding: var(--spacing-8);
+}

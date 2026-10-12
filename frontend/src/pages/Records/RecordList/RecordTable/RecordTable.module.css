@@ -1,0 +1,119 @@
+.tableWrapper {
+  background: var(--color-white);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-xs);
+  /* Without these the table's intrinsic width can push the flex column — and
+     with it the page — wider than the viewport. The inner wrapper scrolls. */
+  min-width: 0;
+  max-width: 100%;
+}
+
+.mobileCards {
+  display: none;
+  flex-direction: column;
+  gap: var(--spacing-3);
+}
+
+.emptyState {
+  text-align: center;
+  padding: 2rem;
+  color: var(--color-gray-400);
+}
+
+.mobileCard {
+  background: var(--color-white);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-4);
+  cursor: pointer;
+  overflow: hidden;
+  transition: box-shadow var(--transition-fast);
+}
+
+.mobileCard:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.mobileCard.selected {
+  border-color: var(--color-primary);
+  background: var(--color-primary-light);
+}
+
+.mobileCardHeader {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: var(--spacing-2);
+  margin-bottom: var(--spacing-3);
+  overflow: hidden;
+}
+
+.mobileCardCheck {
+  flex-shrink: 0;
+}
+
+.mobileCardTitle {
+  min-width: 0;
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-gray-900);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mobileCardEdit {
+  flex-shrink: 0;
+  background: none;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-sm);
+  padding: var(--spacing-1) var(--spacing-2);
+  font-size: var(--font-size-xs);
+  color: var(--color-gray-600);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+  text-decoration: none;
+}
+
+.mobileCardEdit:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.mobileCardFields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-2);
+}
+
+.mobileCardLabel {
+  display: block;
+  font-size: var(--font-size-xs);
+  color: var(--color-gray-500);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 2px;
+}
+
+.mobileCardValue {
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-800);
+}
+
+@media (max-width: 768px) {
+  .tableWrapper {
+    display: none;
+  }
+  .mobileCards {
+    display: flex;
+  }
+}
+
+@media (max-width: 480px) {
+  .mobileCardFields {
+    grid-template-columns: 1fr;
+  }
+}

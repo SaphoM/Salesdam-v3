@@ -1,0 +1,306 @@
+﻿---
+import MainLayout from '../../layouts/MainLayout.astro';
+---
+
+<MainLayout title="Generating Quotes | Salesdam Docs" description="Create and manage sales quotes">
+  <div class="content-wrapper">
+    <h1>Generating Quotes</h1>
+
+    <p class="intro">Generate professional quotes from deals to send to clients for approval.</p>
+
+    <h2>Quote Workflow</h2>
+
+    <div class="workflow-steps">
+      <div class="step">Deal Created</div>
+      <div class="divider">→</div>
+      <div class="step">Add Line Items</div>
+      <div class="divider">→</div>
+      <div class="step">Generate Quote</div>
+      <div class="divider">→</div>
+      <div class="step">Send to Client</div>
+      <div class="divider">→</div>
+      <div class="step">Track Status</div>
+    </div>
+
+    <h2>Quote Fields</h2>
+
+    <table>
+      <tr>
+        <th>Field</th>
+        <th>Description</th>
+      </tr>
+      <tr>
+        <td>Quote Number</td>
+        <td>Auto-generated (e.g., QU-001001)</td>
+      </tr>
+      <tr>
+        <td>Quote Date</td>
+        <td>Date quote created</td>
+      </tr>
+      <tr>
+        <td>Validity Period</td>
+        <td>How long quote is valid (default 30 days)</td>
+      </tr>
+      <tr>
+        <td>Client</td>
+        <td>Company receiving quote</td>
+      </tr>
+      <tr>
+        <td>Contact Person</td>
+        <td>Primary contact</td>
+      </tr>
+      <tr>
+        <td>Line Items</td>
+        <td>Products/services included</td>
+      </tr>
+      <tr>
+        <td>Subtotal</td>
+        <td>Sum before tax/discount</td>
+      </tr>
+      <tr>
+        <td>Tax %</td>
+        <td>Tax percentage applied</td>
+      </tr>
+      <tr>
+        <td>Total</td>
+        <td>Final quote amount</td>
+      </tr>
+      <tr>
+        <td>Status</td>
+        <td>Draft, Sent, Accepted, Rejected</td>
+      </tr>
+    </table>
+
+    <h2>Generating a Quote</h2>
+
+    <h3>From Deal</h3>
+
+    <ol>
+      <li>Open the deal record</li>
+      <li>Verify line items are complete</li>
+      <li>Click "Generate Quote" button</li>
+      <li>Quote form appears with pre-filled data:
+        <ul>
+          <li>Client name</li>
+          <li>Line items from deal</li>
+          <li>Pricing from line items</li>
+          <li>Default tax rate</li>
+        </ul>
+      </li>
+      <li>Review and adjust as needed</li>
+      <li>Add terms and conditions (optional)</li>
+      <li>Add payment instructions</li>
+      <li>Click "Create Quote"</li>
+    </ol>
+
+    <h3>Quote Details to Configure</h3>
+
+    <pre><code>Quote Information:
+  - Quote Date (auto-filled)
+  - Validity Period (30 days default)
+  - Payment Terms (Net 30, etc.)
+
+Company Information:
+  - Your company name
+  - Logo (if configured)
+  - Contact information
+
+Client Information:
+  - Client company
+  - Billing address
+  - Shipping address (if applicable)
+
+Quote Terms:
+  - Payment instructions
+  - Terms & Conditions
+  - Cancellation policy
+  - Additional notes</code></pre>
+
+    <h2>Quote Templates</h2>
+
+    <p>Customize quote appearance:</p>
+
+    <ol>
+      <li>Go to Settings → Quote Settings</li>
+      <li>Configure company branding:
+        <ul>
+          <li>Company name</li>
+          <li>Logo upload</li>
+          <li>Footer text</li>
+          <li>Bank details</li>
+        </ul>
+      </li>
+      <li>Set default terms and conditions</li>
+      <li>Configure payment instructions</li>
+      <li>Set default validity period</li>
+    </ol>
+
+    <h2>Quote Actions</h2>
+
+    <h3>Send Quote</h3>
+
+    <ol>
+      <li>Open quote in Draft status</li>
+      <li>Click "Send Quote" button</li>
+      <li>Enter recipient email</li>
+      <li>Optional: Add cover message</li>
+      <li>Click "Send"</li>
+      <li>Quote status changes to "Sent"</li>
+      <li>Email sent with quote PDF</li>
+    </ol>
+
+    <h3>Download/Print Quote</h3>
+
+    <ol>
+      <li>Open quote</li>
+      <li>Click "Download PDF" button</li>
+      <li>PDF generated with formatting</li>
+      <li>Save to computer or print</li>
+    </ol>
+
+    <h3>Email Quote</h3>
+
+    <ol>
+      <li>Open quote</li>
+      <li>Click "Email" button</li>
+      <li>Compose message</li>
+      <li>Attach PDF</li>
+      <li>Send from your email</li>
+    </ol>
+
+    <h2>Quote Status Tracking</h2>
+
+    <table>
+      <tr>
+        <th>Status</th>
+        <th>Description</th>
+        <th>Action</th>
+      </tr>
+      <tr>
+        <td>Draft</td>
+        <td>Being prepared, not sent</td>
+        <td>Edit or send</td>
+      </tr>
+      <tr>
+        <td>Sent</td>
+        <td>Sent to client</td>
+        <td>Track response</td>
+      </tr>
+      <tr>
+        <td>Accepted</td>
+        <td>Client accepted</td>
+        <td>Convert to order</td>
+      </tr>
+      <tr>
+        <td>Rejected</td>
+        <td>Client declined</td>
+        <td>Archive or revise</td>
+      </tr>
+      <tr>
+        <td>Expired</td>
+        <td>Validity period passed</td>
+        <td>Generate new quote</td>
+      </tr>
+    </table>
+
+    <h2>Converting Quote to Order</h2>
+
+    <ol>
+      <li>Open quote with "Accepted" status</li>
+      <li>Click "Convert to Order" button</li>
+      <li>Review line items</li>
+      <li>Add shipping information (if applicable)</li>
+      <li>Set order date</li>
+      <li>Set delivery date</li>
+      <li>Click "Create Order"</li>
+      <li>Order created and linked to quote</li>
+      <li>Quote status changes to "Converted"</li>
+    </ol>
+
+    <h2>Quote Analytics</h2>
+
+    <ul>
+      <li>Quotes sent this period</li>
+      <li>Acceptance rate %</li>
+      <li>Average quote value</li>
+      <li>Total value of pending quotes</li>
+      <li>Average time to acceptance</li>
+      <li>Quote to order conversion rate</li>
+    </ul>
+
+    <h2>Best Practices</h2>
+
+    <ul>
+      <li>✓ Include all line items before generating</li>
+      <li>✓ Customize with company branding</li>
+      <li>✓ Set realistic validity periods</li>
+      <li>✓ Include clear payment terms</li>
+      <li>✓ Track quote status regularly</li>
+      <li>✓ Follow up before quote expires</li>
+      <li>✗ Don't send quotes without review</li>
+      <li>✗ Don't miss quote validity deadlines</li>
+      <li>✗ Don't forget to convert accepted quotes to orders</li>
+    </ul>
+
+    <div class="note">
+      <strong>💡 Tip:</strong> Set up quote templates for different product lines to speed up quote generation.
+    </div>
+
+    <h2>Next Steps</h2>
+
+    <ul>
+      <li><a href="/features/orders">Create Orders from Quotes</a></li>
+      <li><a href="/features/deal-line-items">Line Items</a></li>
+      <li><a href="/features/invoices">Generate Invoices</a></li>
+    </ul>
+
+    <div class="success">
+      <strong>✓ Quote Generated!</strong> Send to client and track acceptance. Next: <a href="/features/orders">Create Orders</a>.
+    </div>
+  </div>
+</MainLayout>
+
+<style>
+  .workflow-steps {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin: 30px 0;
+    padding: 20px;
+    background: var(--color-gray-50);
+    border-radius: 8px;
+  }
+
+  .step {
+    background: var(--surface);
+    border: 1px solid var(--border-color);
+    padding: 12px 16px;
+    border-radius: 6px;
+    font-weight: 500;
+    font-size: 14px;
+    white-space: nowrap;
+  }
+
+  .divider {
+    color: var(--color-gray-300);
+    font-size: 20px;
+  }
+
+  @media (max-width: 768px) {
+    .workflow-steps {
+      gap: 8px;
+      padding: 16px;
+    }
+
+    .step {
+      font-size: 12px;
+      padding: 10px 12px;
+    }
+
+    .divider {
+      font-size: 16px;
+    }
+  }
+</style>

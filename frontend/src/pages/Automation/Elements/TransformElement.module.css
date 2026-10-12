@@ -1,0 +1,66 @@
+.wrapper { display: flex; flex-direction: column; gap: var(--spacing-1); }
+
+.mappingList { display: flex; flex-direction: column; gap: var(--spacing-2); width: 100%; }
+
+.mappingRow {
+  display: grid;
+  grid-template-columns: 1fr 20px 1fr 140px 28px;
+  align-items: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-2) var(--spacing-3);
+  background: var(--color-white);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+}
+
+.fieldInput, .transformSel {
+  width: 100%;
+  padding: 6px var(--spacing-2);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-sm);
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-800);
+  background: var(--color-gray-50);
+  outline: none;
+  box-sizing: border-box;
+}
+.fieldInput:focus, .transformSel:focus {
+  border-color: var(--color-primary);
+  background: var(--color-white);
+}
+.fieldInput::placeholder { color: var(--color-gray-400); }
+
+.transformSel {
+  font-size: var(--font-size-xs);
+  color: #0284c7;
+  background: #f0f9ff;
+  border-color: #bae6fd;
+}
+
+.arrow {
+  text-align: center;
+  color: var(--color-gray-400);
+  font-size: var(--font-size-sm);
+  font-weight: bold;
+}
+
+.delBtn {
+  display: flex; align-items: center; justify-content: center;
+  width: 26px; height: 26px;
+  border: 1px solid var(--border-color); border-radius: var(--border-radius-sm);
+  background: none; color: var(--color-gray-400); cursor: pointer; font-size: 14px;
+  transition: all var(--transition-fast);
+}
+.delBtn:hover { background: var(--color-danger-light); color: var(--color-danger); border-color: var(--color-danger); }
+
+.addBtn {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: var(--font-size-xs); font-weight: var(--font-weight-medium);
+  color: var(--color-primary); background: none; border: none; cursor: pointer; padding: 2px 0;
+}
+.addBtn:hover { text-decoration: underline; }
+
+.empty {
+  font-size: var(--font-size-xs); color: var(--color-gray-400);
+  font-style: italic; margin: 0; padding: var(--spacing-2);
+}

@@ -1,0 +1,19 @@
+.page { display: flex; flex-direction: column; gap: var(--spacing-5); }
+.header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: var(--spacing-4); }
+.titleRow { display: flex; align-items: center; gap: var(--spacing-3); }
+.icon { color: var(--color-primary); }
+.title { font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); }
+.subtitle { font-size: var(--font-size-sm); color: var(--color-gray-500); margin-bottom: 0; }
+.actions { display: flex; gap: var(--spacing-3); align-items: center; }
+.search { padding: var(--spacing-2) var(--spacing-3); border: 1px solid var(--border-color); border-radius: var(--border-radius); font-size: var(--font-size-sm); }
+.slug { font-size: var(--font-size-xs); color: var(--color-gray-500); font-family: var(--font-mono); }
+.planBadge { font-size: 11px; padding: 2px 8px; background: var(--color-primary-light); color: var(--color-primary); border-radius: var(--border-radius-full); font-weight: var(--font-weight-medium); text-transform: capitalize; }
+.statusBadge { font-size: 11px; padding: 2px 8px; border-radius: var(--border-radius-full); font-weight: var(--font-weight-medium); text-transform: capitalize; }
+.active { background: var(--color-success-light); color: #166534; }
+.suspended { background: var(--color-warning-light); color: #92400e; }
+.deleted { background: var(--color-danger-light); color: #991b1b; }
+.rowActions { display: flex; gap: var(--spacing-2); }
+.activateBtn, .suspendBtn, .deleteBtn { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: var(--border-radius-sm); border: 1px solid var(--border-color); background: var(--color-white); cursor: pointer; transition: all var(--transition-fast); }
+.activateBtn { color: var(--color-success); } .activateBtn:hover { background: var(--color-success-light); }
+.suspendBtn { color: var(--color-warning); } .suspendBtn:hover { background: var(--color-warning-light); }
+.deleteBtn { color: var(--color-danger); } .deleteBtn:hover { background: var(--color-danger-light); }

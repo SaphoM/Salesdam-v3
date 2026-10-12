@@ -1,0 +1,385 @@
+---
+import DevLayout from '../../layouts/DevLayout.astro';
+const jsonOpen = '{';
+const jsonClose = '}';
+---
+
+<DevLayout
+  title="Architecture - Developer Guide - Mini CRM"
+  description="Technical architecture and system design of Mini CRM"
+>
+  <h1>Architecture</h1>
+
+  <p>
+    Mini CRM follows a MERN stack architecture with a clear separation between frontend
+    and backend. This document explains the system design, component interactions, and
+    key architectural decisions.
+  </p>
+
+  <h2>High-Level Architecture</h2>
+
+  <pre><code>┌─────────────────────────────────────────────────────────┐
+│                     Client Browser                       │
+│  ┌───────────────────────────────────────────────────┐  │
+│  │           React Frontend (Port 3000)              │  │
+│  │  - React Components                               │  │
+│  │  - Context API (State Management)                 │  │
+│  │  - Axios (HTTP Client)                            │  │
+│  │  - React Router (Navigation)                      │  │
+│  └───────────────────────────────────────────────────┘  │
+└───────────────────────┬─────────────────────────────────┘
+                        │ HTTP/REST
+                        │ (Session Cookie)
+┌───────────────────────▼─────────────────────────────────┐
+│         Express Backend Server (Port 5001)              │
+│  ┌───────────────────────────────────────────────────┐  │
+│  │  Middleware Stack                                 │  │
+│  │  - Session Management                             │  │
+│  │  - Authentication (requireAuth)                   │  │
+│  │  - Tenant Resolution (tenant)                     │  │
+│  │  - Permission Checking (permissions)              │  │
+│  └───────────────────────────────────────────────────┘  │
+│  ┌───────────────────────────────────────────────────┐  │
+│  │  Route Handlers                                   │  │
+│  │  - /api/auth    - Authentication                  │  │
+│  │  - /api/users   - User management                 │  │
+│  │  - /api/objects - Object metadata                 │  │
+│  │  - /api/records - Record CRUD                     │  │
+│  │  - /api/admin   - Automation, dashboards          │  │
+│  └───────────────────────────────────────────────────┘  │
+│  ┌───────────────────────────────────────────────────┐  │
+│  │  Controllers                                      │  │
+│  │  - Business logic                                 │  │
+│  │  - Data validation                                │  │
+│  │  - Response formatting                            │  │
+│  └───────────────────────────────────────────────────┘  │
+└───────────────────────┬─────────────────────────────────┘
+                        │ Mongoose ODM
+┌───────────────────────▼─────────────────────────────────┐
+│              MongoDB Database                            │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐     │
+│  │   Tenant    │  │    User     │  │  ObjectMeta │     │
+│  └─────────────┘  └─────────────┘  └─────────────┘     │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐     │
+│  │  FieldMeta  │  │   Session   │  │DynamicRecord│     │
+│  └─────────────┘  └─────────────┘  └─────────────┘     │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐     │
+│  │    Role     │  │ Automation  │  │  Dashboard  │     │
+│  └─────────────┘  └─────────────┘  └─────────────┘     │
+└─────────────────────────────────────────────────────────┘</code></pre>
+
+  <h2>Backend Architecture</h2>
+
+  <h3>Folder Structure</h3>
+  <pre><code>backend/
+├── app.js                 # Express app configuration
+├── server.js              # Server entry point
+├── controllers/           # Request handlers
+│   ├── authController.js      # Login, register, logout
+│   ├── userController.js      # User CRUD
+│   ├── objectController.js    # Object metadata
+│   ├── recordController.js    # Dynamic record CRUD
+│   ├── roleController.js      # Role management
+│   └── adminController.js     # Automation, dashboards
+├── models/                # Mongoose schemas
+│   ├── Tenant.js
+│   ├── User.js
+│   ├── Session.js
+│   ├── ObjectMeta.js
+│   ├── FieldMeta.js
+│   ├── DynamicRecord.js
+│   ├── Role.js
+│   ├── Automation.js
+│   └── Dashboard.js
+├── routes/                # Express routes
+│   ├── auth.js
+│   ├── users.js
+│   ├── objects.js
+│   ├── records.js
+│   └── admin.js
+├── middleware/            # Custom middleware
+│   ├── auth.js               # requireAuth
+│   ├── tenant.js             # Tenant resolution
+│   └── permissions.js        # Permission checks
+└── utils/                 # Helpers
+    ├── validators.js         # Input validation
+    └── errors.js             # Error handling</code></pre>
+
+  <h3>Request Flow</h3>
+  <ol>
+    <li><strong>Client Request:</strong> Browser sends HTTP request with session cookie</li>
+    <li><strong>Session Middleware:</strong> Validates session, loads session data</li>
+    <li><strong>Auth Middleware:</strong> Checks if user is authenticated (requireAuth)</li>
+    <li><strong>Tenant Middleware:</strong> Extracts tenantId from session, adds to req.tenant</li>
+    <li><strong>Permission Middleware:</strong> Verifies user has required permissions</li>
+    <li><strong>Route Handler:</strong> Calls appropriate controller function</li>
+    <li><strong>Controller:</strong> Executes business logic, queries database</li>
+    <li><strong>Database:</strong> MongoDB returns data via Mongoose</li>
+    <li><strong>Response:</strong> Controller sends JSON response to client</li>
+  </ol>
+
+  <h3>Middleware Stack</h3>
+  <pre><code>{'// app.js middleware order\napp.use(express.json());\napp.use(express.urlencoded({ extended: true }));\napp.use(session({\n  secret: process.env.SESSION_SECRET,\n  store: MongoStore.create({ mongoUrl }),\n  resave: false,\n  saveUninitialized: false,\n  cookie: {\n    maxAge: 24 * 60 * 60 * 1000,\n    httpOnly: true,\n    secure: process.env.NODE_ENV === "production"\n  }\n}));\n\n// Protected routes use:\nrouter.use(requireAuth);\nrouter.use(tenant);\nrouter.use(permissions("object", "read"));'}</code></pre>
+
+  <h2>Frontend Architecture</h2>
+
+  <h3>Folder Structure</h3>
+  <pre><code>frontend/src/
+├── App.jsx                # Root component
+├── main.jsx               # React entry point
+├── components/            # Reusable components
+│   ├── common/
+│   │   ├── Button/
+│   │   ├── Modal/
+│   │   ├── Table/
+│   │   └── Field/
+│   ├── layout/
+│   │   ├── Layout/
+│   │   ├── Sidebar/
+│   │   └── Topbar/
+│   ├── records/
+│   │   ├── RecordList/
+│   │   ├── RecordDetail/
+│   │   └── RecordForm/
+│   └── dashboard/
+│       ├── WidgetCard/
+│       └── WidgetConfigModal/
+├── pages/                 # Page components
+│   ├── Login.jsx
+│   ├── Register.jsx
+│   ├── Dashboard.jsx
+│   ├── ObjectList.jsx
+│   ├── ObjectDetail.jsx
+│   ├── RecordListPage.jsx
+│   └── SettingsPage.jsx
+├── context/               # React Context
+│   ├── AuthContext.jsx       # Authentication state
+│   └── AppContext.jsx        # Global app state
+├── hooks/                 # Custom hooks
+│   ├── useAuth.js
+│   ├── useObjects.js
+│   └── useRecords.js
+└── utils/                 # Utilities
+    ├── api.js                # Axios instance
+    └── helpers.js            # Helper functions</code></pre>
+
+  <h3>Component Hierarchy</h3>
+  <pre><code>App
+├── AuthContext.Provider
+│   └── AppContext.Provider
+│       ├── Router
+│       │   ├── /login → Login
+│       │   ├── /register → Register
+│       │   └── /* (protected) → Layout
+│       │       ├── Sidebar
+│       │       ├── Topbar
+│       │       └── Outlet (page content)
+│       │           ├── Dashboard
+│       │           ├── ObjectList → ObjectCard[]
+│       │           ├── ObjectDetail → FieldList
+│       │           ├── RecordListPage → Table
+│       │           └── RecordDetail → RelatedList[]</code></pre>
+
+  <h3>State Management</h3>
+  <p>Uses React Context API for global state:</p>
+
+  <h4>AuthContext</h4>
+  <pre><code>{`${jsonOpen}
+  user: ${ jsonOpen} id, name, email, role ${jsonClose},
+  tenant: ${jsonOpen} id, name ${jsonClose},
+  isAuthenticated: boolean,
+  login: (email, password) => Promise,
+  logout: () => Promise,
+  register: (data) => Promise
+${jsonClose}`}</code></pre>
+
+  <h4>AppContext</h4>
+  <pre><code>{`${jsonOpen}
+  objects: ObjectMeta[],
+  currentObject: ObjectMeta | null,
+  refreshObjects: () => Promise,
+  setCurrentObject: (object) => void
+${jsonClose}`}</code></pre>
+
+  <h2>Database Schema Design</h2>
+
+  <h3>Multi-Tenancy Pattern</h3>
+  <p>
+    Every collection includes a <code>tenantId</code> field. All queries filter by
+    tenant to ensure data isolation.
+  </p>
+
+  <pre><code>{`// Example query with tenant filter
+const records = await DynamicRecord.find(${jsonOpen}
+  tenantId: req.tenant._id,
+  objectApiName: 'customer'
+${jsonClose});`}</code></pre>
+
+  <h3>Dynamic Schema Pattern</h3>
+  <p>
+    Instead of creating MongoDB collections for each custom object, we use a flexible
+    schema:
+  </p>
+
+  <pre><code>{`// ObjectMeta defines the structure
+${jsonOpen}
+  tenantId: ObjectId,
+  label: "Customer",
+  apiName: "customer",
+  fields: [ref to FieldMeta]
+${jsonClose}
+
+// DynamicRecord stores actual data
+${jsonOpen}
+  tenantId: ObjectId,
+  objectApiName: "customer",
+  data: ${jsonOpen}
+    name: "Acme Corp",
+    email: "contact@acme.com",
+    revenue: 1000000
+  ${jsonClose}
+${jsonClose}`}</code></pre>
+
+  <h2>API Design</h2>
+
+  <h3>RESTful Conventions</h3>
+  <ul>
+    <li><strong>GET:</strong> Retrieve resources</li>
+    <li><strong>POST:</strong> Create new resources</li>
+    <li><strong>PUT/PATCH:</strong> Update existing resources</li>
+    <li><strong>DELETE:</strong> Remove resources</li>
+  </ul>
+
+  <h3>Response Format</h3>
+  <pre><code>{`// Success response
+${jsonOpen}
+  "success": true,
+  "data": ${jsonOpen} ... ${jsonClose},
+  "message": "Operation completed"
+${jsonClose}
+
+// Error response
+${jsonOpen}
+  "success": false,
+  "error": "Error message",
+  "code": "ERROR_CODE"
+${jsonClose}`}</code></pre>
+
+  <h3>Error Handling</h3>
+  <pre><code>{`// Centralized error handler
+app.use((err, req, res, next) => ${jsonOpen}
+  console.error(err.stack);
+  res.status(err.status || 500).json(${jsonOpen}
+    success: false,
+    error: err.message || 'Internal server error',
+    code: err.code
+  ${jsonClose});
+${jsonClose});`}</code></pre>
+
+  <h2>Security Architecture</h2>
+
+  <h3>Authentication Flow</h3>
+  <ol>
+    <li>User submits login credentials</li>
+    <li>Backend validates credentials with bcrypt</li>
+    <li>If valid, creates session in MongoDB</li>
+    <li>Returns session cookie to client</li>
+    <li>Client includes cookie in subsequent requests</li>
+    <li>Session middleware validates and loads session data</li>
+  </ol>
+
+  <h3>Authorization Layers</h3>
+  <ol>
+    <li><strong>Authentication:</strong> Is user logged in?</li>
+    <li><strong>Tenant Isolation:</strong> Does user belong to this tenant?</li>
+    <li><strong>Role Permissions:</strong> Does role allow this action?</li>
+    <li><strong>Object Permissions:</strong> Can user access this object?</li>
+    <li><strong>Record Ownership:</strong> Does user own this record?</li>
+  </ol>
+
+  <h3>Security Best Practices</h3>
+  <ul>
+    <li>Passwords hashed with bcrypt (10 rounds)</li>
+    <li>Session cookies are httpOnly and secure in production</li>
+    <li>All queries include tenant filter</li>
+    <li>Input validation on all endpoints</li>
+    <li>SQL injection prevented by Mongoose</li>
+    <li>XSS protection via React's escaping</li>
+    <li>CORS configured for frontend domain only</li>
+  </ul>
+
+  <h2>Performance Considerations</h2>
+
+  <h3>Database Indexes</h3>
+  <pre><code>{`// Key indexes
+User: ${jsonOpen} tenantId: 1, email: 1 ${jsonClose} (unique)
+ObjectMeta: ${jsonOpen} tenantId: 1, apiName: 1 ${jsonClose} (unique)
+DynamicRecord: ${jsonOpen} tenantId: 1, objectApiName: 1 ${jsonClose}
+Session: ${jsonOpen} sessionId: 1 ${jsonClose} (unique), ${jsonOpen} expiresAt: 1 ${jsonClose} (TTL)`}</code></pre>
+
+  <h3>Caching Strategy</h3>
+  <ul>
+    <li>ObjectMeta cached in memory (updated on change)</li>
+    <li>Session data cached by connect-mongo</li>
+    <li>Frontend caches API responses with React Query (future enhancement)</li>
+  </ul>
+
+  <h3>Query Optimization</h3>
+  <ul>
+    <li>Use select() to fetch only needed fields</li>
+    <li>Paginate large result sets</li>
+    <li>Limit related list queries</li>
+    <li>Use aggregate pipelines for complex queries</li>
+  </ul>
+
+  <h2>Scalability</h2>
+
+  <h3>Horizontal Scaling</h3>
+  <p>Backend is stateless (sessions in MongoDB), allowing multiple instances:</p>
+  <ul>
+    <li>Deploy multiple Express servers behind load balancer</li>
+    <li>MongoDB handles session synchronization</li>
+    <li>No sticky sessions required</li>
+  </ul>
+
+  <h3>Database Scaling</h3>
+  <ul>
+    <li>MongoDB replica sets for high availability</li>
+    <li>Sharding by tenantId for large deployments</li>
+    <li>Read replicas for analytics queries</li>
+  </ul>
+
+  <h2>Deployment Architecture</h2>
+
+  <pre><code>Production Setup:
+
+┌─────────────────┐
+│   Load Balancer │
+│     (Nginx)     │
+└────────┬────────┘
+         │
+    ┌────┴────┐
+    │         │
+┌───▼───┐ ┌──▼────┐
+│App 1  │ │App 2  │  ← Express instances
+└───┬───┘ └──┬────┘
+    │        │
+    └────┬───┘
+         │
+    ┌────▼────────┐
+    │   MongoDB   │
+    │ Replica Set │
+    └─────────────┘</code></pre>
+
+  <h2>Future Enhancements</h2>
+
+  <ul>
+    <li>Redis for session store (faster than MongoDB)</li>
+    <li>Message queue for async tasks (Bull/RabbitMQ)</li>
+    <li>ElasticSearch for advanced search</li>
+    <li>WebSocket support for real-time updates</li>
+    <li>CDN for frontend static assets</li>
+    <li>Docker containers for deployment</li>
+    <li>Kubernetes for orchestration</li>
+  </ul>
+</DevLayout>

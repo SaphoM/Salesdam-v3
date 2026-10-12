@@ -1,0 +1,44 @@
+---
+import MainLayout from '../../layouts/MainLayout.astro';
+import ApiExplorer from '../../components/ApiExplorer.astro';
+import { UNDOCUMENTED_MOUNTS } from '../../data/openapi.js';
+---
+
+<MainLayout
+  title="Endpoint Explorer"
+  description="Every documented Salesdam API endpoint, with schemas and a live request runner."
+>
+  <h1>Endpoint Explorer</h1>
+  <p class="lead">
+    Every documented endpoint, grouped by resource. Expand one to see its
+    parameters, request body and responses — then send a real request from the
+    same panel.
+  </p>
+
+  <div class="note">
+    <strong>Requests here are real.</strong> The runner sends to your configured
+    API and writes to live tenant data. Try destructive calls
+    (<code>DELETE</code>, <code>bulk-delete</code>) against a development tenant,
+    not production.
+  </div>
+
+  <ApiExplorer />
+
+  <h2>Not documented yet</h2>
+  <p>
+    These routes exist and are mounted, but aren't described above. They are
+    listed so you can tell "undocumented" from "doesn't exist" — treat their
+    shapes as unstable until they're written up.
+  </p>
+  <p class="mount-list">
+    {UNDOCUMENTED_MOUNTS.map((m) => <code>{m}</code>)}
+  </p>
+</MainLayout>
+
+<style>
+  .mount-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-2);
+  }
+</style>

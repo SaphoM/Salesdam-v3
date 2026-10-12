@@ -1,0 +1,45 @@
+# Salesdam Insurance Workspace - Production Environment
+# Copy to /etc/salesdam/environment and fill in values
+
+# Database
+MONGODB_URI=mongodb://localhost:27017/salesdam?replicaSet=rs0
+
+# Server
+NODE_ENV=production
+PORT=5002
+CORS_ORIGIN=https://salesdam.example.com
+
+# Session
+SESSION_SECRET=your-super-secret-session-key-min-32-chars
+SESSION_COOKIE_DOMAIN=.example.com
+SESSION_COOKIE_SECURE=true
+
+# SMTP (for email delivery)
+SMTP_HOST=smtp.example.com
+SMTP_PORT=587
+SMTP_SECURE=false
+SMTP_USER=noreply@example.com
+SMTP_PASS=your-smtp-password
+SMTP_FROM="Salesdam Insurance <noreply@example.com>"
+SMTP_FROM_EMAIL=noreply@example.com
+
+# Frontend URL (for email links)
+APP_URL=https://salesdam.example.com
+
+# JWT (for API keys)
+JWT_SECRET=your-jwt-secret-min-32-chars
+
+# External integrations (fill in when available)
+EUHORIA_API_KEY=
+EUHORIA_API_SECRET=
+META_APP_ID=
+META_APP_SECRET=
+WHATSAPP_API_KEY=
+WHATSAPP_PHONE_NUMBER_ID=
+PAY_AT_MERCHANT_ID=
+PAY_AT_PASSWORD=
+EASYPAY_MERCHANT_ID=
+EASYPAY_PASSWORD=
+PAYMENT_GATEWAY_API_KEY=
+UNDERWRITER_API_ENDPOINT=
+UNDERWRITER_API_KEY=

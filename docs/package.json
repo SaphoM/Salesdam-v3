@@ -1,0 +1,18 @@
+{
+  "name": "salesdam-docs",
+  "version": "1.0.0",
+  "description": "Salesdam CRM Documentation Website",
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "check:links": "node scripts/check-links.mjs",
+    "build": "npm run check:links && astro build",
+    "build:only": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "astro": "^4.0.0",
+    "lucide-astro": "^0.556.0"
+  }
+}
