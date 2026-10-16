@@ -123,6 +123,10 @@ try {
   const waCap = (capRes.json?.data || []).find((c) => c.channel === 'whatsapp');
   check('the capabilities endpoint exposes channel support', capRes.status === 200 && waCap?.templates === true, `templates=${waCap?.templates}`);
 
+  const provRes = await req('/api/v1/channels/providers', { cookie: cookieAdmin });
+  const metaProv = (provRes.json?.data || []).find((p) => p.provider === 'meta');
+  check('the provider catalog lists required credentials and normalizer support', provRes.status === 200 && metaProv?.requiredCredentials?.includes('phoneNumberId') && metaProv?.inboundNormalizer === true, `creds=${metaProv?.requiredCredentials}`);
+
   const waCreate = await req('/api/v1/channels', {
     method: 'POST', cookie: cookieAdmin,
     body: {
@@ -134,6 +138,9 @@ try {
   const waId = waCreate.json?.data?._id;
   check('an admin can register a channel account', waCreate.status === 201, `HTTP ${waCreate.status}`);
   check('provider secrets are never returned', !('webhookSecret' in (waCreate.json?.data || {})) && !('credentials' in (waCreate.json?.data || {})), `keys=${Object.keys(waCreate.json?.data || {}).join(',')}`);
+
+  const validateWa = await req(`/api/v1/channels/${waId}/validate`, { method: 'POST', cookie: cookieAdmin });
+  check('provider config validation reports missing credentials', validateWa.status === 200 && validateWa.json?.data?.valid === false && (validateWa.json?.data?.missing || []).includes('phoneNumberId'), `missing=${(validateWa.json?.data?.missing || []).join(',')}`);
 
   const stdCreate = await req('/api/v1/channels', {
     method: 'POST', cookie: cookieAgent,
@@ -177,6 +184,24 @@ try {
   check('the inbox lists open conversations', list.status === 200 && list.json?.data?.length === 1, `count=${list.json?.data?.length}`);
   const unassigned = await req('/api/v1/conversations?assigned=unassigned', { cookie: cookieAgent });
   check('the inbox can filter unassigned conversations', unassigned.json?.data?.length === 1, `count=${unassigned.json?.data?.length}`);
+
+  // ── Real provider payload normalization (§16.1) ─────────────────────────
+  const metaPayload = {
+    object: 'whatsapp_business_account',
+    entry: [{ id: '123', changes: [{ field: 'messages', value: {
+      messaging_product: 'whatsapp',
+      metadata: { display_phone_number: '27110000000', phone_number_id: 'pn1' },
+      contacts: [{ profile: { name: 'Meta User' }, wa_id: '27829998888' }],
+      messages: [{ from: '27829998888', id: 'wamid.TEST1', timestamp: '1700000000', type: 'text', text: { body: 'Hello via Meta' } }],
+      statuses: [{ id: 'wamid.TEST1', status: 'delivered', timestamp: '1700000001', recipient_id: '27829998888' }],
+    } }] }],
+  };
+  const okMeta = await signedPost(`/api/v1/channels/webhook/whatsapp/${waId}`, 'wa-secret', metaPayload);
+  check('a provider-shaped Meta payload is normalized and ingested', okMeta.status === 202 && okMeta.json?.data?.accepted === 2, `accepted=${okMeta.json?.data?.accepted}`);
+  const metaMsg = await Message.findOne({ tenantId: tenantAId, externalMessageId: 'wamid.TEST1' });
+  check('the normalized message is stored and its status event applied', Boolean(metaMsg) && metaMsg.status === 'delivered', `status=${metaMsg?.status}`);
+  const metaConv = metaMsg ? await Conversation.findById(metaMsg.conversationId) : null;
+  check('the normalized contact name is captured', metaConv?.contactName === 'Meta User', `name=${metaConv?.contactName}`);
 
   const accept = await req(`/api/v1/conversations/${convId}/assign`, { method: 'POST', cookie: cookieAgent, body: {} });
   check('an agent can accept a conversation', String(accept.json?.data?.assignedTo?._id || accept.json?.data?.assignedTo) === String(agent._id), `assignedTo=${accept.json?.data?.assignedTo}`);
@@ -247,6 +272,12 @@ try {
   const callActivity = await Activity.findOne({ tenantId: tenantAId, type: 'call', recordId: contact._id });
   check('the call is logged against the matched record', Boolean(callActivity), `found=${Boolean(callActivity)}`);
   check('the call log captures duration and recording link', callActivity?.metadata?.durationSeconds === 120 && callActivity?.metadata?.recordingUrl === 'https://rec.example.com/1', `duration=${callActivity?.metadata?.durationSeconds}`);
+
+  // ── Telephony provider readiness (§18.5) ────────────────────────────────
+  const telProviders = await req('/api/v1/telephony/providers', { cookie: cookieAgent });
+  check('the telephony provider catalog is exposed', telProviders.status === 200 && telProviders.json?.data?.some((p) => p.provider === 'euphoria' && p.callControlImplemented === false), `providers=${(telProviders.json?.data || []).map((p) => p.provider).join(',')}`);
+  const dialRes = await req('/api/v1/telephony/calls', { method: 'POST', cookie: cookieAgent, body: { provider: 'euphoria', to: '+27821234567' } });
+  check('outbound call control declines explicitly until a provider is wired', dialRes.status === 501, `HTTP ${dialRes.status}`);
 
   // ── Inactive account & isolation ────────────────────────────────────────
   await ChannelAccount.updateOne({ _id: waId }, { $set: { isActive: false } });

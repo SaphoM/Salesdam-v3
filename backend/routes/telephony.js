@@ -6,6 +6,8 @@ import {
   getDispositions,
   wrapUp,
   callHistory,
+  listProviders,
+  dial,
 } from '../controllers/telephonyController.js';
 import { requireAuth, requireAdmin } from '../middleware/auth.js';
 import { enforceTenant } from '../middleware/tenant.js';
@@ -19,6 +21,8 @@ router.put('/status/me', setMyStatus);
 router.get('/status', requireAdmin, listStatuses);
 
 router.get('/dispositions', getDispositions);
+router.get('/providers', listProviders);
+router.post('/calls', dial);
 router.get('/calls', callHistory);
 router.post('/calls/:activityId/wrap-up', wrapUp);
 

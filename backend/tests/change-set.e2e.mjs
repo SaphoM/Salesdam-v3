@@ -27,6 +27,7 @@ import DuplicateRule from '../models/DuplicateRule.js';
 import TenantConfiguration from '../models/TenantConfiguration.js';
 import ChangeSet from '../models/ChangeSet.js';
 import DeploymentLog from '../models/DeploymentLog.js';
+import DynamicRecord from '../models/DynamicRecord.js';
 import { seedDefaultRoles } from '../services/roleService.js';
 
 const RUN = Date.now().toString(36);
@@ -68,6 +69,7 @@ const loginCookie = async (username) => {
 
 let sandboxId = null;
 let prodId = null;
+let cloneId = null;
 
 try {
   await connectDB();
@@ -282,18 +284,83 @@ try {
   const adminLog = await req(`/api/v1/change-sets/deployment-log?targetTenantId=${prodId}`, { cookie: cookieAdminA });
   check('an admin cannot read another tenant deployment log', adminLog.status === 403, `HTTP ${adminLog.status}`);
 
+  // Rollback (13): undo a deployment by restoring pre-deployment state.
+  const rollbackRes = await req(
+    `/api/v1/change-sets/deployment-log/${deployedLog._id}/rollback`,
+    { method: 'POST', cookie: cookieSuperA },
+  );
+  check('a deployed change set can be rolled back', rollbackRes.status === 200, `HTTP ${rollbackRes.status}`);
+  check('rollback removes objects created by the deployment', !(await ObjectMeta.findOne({ tenantId: prodId, apiName: 'claim' })));
+  check('rollback removes the deployed flow', !(await Automation.findOne({ tenantId: prodId, apiName: 'claim_flow' })));
+  check('rollback removes the deployed tenant-config override', !(await TenantConfiguration.findOne({ tenantId: prodId, key: 'approvals.threshold_amount' })));
+
+  const rolledLog = await DeploymentLog.findById(deployedLog._id);
+  check('the deployment log is marked rolled back', rolledLog?.status === 'rolled_back', `status=${rolledLog?.status}`);
+
+  const rollbackAgain = await req(
+    `/api/v1/change-sets/deployment-log/${deployedLog._id}/rollback`,
+    { method: 'POST', cookie: cookieSuperA },
+  );
+  check('a deployment cannot be rolled back twice', rollbackAgain.status === 409, `HTTP ${rollbackAgain.status}`);
+
+  // Rollback restores a pre-existing component instead of deleting it.
+  await ObjectMeta.create({
+    tenantId: prodId, name: 'Claim', label: 'PRE-EXISTING', pluralLabel: 'Claims',
+    apiName: 'claim', nameFieldApiName: 'name', isActive: true,
+  });
+  await req(`/api/v1/change-sets/${pkg2Id}/deploy`, { method: 'POST', cookie: cookieSuperA, body: { targetTenantId: String(prodId) } });
+  const restoreLog = await DeploymentLog.findOne({ tenantId: prodId, status: 'deployed' }).sort({ at: -1 });
+  await req(`/api/v1/change-sets/deployment-log/${restoreLog._id}/rollback`, { method: 'POST', cookie: cookieSuperA });
+  const restored = await ObjectMeta.findOne({ tenantId: prodId, apiName: 'claim' });
+  check('rollback restores a pre-existing component instead of deleting it', restored?.label === 'PRE-EXISTING', `label=${restored?.label}`);
+  check('rollback still removes components that did not pre-exist', !(await Automation.findOne({ tenantId: prodId, apiName: 'claim_flow' })));
+
+  // Sandbox cloning (13): clone configuration into an isolated tenant, no data.
+  await DynamicRecord.create({
+    tenantId: sandboxId, objectId: objClaim._id, objectApiName: 'claim',
+    data: { name: 'CLAIM-1' },
+  });
+  const cloneRes = await req('/api/v1/change-sets/sandbox', {
+    method: 'POST', cookie: cookieSuperA,
+    body: { sourceTenantId: String(sandboxId), name: `ZZ_CLONE_${RUN}` },
+  });
+  cloneId = cloneRes.json?.data?.tenant?._id;
+  check('a sandbox tenant can be cloned from a source tenant', cloneRes.status === 201 && Boolean(cloneId), `HTTP ${cloneRes.status}`);
+  check('the clone is marked as a sandbox of its source', cloneRes.json?.data?.tenant?.isSandbox === true && String(cloneRes.json?.data?.tenant?.clonedFromTenantId) === String(sandboxId), `from=${cloneRes.json?.data?.tenant?.clonedFromTenantId}`);
+
+  const cloneObj = await ObjectMeta.findOne({ tenantId: cloneId, apiName: 'claim' });
+  const cloneFields = await FieldMeta.find({ tenantId: cloneId, objectApiName: 'claim' }).select('apiName').lean();
+  const cloneConfig = await TenantConfiguration.findOne({ tenantId: cloneId, key: 'approvals.threshold_amount' });
+  check('the clone receives the source objects and fields', Boolean(cloneObj) && cloneFields.length === 3, `fields=${cloneFields.length}`);
+  check('the clone receives tenant-config overrides', String(cloneConfig?.value) === '5000', `value=${cloneConfig?.value}`);
+
+  const cloneLayout = await Layout.findOne({ tenantId: cloneId, objectApiName: 'claim', name: 'Claim Detail' });
+  const cloneAdminRole = await Role.findOne({ tenantId: cloneId, name: 'admin' });
+  check('clone role references resolve to the clone tenant', (cloneLayout?.assignedRoles || []).map(String).includes(String(cloneAdminRole?._id)), `roles=${(cloneLayout?.assignedRoles || []).join(',')}`);
+
+  const cloneRecords = await DynamicRecord.countDocuments({ tenantId: cloneId });
+  check('the clone receives no business data', cloneRecords === 0, `records=${cloneRecords}`);
+
+  // RBAC: sandbox cloning is operator-level.
+  const adminClone = await req('/api/v1/change-sets/sandbox', {
+    method: 'POST', cookie: cookieAdminA,
+    body: { sourceTenantId: String(sandboxId), name: `ZZ_NOPE_${RUN}` },
+  });
+  check('an admin cannot clone a tenant', adminClone.status === 403, `HTTP ${adminClone.status}`);
+
   // Tenant isolation.
   const prodPackages = await req('/api/v1/change-sets', { cookie: cookieAdminB });
   check('packages are scoped to the tenant that exported them', prodPackages.status === 200 && prodPackages.json?.data?.length === 0, `count=${prodPackages.json?.data?.length}`);
 } catch (err) {
   check('test harness ran without error', false, err.message);
 } finally {
-  const ids = [sandboxId, prodId].filter(Boolean);
+  const ids = [sandboxId, prodId, cloneId].filter(Boolean);
   if (ids.length) {
     await Tenant.deleteMany({ _id: { $in: ids } });
     const cleanup = [
       User, Role, Session, ObjectMeta, FieldMeta, Layout, Automation,
       ApprovalProcess, DuplicateRule, TenantConfiguration, ChangeSet, DeploymentLog,
+      DynamicRecord,
     ];
     await Promise.all(cleanup.map((M) => M.deleteMany({ tenantId: { $in: ids } }).catch(() => {})));
   }

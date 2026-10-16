@@ -1,4 +1,5 @@
 import ChangeSet from '../models/ChangeSet.js';
+import DeploymentLog from '../models/DeploymentLog.js';
 import changeSetService from '../services/changeSetService.js';
 import { asyncHandler, sendSuccess, AppError } from '../utils/errors.js';
 
@@ -89,6 +90,28 @@ const deploymentLog = asyncHandler(async (req, res) => {
   });
 });
 
+const rollbackDeployment = asyncHandler(async (req, res) => {
+  const log = await DeploymentLog.findById(req.params.logId);
+  if (!log) throw new AppError('Deployment log not found.', 404);
+  const result = await changeSetService.rollback({ log, user: req.user });
+  sendSuccess(res, { data: result }, 'Deployment rolled back');
+});
+
+const cloneSandbox = asyncHandler(async (req, res) => {
+  const { sourceTenantId, name } = req.body || {};
+  const result = await changeSetService.cloneConfiguration({
+    sourceTenantId: sourceTenantId || req.tenantId,
+    name,
+    user: req.user,
+  });
+  sendSuccess(
+    res,
+    { data: result },
+    `Sandbox tenant created (${result.componentCount} components)`,
+    201,
+  );
+});
+
 export {
   createChangeSet,
   listChangeSets,
@@ -96,4 +119,6 @@ export {
   validateChangeSet,
   deployChangeSet,
   deploymentLog,
+  rollbackDeployment,
+  cloneSandbox,
 };

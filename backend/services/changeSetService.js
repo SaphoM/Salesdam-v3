@@ -9,6 +9,8 @@ import DuplicateRule from '../models/DuplicateRule.js';
 import TenantConfiguration from '../models/TenantConfiguration.js';
 import Role from '../models/Role.js';
 import User from '../models/User.js';
+import Tenant from '../models/Tenant.js';
+import { seedDefaultRoles } from './roleService.js';
 import { AppError } from '../utils/errors.js';
 import logger from '../utils/logger.js';
 
@@ -482,6 +484,182 @@ const PERSISTERS = {
   },
 };
 
+const _DELETE_BY_KEY = {
+  object: (tenantId, key) => ObjectMeta.deleteOne({ tenantId, apiName: key }),
+  field: (tenantId, key) => {
+    const parts = _splitKey(key, '.');
+    return parts
+      ? FieldMeta.deleteOne({ tenantId, objectApiName: parts[0], apiName: parts[1] })
+      : null;
+  },
+  layout: (tenantId, key) => {
+    const parts = _splitKey(key, ':');
+    return parts
+      ? Layout.deleteOne({ tenantId, objectApiName: parts[0], name: parts[1] })
+      : null;
+  },
+  flow: (tenantId, key) => Automation.deleteOne({ tenantId, apiName: key }),
+  approval_process: (tenantId, key) => {
+    const parts = _splitKey(key, ':');
+    return parts
+      ? ApprovalProcess.deleteOne({
+          tenantId,
+          objectApiName: parts[0],
+          name: parts[1],
+        })
+      : null;
+  },
+  duplicate_rule: (tenantId, key) => {
+    const parts = _splitKey(key, ':');
+    return parts
+      ? DuplicateRule.deleteOne({
+          tenantId,
+          objectApiName: parts[0],
+          name: parts[1],
+        })
+      : null;
+  },
+  tenant_config: (tenantId, key) =>
+    TenantConfiguration.deleteOne({ tenantId, key }),
+};
+
+const _ordered = (components) =>
+  [...(components || [])].sort(
+    (a, b) =>
+      COMPONENT_ORDER.indexOf(a.componentType) -
+      COMPONENT_ORDER.indexOf(b.componentType),
+  );
+
+/**
+ * Apply packaged components to a target tenant, parents before children
+ * (shared by cross-tenant deploy and sandbox cloning). Returns each component's
+ * pre-application snapshot (or null) so a deployment can be rolled back (§13).
+ */
+const persistComponents = async (targetTenantId, components, warnings = []) => {
+  const manifest = [];
+  for (const component of _ordered(components)) {
+    const before = await SNAPSHOTTERS[component.componentType](
+      targetTenantId,
+      component.componentKey,
+    );
+    await PERSISTERS[component.componentType](
+      targetTenantId,
+      component.snapshot,
+      warnings,
+    );
+    manifest.push({
+      componentType: component.componentType,
+      componentKey: component.componentKey,
+      before,
+    });
+  }
+  return manifest;
+};
+
+/** Every metadata component a tenant currently owns (for cloning). */
+const collectAll = async (tenantId) => {
+  const [objects, fields, layouts, flows, approvals, duplicateRules, configs] =
+    await Promise.all([
+      ObjectMeta.find({ tenantId }).select('apiName').lean(),
+      FieldMeta.find({ tenantId }).select('objectApiName apiName').lean(),
+      Layout.find({ tenantId }).select('objectApiName name').lean(),
+      Automation.find({ tenantId }).select('apiName').lean(),
+      ApprovalProcess.find({ tenantId }).select('objectApiName name').lean(),
+      DuplicateRule.find({ tenantId }).select('objectApiName name').lean(),
+      TenantConfiguration.find({ tenantId }).select('key').lean(),
+    ]);
+
+  const seen = new Set();
+  const components = [];
+  const push = async (componentType, componentKey) => {
+    const dedupe = `${componentType}:${componentKey}`;
+    if (seen.has(dedupe)) return;
+    seen.add(dedupe);
+    const snapshot = await SNAPSHOTTERS[componentType](tenantId, componentKey);
+    if (snapshot) components.push({ componentType, componentKey, snapshot });
+  };
+
+  for (const doc of objects) await push('object', doc.apiName);
+  for (const doc of fields)
+    await push('field', `${doc.objectApiName}.${doc.apiName}`);
+  for (const doc of layouts)
+    await push('layout', `${doc.objectApiName}:${doc.name}`);
+  for (const doc of flows) await push('flow', doc.apiName);
+  for (const doc of approvals)
+    await push('approval_process', `${doc.objectApiName}:${doc.name}`);
+  for (const doc of duplicateRules)
+    await push('duplicate_rule', `${doc.objectApiName}:${doc.name}`);
+  for (const doc of configs) await push('tenant_config', doc.key);
+
+  return components;
+};
+
+/**
+ * Clone a tenant's configuration into a new isolated sandbox tenant with no
+ * business data (Core BRD §13). Default roles are seeded so role references
+ * remap by name.
+ */
+const cloneConfiguration = async ({ sourceTenantId, name, user }) => {
+  const source = await Tenant.findById(sourceTenantId).lean();
+  if (!source) throw new AppError('Source tenant not found.', 404);
+
+  const components = await collectAll(sourceTenantId);
+
+  const suffix = Math.random().toString(36).slice(2, 8);
+  const clone = await Tenant.create({
+    name: name || `${source.name} (Sandbox ${suffix})`,
+    hub: source.hub,
+    plan: source.plan,
+    status: 'active',
+    isSandbox: true,
+    clonedFromTenantId: source._id,
+    ownerEmail: source.ownerEmail || user?.email,
+  });
+  await seedDefaultRoles(clone._id);
+
+  const warnings = [];
+  await persistComponents(String(clone._id), components, warnings);
+
+  logger.info(
+    `Cloned ${components.length} components from tenant ${sourceTenantId} into sandbox tenant ${clone._id}`,
+  );
+  return { tenant: clone, componentCount: components.length, warnings };
+};
+
+/**
+ * Undo a deployment by restoring each component to its pre-deployment state
+ * (recreate the previous snapshot, or delete if it did not exist). Reverse
+ * order removes children before the objects they hang off (§13).
+ */
+const rollback = async ({ log, user }) => {
+  if (!log) throw new AppError('Deployment log not found.', 404);
+  if (log.status !== 'deployed') {
+    throw new AppError(
+      `Only a deployed change set can be rolled back (status: ${log.status}).`,
+      409,
+    );
+  }
+
+  const tenantId = log.tenantId;
+  const warnings = [];
+  for (const entry of [...(log.rollback || [])].reverse()) {
+    const remove = _DELETE_BY_KEY[entry.componentType];
+    if (entry.before == null) await remove(tenantId, entry.componentKey);
+    else await PERSISTERS[entry.componentType](tenantId, entry.before, warnings);
+  }
+
+  log.status = 'rolled_back';
+  log.rolledBackAt = new Date();
+  log.rolledBackBy = user?._id;
+  log.warnings = [...(log.warnings || []), ...warnings];
+  await log.save();
+
+  logger.info(
+    `Change set '${log.changeSetName}' rolled back on tenant ${tenantId}`,
+  );
+  return { log, warnings };
+};
+
 const deploy = async ({ changeSet, targetTenantId, user }) => {
   if (String(targetTenantId) === String(changeSet.tenantId)) {
     throw new AppError('Source and target tenant must differ.', 400);
@@ -518,18 +696,11 @@ const deploy = async ({ changeSet, targetTenantId, user }) => {
   }
 
   const warnings = [];
-  const ordered = [...(changeSet.components || [])].sort(
-    (a, b) =>
-      COMPONENT_ORDER.indexOf(a.componentType) -
-      COMPONENT_ORDER.indexOf(b.componentType),
+  const rollbackManifest = await persistComponents(
+    targetTenantId,
+    changeSet.components,
+    warnings,
   );
-  for (const component of ordered) {
-    await PERSISTERS[component.componentType](
-      targetTenantId,
-      component.snapshot,
-      warnings,
-    );
-  }
 
   const log = await DeploymentLog.create({
     tenantId: targetTenantId,
@@ -537,8 +708,9 @@ const deploy = async ({ changeSet, targetTenantId, user }) => {
     changeSetId: changeSet._id,
     changeSetName: changeSet.name,
     status: 'deployed',
-    componentCount: ordered.length,
+    componentCount: rollbackManifest.length,
     warnings,
+    rollback: rollbackManifest,
     message: 'Deployment succeeded.',
     by: user?._id,
   });
@@ -553,9 +725,9 @@ const deploy = async ({ changeSet, targetTenantId, user }) => {
   await changeSet.save();
 
   logger.info(
-    `Change set '${changeSet.name}' deployed to tenant ${targetTenantId} (${ordered.length} components)`,
+    `Change set '${changeSet.name}' deployed to tenant ${targetTenantId} (${rollbackManifest.length} components)`,
   );
-  return { log, warnings, componentCount: ordered.length };
+  return { log, warnings, componentCount: rollbackManifest.length };
 };
 
 const listDeploymentLog = async ({ tenantId, limit, skip }) => {
@@ -569,4 +741,13 @@ const listDeploymentLog = async ({ tenantId, limit, skip }) => {
   return { items, total, limit: size, skip: offset };
 };
 
-export default { COMPONENT_TYPES, build, validate, deploy, listDeploymentLog };
+export default {
+  COMPONENT_TYPES,
+  build,
+  validate,
+  deploy,
+  rollback,
+  cloneConfiguration,
+  collectAll,
+  listDeploymentLog,
+};

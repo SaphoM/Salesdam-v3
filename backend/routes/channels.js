@@ -2,10 +2,12 @@ import express from 'express';
 import {
   listAccounts,
   capabilities,
+  providers,
   getAccount,
   createAccount,
   updateAccount,
   deleteAccount,
+  validateAccount,
   webhook,
 } from '../controllers/channelController.js';
 import { requireAuth, requireAdmin } from '../middleware/auth.js';
@@ -18,10 +20,12 @@ const router = express.Router();
 router.post('/webhook/:channel/:accountId', webhook);
 
 router.get('/capabilities', requireAuth, enforceTenant, capabilities);
+router.get('/providers', requireAuth, enforceTenant, providers);
 
 router.use(requireAuth, enforceTenant, requireAdmin);
 router.get('/', listAccounts);
 router.post('/', createAccount);
+router.post('/:id/validate', validateAccount);
 router.get('/:id', getAccount);
 router.put('/:id', updateAccount);
 router.delete('/:id', deleteAccount);

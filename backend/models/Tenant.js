@@ -33,6 +33,9 @@ const tenantSchema = new mongoose.Schema(
       enum: ['marketplace', 'paystack', 'manual'],
       default: 'manual',
     },
+    // Marks a cloned, isolated configuration tenant (Core BRD §13).
+    isSandbox: { type: Boolean, default: false, index: true },
+    clonedFromTenantId: { type: mongoose.Schema.Types.ObjectId, ref: 'Tenant' },
     settings: {
       timezone: { type: String, default: 'UTC' },
       dateFormat: { type: String, default: 'MM/DD/YYYY' },

@@ -1,5 +1,16 @@
 import telephonyService from '../services/telephonyService.js';
+import telephonyProviders from '../services/telephonyProviders.js';
 import { asyncHandler, sendSuccess } from '../utils/errors.js';
+
+// Supported telephony providers and their (not-yet-wired) call-control scope.
+const listProviders = asyncHandler(async (_req, res) => {
+  sendSuccess(res, { data: telephonyProviders.listProviders() });
+});
+
+// Outbound call control seam: declines explicitly until a provider is wired.
+const dial = asyncHandler(async (req, res) => {
+  telephonyProviders.callControl(req.body?.provider, 'dial');
+});
 
 const getMyStatus = asyncHandler(async (req, res) => {
   const status = await telephonyService.getStatus({
@@ -54,4 +65,13 @@ const callHistory = asyncHandler(async (req, res) => {
   });
 });
 
-export { getMyStatus, setMyStatus, listStatuses, getDispositions, wrapUp, callHistory };
+export {
+  getMyStatus,
+  setMyStatus,
+  listStatuses,
+  getDispositions,
+  wrapUp,
+  callHistory,
+  listProviders,
+  dial,
+};

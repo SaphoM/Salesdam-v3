@@ -26,6 +26,15 @@ const getAccount = async ({ tenantId, id }) => {
   return account;
 };
 
+/** Account including provider secrets — for server-side config validation. */
+const getAccountSecrets = async ({ tenantId, id }) => {
+  const account = await ChannelAccount.findOne({ _id: id, tenantId }).select(
+    '+credentials +webhookSecret',
+  );
+  if (!account) throw new AppError('Channel account not found.', 404);
+  return account;
+};
+
 const createAccount = async ({ tenantId, data = {}, user }) => {
   const { channel, name } = data;
   if (!CHANNELS.includes(channel)) {
@@ -361,6 +370,7 @@ export { getAdapter };
 export default {
   listAccounts,
   getAccount,
+  getAccountSecrets,
   createAccount,
   updateAccount,
   deleteAccount,

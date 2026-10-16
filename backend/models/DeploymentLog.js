@@ -25,7 +25,7 @@ const deploymentLogSchema = new mongoose.Schema(
 
     status: {
       type: String,
-      enum: ['deployed', 'blocked'],
+      enum: ['deployed', 'blocked', 'rolled_back'],
       required: true,
       index: true,
     },
@@ -33,6 +33,11 @@ const deploymentLogSchema = new mongoose.Schema(
     missing: { type: [mongoose.Schema.Types.Mixed], default: [] },
     warnings: { type: [String], default: [] },
     message: { type: String, default: '' },
+
+    // Pre-deployment snapshots so a deployment can be rolled back (§13).
+    rollback: { type: [mongoose.Schema.Types.Mixed], default: [] },
+    rolledBackAt: { type: Date },
+    rolledBackBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
 
     by: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     at: { type: Date, default: Date.now },
