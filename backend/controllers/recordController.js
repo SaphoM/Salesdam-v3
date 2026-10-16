@@ -34,6 +34,7 @@ import RecentlyViewed from '../models/RecentlyViewed.js';
 import { buildFilterQuery, buildSort } from '../services/listViewService.js';
 import { defaultViewsFor } from '../config/listViews.js';
 import approvalProcessService from '../services/approvalProcessService.js';
+import duplicateDetectionService from '../services/duplicateDetectionService.js';
 
 /**
  * Resolves a view key to its definition. Config-defined defaults are checked
@@ -319,6 +320,23 @@ const getRecord = asyncHandler(async (req, res) => {
  */
 const createRecord = asyncHandler(async (req, res) => {
   const { objectApiName } = req.params;
+
+  // Configurable duplicate detection (Core BRD §3.4). Runs on the request body
+  // so it applies equally to manual capture, API and import callers.
+  const duplicateCheck = await duplicateDetectionService.check(
+    req.tenantId,
+    objectApiName,
+    req.body,
+    {},
+  );
+  if (duplicateCheck.action === 'block') {
+    return res.status(409).json({
+      success: false,
+      message: 'A potential duplicate record was found.',
+      duplicates: duplicateCheck.matches,
+    });
+  }
+
   const session = await mongoose.startSession();
   session.startTransaction();
 
@@ -459,7 +477,12 @@ const createRecord = asyncHandler(async (req, res) => {
 
     sendSuccess(
       res,
-      { data: record.toDataObject() },
+      {
+        data: record.toDataObject(),
+        ...(duplicateCheck.action === 'warn' && duplicateCheck.matches.length
+          ? { duplicateMatches: duplicateCheck.matches }
+          : {}),
+      },
       'Record created successfully',
       201,
     );
@@ -478,6 +501,22 @@ const createRecord = asyncHandler(async (req, res) => {
  */
 const updateRecord = asyncHandler(async (req, res) => {
   const { objectApiName, id } = req.params;
+
+  // Configurable duplicate detection (Core BRD §3.4), excluding this record.
+  const duplicateCheck = await duplicateDetectionService.check(
+    req.tenantId,
+    objectApiName,
+    req.body,
+    { excludeRecordId: id },
+  );
+  if (duplicateCheck.action === 'block') {
+    return res.status(409).json({
+      success: false,
+      message: 'This change would create a duplicate record.',
+      duplicates: duplicateCheck.matches,
+    });
+  }
+
   const session = await mongoose.startSession();
   session.startTransaction();
 
@@ -617,6 +656,9 @@ const updateRecord = asyncHandler(async (req, res) => {
     const responseData = { data: record.toDataObject() };
     if (convertedOrder) {
       responseData.convertedOrder = convertedOrder.toDataObject();
+    }
+    if (duplicateCheck.action === 'warn' && duplicateCheck.matches.length) {
+      responseData.duplicateMatches = duplicateCheck.matches;
     }
 
     sendSuccess(
