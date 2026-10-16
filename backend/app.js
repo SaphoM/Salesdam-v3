@@ -100,7 +100,16 @@ app.use(
 app.use(compression());
 
 // Body parsing
-app.use(express.json({ limit: '10mb' }));
+// Keep the raw payload so webhook HMAC signatures can be verified over the
+// exact bytes Paystack signed (re-serializing JSON can change them).
+app.use(
+  express.json({
+    limit: '10mb',
+    verify: (req, _res, buf) => {
+      req.rawBody = buf;
+    },
+  }),
+);
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Sanitize MongoDB queries (prevent injection)

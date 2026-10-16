@@ -418,12 +418,20 @@ class PaystackService {
   }
 
   /**
-   * Verify webhook signature using timing-safe comparison
+   * Verify webhook signature using timing-safe comparison.
+   * `rawBody` must be the exact bytes received (Buffer or string); never a
+   * re-serialized object, which can differ from what Paystack signed.
    */
-  verifyWebhookSignature(signature, body) {
+  verifyWebhookSignature(signature, rawBody) {
+    if (!signature || typeof signature !== 'string') return false;
+
+    const payload = Buffer.isBuffer(rawBody)
+      ? rawBody
+      : Buffer.from(String(rawBody ?? ''), 'utf8');
+
     const hash = crypto
       .createHmac('sha512', this.secretKey)
-      .update(JSON.stringify(body))
+      .update(payload)
       .digest('hex');
 
     // Use timing-safe comparison to prevent length/oracle attacks

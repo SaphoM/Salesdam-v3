@@ -41,13 +41,12 @@ const initEmailTransporter = () => {
  * POST /api/paystack-webhook
  * Public webhook endpoint for Paystack payment notifications
  */
-router.post('/', express.json(), async (req, res) => {
+router.post('/', async (req, res) => {
   try {
     const signature = req.headers['x-paystack-signature'];
-    const body = JSON.stringify(req.body);
 
-    // Verify webhook signature
-    if (!paystackService.verifyWebhookSignature(signature, req.body)) {
+    // Verify webhook signature against the raw request bytes.
+    if (!paystackService.verifyWebhookSignature(signature, req.rawBody)) {
       logger.warn('Invalid Paystack webhook signature');
       return res.status(401).json({ success: false, message: 'Invalid signature' });
     }
