@@ -36,6 +36,7 @@ jobs:
         run: |
           node tests/tenant-isolation.e2e.mjs
           node tests/password-reset.e2e.mjs
+          node tests/configuration.e2e.mjs
           node tests/insurance-endorsements.e2e.mjs
       - name: Run insurance domain suites
         working-directory: backend
