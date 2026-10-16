@@ -4,7 +4,7 @@ Source documents:
 
 - `Salesdam API and Integration Guide v1.0`, dated 14 October 2026 (provided as PDF).
 - `Salesdam V3 Platform Core BRD V2.1`, dated 10 October 2026.
-- Actual application code in `backend/` at master commit `2051210`.
+- Actual application code in `backend/` at master commit `6f89923`.
 
 ## Conformance summary
 
@@ -71,6 +71,36 @@ Recommendation: update the guide route index and mark extension clearly.
 - Password reset tokens are stored as SHA-256 hashes; only the raw token is
   emailed, and reset links are single-use and expire in 2 hours. Reset email
   failures no longer change the response shape (no username enumeration).
+
+## Core BRD feature API surfaces added (2026-10-16)
+
+These are new, versioned, tenant-scoped routes under `/api/v1`. Each has an
+end-to-end suite wired into `.github/workflows/quality.yml`.
+
+| BRD | Feature | Routes | Tests |
+| --- | --- | --- | --- |
+| §14 | Tenant configuration resolution | `/configuration` | `tests/configuration.e2e.mjs` (18) |
+| §8 | Approval-process builder | `/approval-processes` | `tests/approval-process.e2e.mjs` (32) |
+| §3.4 | Duplicate detection | `/duplicate-rules` | `tests/duplicate-detection.e2e.mjs` (20) |
+| §23 | Communication consent | `/consents` | `tests/consent.e2e.mjs` (19) |
+| §24 | Activity & interaction timeline | `/activities` | `tests/activity.e2e.mjs` (17) |
+| §13 | Metadata deployment / change sets | `/change-sets` | `tests/change-set.e2e.mjs` (32) |
+| §16 | Omnichannel inbox, channels, templates | `/channels`, `/conversations`, `/message-templates` | `tests/omnichannel.e2e.mjs` (35) |
+| §18 | Call centre / telephony | `/telephony` | `tests/telephony.e2e.mjs` (16) |
+
+Security posture of the new surfaces:
+
+- Cross-tenant metadata promotion (`/change-sets/:id/validate|deploy` and the
+  deployment log) is superuser-only; packaging stays admin-scoped to the
+  caller's own tenant.
+- Channel webhooks (`POST /channels/webhook/:channel/:accountId`) authenticate
+  by timing-safe HMAC-SHA256 over the raw request bytes and reject unsigned or
+  wrongly signed payloads; an account without a signing secret accepts nothing.
+- Channel provider credentials and webhook secrets are `select:false` and
+  stripped from JSON responses.
+- These routes fall under the existing `/api` global rate limiter; the webhook
+  is intentionally public (no session) because the signature is the credential.
+
 
 ## Security-related contract notes that should remain in force
 - API keys are derived from environment state and key hash storage, not plaintext.

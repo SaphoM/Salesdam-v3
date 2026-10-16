@@ -94,6 +94,52 @@ service for the database-backed tests).
 
 ---
 
+## Core BRD Platform Features (delivered 2026-10-16)
+
+Seven platform capabilities from the Core BRD previously flagged as not
+started were built as new, tenant-scoped `/api/v1` surfaces. Each ships with an
+end-to-end suite and is wired into `.github/workflows/quality.yml`.
+
+| BRD | Feature | Surface | Suite | Checks |
+|-----|---------|---------|-------|--------|
+| §14 | Platform-wide TenantConfiguration resolution | `/configuration` | `configuration.e2e.mjs` | 18/18 |
+| §8 | Configurable multi-step approval-process builder | `/approval-processes` | `approval-process.e2e.mjs` | 32/32 |
+| §3.4 | Configurable duplicate detection & matching | `/duplicate-rules` | `duplicate-detection.e2e.mjs` | 20/20 |
+| §23 | Communication consent & preferences | `/consents` | `consent.e2e.mjs` | 19/19 |
+| §24 | Activity & customer interaction timeline | `/activities` | `activity.e2e.mjs` | 17/17 |
+| §13 | Metadata deployment & change sets | `/change-sets` | `change-set.e2e.mjs` | 32/32 |
+| §16 | Omnichannel inbox, channels & messaging templates | `/channels`, `/conversations`, `/message-templates` | `omnichannel.e2e.mjs` | 35/35 |
+| §18 | Call centre/telephony presence, dispositions & wrap-up | `/telephony` | `telephony.e2e.mjs` | 16/16 |
+
+### Verified outcomes in these features
+
+- Approval requests lock the underlying record (`423` on update/delete while a
+  request is pending); waiting steps carry no approver so `pending/mine` cannot
+  match future steps.
+- Duplicate rules `block` with `409 + duplicates` or `warn` with
+  `duplicateMatches` on the create/update response.
+- Cross-tenant metadata promotion is superuser-only; deployment is blocked
+  until required objects/fields exist in the target tenant (§13.2), with a
+  deployment log recorded either way.
+- Channel webhooks authenticate by timing-safe HMAC over the raw body; provider
+  secrets are never serialized.
+- Outbound omnichannel replies are stored `queued` with an explicit provider
+  status and are never reported as delivered while providers are unwired.
+- Consent enforcement gates outbound replies when `consent.enforcement` is on.
+
+### Honest status of these features
+
+- **External providers remain UNVERIFIED**: live Meta/WhatsApp, SMTP/SMS
+  gateway and Euphoria telephony calls are not integrated (no credentials,
+  and Euphoria API docs were not supplied). The ingestion, inbox, template,
+  consent and call-logging logic around them is tested; delivery itself is not.
+- **Deferred, noted in commits**: Meta Lead Ads capture (§16.1) pending a lead
+  field-mapping contract; sandbox tenant cloning and package rollback (§13);
+  on-approve flow triggering; duplicate record merge; creating a Lead/Contact
+  directly from a conversation.
+
+---
+
 ## Feature Completeness (BRD v1.0)
 
 ### ✅ Fully Implemented
