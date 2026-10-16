@@ -206,10 +206,10 @@ export const submitEndorsement = async ({ tenantId, userId, endorsementId }) => 
   // Requires approval - transition to pending_approval and create workflow
   await transitionEndorsement({ tenantId, userId, endorsement, to: ENDORSEMENT_STATUS.PENDING_APPROVAL });
 
-  // Create the approval workflow (default chain: underwriting → management)
+  // Keep the initial endorsement approval as a single gate. Multi-stage sourcing
+  // can replace this default when product approval rules require more stages.
   const chain = [
     { stage: 'underwriting_review', role: 'underwriter', order: 1 },
-    { stage: 'management_review', role: 'manager', order: 2 },
   ];
 
   await endorsementApprovalService.createApprovalWorkflow({

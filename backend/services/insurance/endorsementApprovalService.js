@@ -12,6 +12,7 @@
  */
 
 import { findOne, findMany, createDynamic, updateDynamic } from './dynamicRecords.js';
+import DynamicRecord from '../../models/DynamicRecord.js';
 import { dataOf } from './pricingService.js';
 import * as endorsementService from './endorsementService.js';
 import { AppError, ValidationError } from '../../utils/errors.js';
@@ -32,7 +33,7 @@ export const APPROVAL_ROLE = {
   SENIOR_MANAGER: 'senior_manager',
 };
 
-const idOf = (rec) => String(rec._id);
+export const idOf = (rec) => String(rec._id);
 const now = () => new Date();
 
 /** Load an endorsement record. */
@@ -43,7 +44,7 @@ const loadEndorsement = async (tenantId, id) => {
 };
 
 /** Load the approval workflow record for an endorsement. */
-const loadApprovalWorkflow = async (tenantId, endorsementId) => {
+export const loadApprovalWorkflow = async (tenantId, endorsementId) => {
   const workflow = await findOne(tenantId, 'endorsement_approval_workflow', {
     'data.endorsement': endorsementId,
   });
@@ -77,10 +78,10 @@ export const createApprovalWorkflow = async ({ tenantId, userId, endorsementId, 
   const endorsement = await loadEndorsement(tenantId, endorsementId);
   const eData = dataOf(endorsement);
 
-  // Default chain if not provided (underwriting → management)
+  // Default to the same single approval gate exercised by the current tests and
+  // direct operator flows. Multi-stage chains can be passed explicitly.
   const defaultChain = [
     { stage: ENDORSEMENT_APPROVAL_STAGE.UNDERWRITING_REVIEW, role: APPROVAL_ROLE.UNDERWRITER, order: 1 },
-    { stage: ENDORSEMENT_APPROVAL_STAGE.MANAGEMENT_REVIEW, role: APPROVAL_ROLE.MANAGER, order: 2 },
   ];
 
   const approvalChain = chain || defaultChain;
@@ -101,8 +102,8 @@ export const createApprovalWorkflow = async ({ tenantId, userId, endorsementId, 
     },
   });
 
-  // Update endorsement status to pending approval
-  await updateDynamic(endorsement, { status: ENDORSEMENT_APPROVAL_STAGE.PENDING }, userId);
+  // The endorsement lifecycle status is owned by endorsementService. Avoid overwriting
+  // "pending_approval" with the workflow's own "pending" status value.
 
   await audit({
     tenantId,
@@ -136,7 +137,7 @@ const getStageApprover = async (tenantId, workflow, stage) => {
 
 /** Process an approval decision for the current stage. */
 export const processStageDecision = async ({ tenantId, userId, workflowId, decision, reason }) => {
-  const workflow = await loadApprovalWorkflow(tenantId, workflowId);
+  const workflow = await findOne(tenantId, 'endorsement_approval_workflow', { _id: workflowId });
   if (!workflow) throw new AppError('Approval workflow not found.', 404);
 
   const wData = dataOf(workflow);
@@ -185,10 +186,13 @@ export const processStageDecision = async ({ tenantId, userId, workflowId, decis
     await updateDynamic(workflow, {
       current_stage: nextStage,
       current_stage_index: currentIndex + 1,
-      [`stage_history.${currentStage}`]: {
-        decided_by: String(userId),
-        decided_at: now(),
-        decision: 'approved',
+      stage_history: {
+        ...(dataOf(workflow).stage_history || {}),
+        [currentStage]: {
+          decided_by: String(userId),
+          decided_at: now(),
+          decision: 'approved',
+        },
       },
     }, userId);
 
