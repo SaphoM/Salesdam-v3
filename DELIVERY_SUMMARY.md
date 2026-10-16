@@ -1,8 +1,16 @@
 # Salesdam V3 Insurance Workspace - Delivery Summary
 
-**Date**: 2026-10-11  
-**Status**: PRODUCTION READY  
-**Total Verified Checks**: 130/130 PASS across 8 test suites
+**Date**: 2026-10-11 (status snapshot) — **verification log appended 2026-10-16**
+**Status**: Feature-complete for the insurance workspace; **NOT signed off for
+production** (see `API_CONTRACT_CONFORMANCE.md` and the audit go-live assessment).
+**Verified on 2026-10-16**: see [Verification log](#verification-log-2026-10-16) below.
+
+> Correction (2026-10-16): earlier versions of this document stated
+> "PRODUCTION READY" and "130/130 checks passing in CI/CD". The platform is not
+> go-live approved: external providers are uncredentialed (UNVERIFIED), and CI
+> gates are defined in `.github/workflows/quality.yml` but had never been run.
+> The table below is the 2026-10-11 snapshot; the log below is the reproducible,
+> currently-verified evidence.
 
 ---
 
@@ -40,11 +48,14 @@ The Salesdam V3 Insurance Workspace has been fully implemented, tested, and is r
 
 ---
 
-## Verified Test Coverage (130/130 Checks)
+## Verified Test Coverage (2026-10-11 snapshot, 130/130 Checks)
+
+> The counts below are the original delivery snapshot. See the verification log
+> below for results re-run on 2026-10-16 (tenant isolation is now 23/23).
 
 | Test Suite | Checks | Coverage |
 |------------|--------|----------|
-| `tenant-isolation.e2e.mjs` | 16/16 | Cross-tenant security |
+| `tenant-isolation.e2e.mjs` | 23/23 | Cross-tenant security (16 at delivery, +7 incident/dashboard/layout) |
 | `insurance-metadata.e2e.mjs` | 9/9 | Object seeding & isolation |
 | `insurance-application.e2e.mjs` | 33/33 | New business flow |
 | `insurance-servicing-claims.e2e.mjs` | 32/32 | Servicing + claims |
@@ -60,6 +71,26 @@ The Salesdam V3 Insurance Workspace has been fully implemented, tested, and is r
 | `enforceTenant.unit.test.js` | 5/5 | Middleware |
 
 **Total**: 130/130 checks PASS
+
+---
+
+## Verification log (2026-10-16)
+
+Re-run against `master` (`4896e04`) on a local MongoDB instance:
+
+| Command | Result |
+|---------|--------|
+| `cd backend && npm test` | 21/21 tests, 3 suites (pricing 12, enforceTenant 5, paystack signature 4) |
+| `node tests/tenant-isolation.e2e.mjs` | 23/23 checks |
+| `node tests/password-reset.e2e.mjs` | 9/9 checks |
+| `node tests/insurance-endorsements.e2e.mjs` | 33/33 checks |
+| `npm run test:insurance` | exit 0 (9/9, 33/33, 32/32, 8/8, 11/11, 18/18, 15/15, 4/4 across the suites) |
+| `cd frontend && npm run build` | pass |
+| `cd admin && npm ci && npm run build` | pass |
+
+Quality gates are defined in `.github/workflows/quality.yml` (Jest, the
+integration scripts above, and the frontend/admin builds, with a MongoDB
+service for the database-backed tests).
 
 ---
 
@@ -138,8 +169,8 @@ npm run scheduler:run       # Manual unified scheduler
 
 ## Go-Live Checklist
 
-- [x] All 130 automated tests pass
-- [x] Cross-tenant isolation verified (16 checks)
+- [x] All automated suites pass (see Verification log, 2026-10-16)
+- [x] Cross-tenant isolation verified (23 checks)
 - [x] Policy documents generate (HTML + PDF) with versioning
 - [x] Automatic email delivery with attachments on issue/endorsement
 - [x] Multi-stage endorsement approval workflow
@@ -165,7 +196,7 @@ npm run scheduler:run       # Manual unified scheduler
 ## Support Information
 
 - **Documentation**: `docs/insurance/BRD_REQUIREMENTS_MATRIX.md` (full traceability)
-- **Test Reports**: All 130 checks passing in CI/CD
+- **Test Reports**: Suites re-verified 2026-10-16 (see Verification log above); CI gates in `.github/workflows/quality.yml`
 - **Architecture**: Multi-tenant, metadata-driven, event-sourced where applicable
 - **Extensibility**: New objects/fields via metadata engine (no code changes)
 
