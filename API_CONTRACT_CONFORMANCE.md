@@ -4,7 +4,7 @@ Source documents:
 
 - `Salesdam API and Integration Guide v1.0`, dated 14 October 2026 (provided as PDF).
 - `Salesdam V3 Platform Core BRD V2.1`, dated 10 October 2026.
-- Actual application code in `backend/` at master commit `c131dae`.
+- Actual application code in `backend/` at master commit `f332095`.
 
 ## Conformance summary
 
@@ -87,6 +87,8 @@ end-to-end suite wired into `.github/workflows/quality.yml`.
 | §13 | Metadata deployment / change sets | `/change-sets` | `tests/change-set.e2e.mjs` (47) |
 | §16 | Omnichannel inbox, channels, templates | `/channels`, `/conversations`, `/message-templates` | `tests/omnichannel.e2e.mjs` (42) |
 | §18 | Call centre / telephony | `/telephony` | `tests/telephony.e2e.mjs` (16) |
+| §3.4 | Duplicate record merge | `POST /records/{objectApiName}/merge` | `tests/record-merge.e2e.mjs` (21) |
+| §16.4 | Create a record from a conversation | `POST /conversations/{id}/create-record` | `tests/conversation-capture.e2e.mjs` (14) |
 
 Environment & provider-readiness surfaces added on top of the change-set and
 omnichannel routes (all superuser- or admin-scoped; no live vendor calls):
@@ -117,6 +119,15 @@ Security posture of the new surfaces:
 - Outbound provider delivery and telephony call control remain stubs that
   return an explicit not-implemented status — nothing is reported as delivered
   or dialled when it was not.
+- Duplicate merge (`POST /records/{objectApiName}/merge`) requires delete
+  permission on the object and is tenant-scoped; it soft-deletes the duplicates
+  and repoints referencing lookups. A merge whose merged result fails validation
+  is rejected and the duplicates are restored, so a rejected merge changes
+  nothing.
+- Create-from-conversation (`POST /conversations/{id}/create-record`) resolves
+  the target object server-side and enforces that user's create permission plus
+  the same duplicate rule gate as manual capture; an already-linked conversation
+  returns `409`.
 - These routes fall under the existing `/api` global rate limiter; the webhook
   is intentionally public (no session) because the signature is the credential.
 

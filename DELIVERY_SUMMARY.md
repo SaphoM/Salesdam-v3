@@ -84,6 +84,8 @@ Re-run against `master` (`4896e04`) on a local MongoDB instance:
 | `node tests/tenant-isolation.e2e.mjs` | 23/23 checks |
 | `node tests/password-reset.e2e.mjs` | 9/9 checks |
 | `node tests/insurance-endorsements.e2e.mjs` | 33/33 checks |
+| `node tests/record-merge.e2e.mjs` | 21/21 checks (f332095) |
+| `node tests/conversation-capture.e2e.mjs` | 14/14 checks (f332095) |
 | `npm run test:insurance` | exit 0 (9/9, 33/33, 32/32, 8/8, 11/11, 18/18, 15/15, 4/4 across the suites) |
 | `cd frontend && npm run build` | pass |
 | `cd admin && npm ci && npm run build` | pass |
@@ -110,6 +112,8 @@ end-to-end suite and is wired into `.github/workflows/quality.yml`.
 | §13 | Metadata deployment & change sets | `/change-sets` | `change-set.e2e.mjs` | 47/47 |
 | §16 | Omnichannel inbox, channels & messaging templates | `/channels`, `/conversations`, `/message-templates` | `omnichannel.e2e.mjs` | 42/42 |
 | §18 | Call centre/telephony presence, dispositions & wrap-up | `/telephony` | `telephony.e2e.mjs` | 16/16 |
+| §3.4 | Duplicate record merge — survivor fills blanks, repoints lookups, soft-deletes the rest | `POST /records/:objectApiName/merge` | `record-merge.e2e.mjs` | 21/21 |
+| §16.4 | Create a record from an inbox conversation | `POST /conversations/:id/create-record` | `conversation-capture.e2e.mjs` | 14/14 |
 
 ### Provider readiness & environment management (delivered 2026-10-16)
 
@@ -140,6 +144,14 @@ credentials or the Insurance ERD — plus explicit seams for the parts that do:
 - Outbound omnichannel replies are stored `queued` with an explicit provider
   status and are never reported as delivered while providers are unwired.
 - Consent enforcement gates outbound replies when `consent.enforcement` is on.
+- Duplicate merge keeps the survivor's fields, fills its blanks from the
+  duplicates, repoints every inbound lookup, soft-deletes the duplicates
+  (`mergedIntoId`) and appends `mergeHistory`; a merge rejected by validation
+  restores the duplicates untouched.
+- Creating a record from a conversation prefills the matched identifier, honors
+  field/object permissions, and applies the same duplicate gate as manual
+  capture (falling back to the channel account's first match-rule object when no
+  object is requested).
 
 ### Honest status of these features
 
@@ -150,8 +162,7 @@ credentials or the Insurance ERD — plus explicit seams for the parts that do:
   The provider layer is now ready: credentials/contracts drop into the declared
   provider definitions and the call-control seam.
 - **Deferred, noted in commits**: Meta Lead Ads capture (§16.1) pending a lead
-  field-mapping contract; on-approve flow triggering; duplicate record merge;
-  creating a Lead/Contact directly from a conversation.
+  field-mapping contract; on-approve flow triggering.
 
 ---
 
