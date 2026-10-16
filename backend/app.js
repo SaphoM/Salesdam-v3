@@ -56,6 +56,7 @@ import approvalProcessRoutes from './routes/approvalProcess.js';
 import duplicateRuleRoutes from './routes/duplicateRules.js';
 import consentRoutes from './routes/consents.js';
 import activityRoutes from './routes/activities.js';
+import changeSetRoutes from './routes/changeSets.js';
 
 const require = createRequire(import.meta.url);
 const { version } = require('./package.json');
@@ -212,6 +213,8 @@ app.use(`${API_V1_PREFIX}/duplicate-rules`, duplicateRuleRoutes);
 app.use(`${API_V1_PREFIX}/consents`, consentRoutes);
 // Activity & customer interaction framework (Core BRD §24).
 app.use(`${API_V1_PREFIX}/activities`, activityRoutes);
+// Metadata deployment & change sets (Core BRD §13).
+app.use(`${API_V1_PREFIX}/change-sets`, changeSetRoutes);
 
 // 404 handler
 app.use((req, res) => {

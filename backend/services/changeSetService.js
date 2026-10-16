@@ -1,0 +1,572 @@
+import ChangeSet, { COMPONENT_TYPES } from '../models/ChangeSet.js';
+import DeploymentLog from '../models/DeploymentLog.js';
+import ObjectMeta from '../models/ObjectMeta.js';
+import FieldMeta from '../models/FieldMeta.js';
+import Layout from '../models/Layout.js';
+import Automation from '../models/Automation.js';
+import ApprovalProcess from '../models/ApprovalProcess.js';
+import DuplicateRule from '../models/DuplicateRule.js';
+import TenantConfiguration from '../models/TenantConfiguration.js';
+import Role from '../models/Role.js';
+import User from '../models/User.js';
+import { AppError } from '../utils/errors.js';
+import logger from '../utils/logger.js';
+
+/**
+ * Metadata deployment & environments (Core BRD §13).
+ *
+ * A ChangeSet is assembled from one tenant's metadata, validated against a
+ * target tenant's dependencies (§13.2) and deployed there, writing a
+ * DeploymentLog entry either way (§13).
+ */
+
+// Deploy parents before children so field/layout components resolve their object.
+const COMPONENT_ORDER = [
+  'object',
+  'field',
+  'layout',
+  'flow',
+  'approval_process',
+  'duplicate_rule',
+  'tenant_config',
+];
+
+const stripTenancy = (doc) => {
+  const obj = typeof doc.toObject === 'function' ? doc.toObject() : { ...doc };
+  for (const key of [
+    '_id',
+    'tenantId',
+    'objectId',
+    'createdAt',
+    'updatedAt',
+    'createdBy',
+    'lastModifiedBy',
+    '__v',
+  ]) {
+    delete obj[key];
+  }
+  return obj;
+};
+
+const _roleNames = async (tenantId, ids = []) => {
+  const clean = ids.filter(Boolean).map(String);
+  if (clean.length === 0) return [];
+  const roles = await Role.find({ tenantId, _id: { $in: clean } })
+    .select('name')
+    .lean();
+  return roles.map((r) => r.name);
+};
+
+const _roleIds = async (tenantId, names = []) => {
+  const clean = (names || []).filter(Boolean);
+  if (clean.length === 0) return [];
+  const roles = await Role.find({ tenantId, name: { $in: clean } })
+    .select('_id')
+    .lean();
+  return roles.map((r) => r._id);
+};
+
+const _splitKey = (key, sep) => {
+  const idx = key.indexOf(sep);
+  if (idx === -1) return null;
+  return [key.slice(0, idx), key.slice(idx + 1)];
+};
+
+/* ── Build (export a package from the source tenant) ────────────────────── */
+
+const SNAPSHOTTERS = {
+  object: async (tenantId, apiName) => {
+    const doc = await ObjectMeta.findOne({ tenantId, apiName });
+    return doc ? stripTenancy(doc) : null;
+  },
+
+  field: async (tenantId, key) => {
+    const parts = _splitKey(key, '.');
+    if (!parts) return null;
+    const doc = await FieldMeta.findOne({
+      tenantId,
+      objectApiName: parts[0],
+      apiName: parts[1],
+    });
+    return doc ? stripTenancy(doc) : null;
+  },
+
+  layout: async (tenantId, key) => {
+    const parts = _splitKey(key, ':');
+    if (!parts) return null;
+    const doc = await Layout.findOne({
+      tenantId,
+      objectApiName: parts[0],
+      name: parts[1],
+    });
+    if (!doc) return null;
+    const snapshot = stripTenancy(doc);
+    // Role ids belong to the source tenant; carry names and re-resolve on deploy.
+    snapshot.assignedRoles = await _roleNames(tenantId, snapshot.assignedRoles);
+    snapshot.buttons = (snapshot.buttons || []).map((button) => ({
+      ...button,
+      visibleRoles: [],
+    }));
+    const buttons = await Promise.all(
+      (doc.buttons || []).map(async (button) => ({
+        id: button.id,
+        names: await _roleNames(tenantId, button.visibleRoles),
+      })),
+    );
+    for (const entry of buttons) {
+      const target = snapshot.buttons.find((b) => b.id === entry.id);
+      if (target) target.visibleRoles = entry.names;
+    }
+    return snapshot;
+  },
+
+  flow: async (tenantId, apiName) => {
+    const doc = await Automation.findOne({ tenantId, apiName });
+    if (!doc) return null;
+    const snapshot = stripTenancy(doc);
+    delete snapshot.externalObjectId; // integration-specific, not portable
+    delete snapshot.stats; // per-tenant runtime counters
+    return snapshot;
+  },
+
+  approval_process: async (tenantId, key) => {
+    const parts = _splitKey(key, ':');
+    if (!parts) return null;
+    const doc = await ApprovalProcess.findOne({
+      tenantId,
+      objectApiName: parts[0],
+      name: parts[1],
+    });
+    if (!doc) return null;
+    const snapshot = stripTenancy(doc);
+    for (const step of snapshot.steps || []) {
+      if (step.approverRoleId) {
+        const role = await Role.findById(step.approverRoleId)
+          .select('name')
+          .lean();
+        step.approverRoleName = role?.name;
+        delete step.approverRoleId;
+      }
+      if (step.approverUserId) {
+        const user = await User.findById(step.approverUserId)
+          .select('email')
+          .lean();
+        step.approverUserEmail = user?.email;
+        delete step.approverUserId;
+      }
+    }
+    return snapshot;
+  },
+
+  duplicate_rule: async (tenantId, key) => {
+    const parts = _splitKey(key, ':');
+    if (!parts) return null;
+    const doc = await DuplicateRule.findOne({
+      tenantId,
+      objectApiName: parts[0],
+      name: parts[1],
+    });
+    return doc ? stripTenancy(doc) : null;
+  },
+
+  tenant_config: async (tenantId, key) => {
+    const doc = await TenantConfiguration.findOne({ key, tenantId }).lean();
+    if (doc) {
+      return {
+        key: doc.key,
+        value: doc.value,
+        dataType: doc.dataType,
+        category: doc.category,
+        label: doc.label,
+        description: doc.description,
+        editableByTenant: doc.editableByTenant,
+      };
+    }
+    const system = await TenantConfiguration.findOne({ key, tenantId: null }).lean();
+    if (system) {
+      return {
+        key: system.key,
+        value: system.value,
+        dataType: system.dataType,
+        category: system.category,
+        label: system.label,
+        description: system.description,
+        editableByTenant: system.editableByTenant,
+      };
+    }
+    return null;
+  },
+};
+
+const build = async ({ tenantId, name, description, components, user }) => {
+  if (!name) throw new AppError('A change set name is required.', 400);
+  if (!Array.isArray(components) || components.length === 0) {
+    throw new AppError('At least one component is required.', 400);
+  }
+
+  const built = [];
+  const notFound = [];
+  for (const component of components) {
+    const { componentType, componentKey } = component || {};
+    if (!COMPONENT_TYPES.includes(componentType)) {
+      throw new AppError(`Unknown component type '${componentType}'.`, 400);
+    }
+    const snapshot = await SNAPSHOTTERS[componentType](tenantId, componentKey);
+    if (!snapshot) notFound.push(`${componentType}:${componentKey}`);
+    else built.push({ componentType, componentKey, snapshot });
+  }
+  if (notFound.length) {
+    throw new AppError(`Components not found: ${notFound.join(', ')}`, 404);
+  }
+
+  return ChangeSet.create({
+    tenantId,
+    name,
+    description,
+    components: built,
+    createdBy: user?._id,
+  });
+};
+
+/* ── Dependency validation (§13.2) ───────────────────────────────────────── */
+
+const _referencedObjects = (components) => {
+  const refs = new Set();
+  for (const component of components) {
+    if (component.componentType === 'object') {
+      refs.add(component.componentKey);
+      continue;
+    }
+    const snapshot = component.snapshot || {};
+    if (snapshot.objectApiName) refs.add(snapshot.objectApiName);
+    if (component.componentType === 'flow' && snapshot.trigger?.objectApiName) {
+      refs.add(snapshot.trigger.objectApiName);
+    }
+    // Layouts may pull in other objects via related lists.
+    if (component.componentType === 'layout') {
+      (snapshot.relatedLists || []).forEach((list) => {
+        if (list?.objectApiName) refs.add(list.objectApiName);
+      });
+    }
+  }
+  return refs;
+};
+
+const _layoutFieldRefs = (snapshot) => {
+  const refs = new Set();
+  const addFields = (fields = []) =>
+    fields.forEach((f) => f?.fieldApiName && refs.add(f.fieldApiName));
+  const addSections = (sections = []) =>
+    (sections || []).forEach((section) =>
+      (section?.columnData || []).forEach((column) =>
+        addFields(column?.fields || []),
+      ),
+    );
+  (snapshot.tabs || []).forEach((tab) => addSections(tab.sections));
+  addSections(snapshot.sections);
+  (snapshot.relatedLists || []).forEach((list) => {
+    if (list.relationshipField) refs.add(list.relationshipField);
+    (list.columns || []).forEach((column) => column && refs.add(column));
+    if (list.sortField) refs.add(list.sortField);
+  });
+  return refs;
+};
+
+const validate = async ({ changeSet, targetTenantId }) => {
+  const components = changeSet.components || [];
+  const missing = [];
+
+  const referenced = _referencedObjects(components);
+  const packaged = new Set(
+    components
+      .filter((c) => c.componentType === 'object')
+      .map((c) => c.componentKey),
+  );
+  const targetObjects = await ObjectMeta.find({
+    tenantId: targetTenantId,
+    apiName: { $in: [...referenced] },
+  })
+    .select('apiName')
+    .lean();
+  const targetObjectSet = new Set(targetObjects.map((o) => o.apiName));
+
+  for (const apiName of referenced) {
+    if (!packaged.has(apiName) && !targetObjectSet.has(apiName)) {
+      missing.push({ dependency: 'object', key: apiName });
+    }
+  }
+
+  // Required fields: layouts must not reference fields absent from both the
+  // target tenant and the package.
+  const packagedFields = new Set(
+    components
+      .filter((c) => c.componentType === 'field')
+      .map((c) => c.componentKey),
+  );
+  for (const component of components) {
+    if (component.componentType !== 'layout') continue;
+    const objectApiName = component.snapshot?.objectApiName;
+    if (!objectApiName) continue;
+    if (!packaged.has(objectApiName) && !targetObjectSet.has(objectApiName)) {
+      continue; // reported as a missing object already
+    }
+    const refs = _layoutFieldRefs(component.snapshot);
+    if (refs.size === 0) continue;
+    const targetFields = await FieldMeta.find({
+      tenantId: targetTenantId,
+      objectApiName,
+      apiName: { $in: [...refs] },
+    })
+      .select('apiName')
+      .lean();
+    const available = new Set(targetFields.map((f) => f.apiName));
+    for (const field of refs) {
+      const key = `${objectApiName}.${field}`;
+      if (available.has(field) || packagedFields.has(key)) continue;
+      missing.push({ dependency: 'field', key, via: `layout:${component.componentKey}` });
+    }
+  }
+
+  return { valid: missing.length === 0, missing };
+};
+
+/* ── Deploy ─────────────────────────────────────────────────────────────── */
+
+const PERSISTERS = {
+  object: async (tenantId, snapshot) => {
+    await ObjectMeta.findOneAndUpdate(
+      { tenantId, apiName: snapshot.apiName },
+      { $set: { ...snapshot, tenantId } },
+      { upsert: true },
+    );
+  },
+
+  field: async (tenantId, snapshot) => {
+    const object = await ObjectMeta.findOne({
+      tenantId,
+      apiName: snapshot.objectApiName,
+    })
+      .select('_id')
+      .lean();
+    if (!object) {
+      throw new AppError(
+        `Object '${snapshot.objectApiName}' is missing in the target tenant.`,
+        409,
+      );
+    }
+    await FieldMeta.findOneAndUpdate(
+      { tenantId, objectApiName: snapshot.objectApiName, apiName: snapshot.apiName },
+      { $set: { ...snapshot, tenantId, objectId: object._id } },
+      { upsert: true },
+    );
+  },
+
+  layout: async (tenantId, snapshot, warnings) => {
+    const object = await ObjectMeta.findOne({
+      tenantId,
+      apiName: snapshot.objectApiName,
+    })
+      .select('_id')
+      .lean();
+    if (!object) {
+      throw new AppError(
+        `Object '${snapshot.objectApiName}' is missing in the target tenant.`,
+        409,
+      );
+    }
+    const assignedRoles = await _roleIds(tenantId, snapshot.assignedRoles);
+    if ((snapshot.assignedRoles || []).length !== assignedRoles.length) {
+      warnings.push(
+        `layout '${snapshot.name}': some assigned roles do not exist in the target tenant`,
+      );
+    }
+    const buttons = await Promise.all(
+      (snapshot.buttons || []).map(async (button) => ({
+        ...button,
+        visibleRoles: await _roleIds(tenantId, button.visibleRoles),
+      })),
+    );
+    await Layout.findOneAndUpdate(
+      { tenantId, objectApiName: snapshot.objectApiName, name: snapshot.name },
+      {
+        $set: {
+          ...snapshot,
+          tenantId,
+          objectId: object._id,
+          assignedRoles,
+          buttons,
+        },
+      },
+      { upsert: true },
+    );
+  },
+
+  flow: async (tenantId, snapshot) => {
+    const data = { ...snapshot };
+    delete data.externalObjectId;
+    delete data.stats;
+    await Automation.findOneAndUpdate(
+      { tenantId, apiName: data.apiName },
+      { $set: { ...data, tenantId } },
+      { upsert: true },
+    );
+  },
+
+  approval_process: async (tenantId, snapshot, warnings) => {
+    const targetRoles = await Role.find({ tenantId }).select('name').lean();
+    const roleNameToId = new Map(targetRoles.map((r) => [r.name, String(r._id)]));
+    const steps = [];
+    for (const [index, step] of (snapshot.steps || []).entries()) {
+      const next = { ...step };
+      if (next.approverRoleName) {
+        const roleId = roleNameToId.get(next.approverRoleName);
+        if (roleId) next.approverRoleId = roleId;
+        else {
+          warnings.push(
+            `approval_process '${snapshot.name}': approver queue '${next.approverRoleName}' not found in the target tenant`,
+          );
+        }
+        delete next.approverRoleName;
+      }
+      if (next.approverUserEmail) {
+        const user = await User.findOne({
+          tenantId,
+          email: next.approverUserEmail,
+        })
+          .select('_id')
+          .lean();
+        if (user) next.approverUserId = user._id;
+        else {
+          warnings.push(
+            `approval_process '${snapshot.name}': step ${index + 1} approver '${next.approverUserEmail}' not found in the target tenant`,
+          );
+        }
+        delete next.approverUserEmail;
+      }
+      steps.push(next);
+    }
+    await ApprovalProcess.findOneAndUpdate(
+      {
+        tenantId,
+        objectApiName: snapshot.objectApiName,
+        name: snapshot.name,
+      },
+      { $set: { ...snapshot, tenantId, steps } },
+      { upsert: true },
+    );
+  },
+
+  duplicate_rule: async (tenantId, snapshot) => {
+    await DuplicateRule.findOneAndUpdate(
+      { tenantId, objectApiName: snapshot.objectApiName, name: snapshot.name },
+      { $set: { ...snapshot, tenantId } },
+      { upsert: true },
+    );
+  },
+
+  tenant_config: async (tenantId, snapshot) => {
+    await TenantConfiguration.findOneAndUpdate(
+      { tenantId, key: snapshot.key },
+      {
+        $set: {
+          value: snapshot.value,
+          dataType: snapshot.dataType,
+          category: snapshot.category,
+          label: snapshot.label,
+          description: snapshot.description,
+          editableByTenant: snapshot.editableByTenant,
+        },
+      },
+      { upsert: true, setDefaultsOnInsert: true },
+    );
+  },
+};
+
+const deploy = async ({ changeSet, targetTenantId, user }) => {
+  if (String(targetTenantId) === String(changeSet.tenantId)) {
+    throw new AppError('Source and target tenant must differ.', 400);
+  }
+
+  const { valid, missing } = await validate({ changeSet, targetTenantId });
+
+  if (!valid) {
+    await DeploymentLog.create({
+      tenantId: targetTenantId,
+      sourceTenantId: changeSet.tenantId,
+      changeSetId: changeSet._id,
+      changeSetName: changeSet.name,
+      status: 'blocked',
+      componentCount: (changeSet.components || []).length,
+      missing,
+      message: 'Required dependencies are missing in the target tenant.',
+      by: user?._id,
+    });
+    changeSet.validations.push({
+      by: user?._id,
+      targetTenantId,
+      valid: false,
+      missing,
+    });
+    changeSet.status = 'failed';
+    await changeSet.save();
+    throw new AppError(
+      `Deployment blocked: missing dependencies (${missing
+        .map((m) => m.key)
+        .join(', ')})`,
+      409,
+    );
+  }
+
+  const warnings = [];
+  const ordered = [...(changeSet.components || [])].sort(
+    (a, b) =>
+      COMPONENT_ORDER.indexOf(a.componentType) -
+      COMPONENT_ORDER.indexOf(b.componentType),
+  );
+  for (const component of ordered) {
+    await PERSISTERS[component.componentType](
+      targetTenantId,
+      component.snapshot,
+      warnings,
+    );
+  }
+
+  const log = await DeploymentLog.create({
+    tenantId: targetTenantId,
+    sourceTenantId: changeSet.tenantId,
+    changeSetId: changeSet._id,
+    changeSetName: changeSet.name,
+    status: 'deployed',
+    componentCount: ordered.length,
+    warnings,
+    message: 'Deployment succeeded.',
+    by: user?._id,
+  });
+
+  changeSet.validations.push({
+    by: user?._id,
+    targetTenantId,
+    valid: true,
+    missing: [],
+  });
+  changeSet.status = 'deployed';
+  await changeSet.save();
+
+  logger.info(
+    `Change set '${changeSet.name}' deployed to tenant ${targetTenantId} (${ordered.length} components)`,
+  );
+  return { log, warnings, componentCount: ordered.length };
+};
+
+const listDeploymentLog = async ({ tenantId, limit, skip }) => {
+  const size = Math.min(Number(limit) || 50, 200);
+  const offset = Number(skip) || 0;
+  const filter = { tenantId };
+  const [items, total] = await Promise.all([
+    DeploymentLog.find(filter).sort({ at: -1 }).skip(offset).limit(size).lean(),
+    DeploymentLog.countDocuments(filter),
+  ]);
+  return { items, total, limit: size, skip: offset };
+};
+
+export default { COMPONENT_TYPES, build, validate, deploy, listDeploymentLog };

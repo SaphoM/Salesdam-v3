@@ -41,6 +41,7 @@ jobs:
           node tests/duplicate-detection.e2e.mjs
           node tests/consent.e2e.mjs
           node tests/activity.e2e.mjs
+          node tests/change-set.e2e.mjs
           node tests/insurance-endorsements.e2e.mjs
       - name: Run insurance domain suites
         working-directory: backend
