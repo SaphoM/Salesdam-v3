@@ -68,6 +68,9 @@ Recommendation: update the guide route index and mark extension clearly.
   populated `role` field. Previously they read a non-existent `roles` array,
   which silently hid role-shared dashboards and returned 500 from
   `GET /layouts/:objectApiName/resolve`.
+- Password reset tokens are stored as SHA-256 hashes; only the raw token is
+  emailed, and reset links are single-use and expire in 2 hours. Reset email
+  failures no longer change the response shape (no username enumeration).
 
 ## Security-related contract notes that should remain in force
 - API keys are derived from environment state and key hash storage, not plaintext.

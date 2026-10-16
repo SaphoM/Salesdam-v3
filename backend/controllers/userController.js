@@ -107,7 +107,7 @@ const createUser = asyncHandler(async (req, res) => {
 
   // Handle password setup
   let userPassword = password;
-  let passwordResetToken = null;
+  let passwordResetToken = null; // raw token, emailed only
 
   if (sendWelcomeEmail) {
     // Generate reset token for password creation
@@ -131,7 +131,9 @@ const createUser = asyncHandler(async (req, res) => {
     email: email.toLowerCase(),
     username: username ? username.toLowerCase().trim() : undefined,
     password: userPassword,
-    passwordResetToken,
+    passwordResetToken: passwordResetToken
+      ? passwordResetService.hashToken(passwordResetToken)
+      : null,
     passwordResetExpires: sendWelcomeEmail ? new Date(Date.now() + 2 * 60 * 60 * 1000) : null,
     role: roleId,
     manager: manager || null,
@@ -575,7 +577,7 @@ const requestPasswordReset = asyncHandler(async (req, res) => {
   const resetToken = passwordResetService.generateResetToken();
   const resetTokenExpires = new Date(Date.now() + 2 * 60 * 60 * 1000); // 2 hours
 
-  user.passwordResetToken = resetToken;
+  user.passwordResetToken = passwordResetService.hashToken(resetToken);
   user.passwordResetExpires = resetTokenExpires;
   await user.save();
 

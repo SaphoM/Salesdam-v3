@@ -539,13 +539,17 @@ const forgotPassword = asyncHandler(async (req, res) => {
   const resetToken = passwordResetService.generateResetToken();
   const resetTokenExpires = new Date(Date.now() + 2 * 60 * 60 * 1000);
 
-  user.passwordResetToken = resetToken;
+  user.passwordResetToken = passwordResetService.hashToken(resetToken);
   user.passwordResetExpires = resetTokenExpires;
   await user.save();
 
-  // Send reset email
+  // Send reset email in background; a mail failure must not change the
+  // response, otherwise valid usernames could be distinguished from unknown
+  // ones (or the request would fail) when SMTP is unavailable.
   const appUrl = process.env.APP_URL || 'http://localhost:3000';
-  await passwordResetService.sendPasswordResetEmail(user.email, resetToken, appUrl);
+  passwordResetService.sendPasswordResetEmail(user.email, resetToken, appUrl).catch((err) => {
+    logger.error('Failed to send password reset email:', err);
+  });
 
   await audit({
     tenantId: user.tenantId,
@@ -574,7 +578,7 @@ const verifyResetToken = asyncHandler(async (req, res) => {
   }
 
   const user = await User.findOne({
-    passwordResetToken: token,
+    passwordResetToken: passwordResetService.hashToken(token),
     passwordResetExpires: { $gt: new Date() },
   }).select('+passwordResetToken +passwordResetExpires');
 
@@ -604,7 +608,7 @@ const resetPassword = asyncHandler(async (req, res) => {
   }
 
   const user = await User.findOne({
-    passwordResetToken: token,
+    passwordResetToken: passwordResetService.hashToken(token),
     passwordResetExpires: { $gt: new Date() },
   }).select('+passwordResetToken +passwordResetExpires +password');
 

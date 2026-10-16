@@ -11,6 +11,14 @@ class PasswordResetService {
   }
 
   /**
+   * Hash a reset token for storage. Only the hash is persisted; the raw token
+   * is sent to the user by email and compared by re-hashing on lookup.
+   */
+  hashToken(token) {
+    return crypto.createHash('sha256').update(String(token)).digest('hex');
+  }
+
+  /**
    * Send password reset email with token
    */
   async sendPasswordResetEmail(email, token, appUrl = 'http://localhost:3000') {
