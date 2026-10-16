@@ -14,6 +14,7 @@
  *   onClose       — called when user dismisses mid-flow
  */
 import React, { useState, useCallback, useEffect } from 'react';
+import DOMPurify from 'dompurify';
 import toast from 'react-hot-toast';
 import { Loader, ChevronLeft, ChevronRight, Check } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -285,7 +286,7 @@ function DisplayComp({ comp, record, formData, user }) {
       return (
         <div
           className={styles.richText}
-          dangerouslySetInnerHTML={{ __html: interp(cfg.content || '') }}
+          dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(interp(cfg.content || '')) }}
         />
       );
     case 'section_header':

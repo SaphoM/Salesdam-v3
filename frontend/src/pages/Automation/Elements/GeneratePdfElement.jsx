@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Eye, FilePlus, X } from 'lucide-react';
 import api from '../../../services/api.js';
 import { Row, Sel, Inp } from './shared.jsx';
+import DOMPurify from 'dompurify';
 import styles from './GeneratePdfElement.module.css';
 
 // ─── PDF Preview modal (screen flows only) ────────────────────────────────────
@@ -20,13 +21,13 @@ function PdfPreviewModal({ template, onClose }) {
           </p>
           <div className={styles.previewPage} style={{ padding: `${template.pageSettings?.marginTop ?? 40}px ${template.pageSettings?.marginRight ?? 40}px ${template.pageSettings?.marginBottom ?? 40}px ${template.pageSettings?.marginLeft ?? 40}px` }}>
             {template.pageSettings?.headerHtml && (
-              <div className={styles.headerHtml} dangerouslySetInnerHTML={{ __html: template.pageSettings.headerHtml }} />
+              <div className={styles.headerHtml} dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(template.pageSettings.headerHtml || '') }} />
             )}
             {(template.blocks || []).sort((a, b) => a.order - b.order).map((block, i) => (
               <PreviewBlock key={block.id || i} block={block} />
             ))}
             {template.pageSettings?.footerHtml && (
-              <div className={styles.footerHtml} dangerouslySetInnerHTML={{ __html: template.pageSettings.footerHtml }} />
+              <div className={styles.footerHtml} dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(template.pageSettings.footerHtml || '') }} />
             )}
           </div>
         </div>

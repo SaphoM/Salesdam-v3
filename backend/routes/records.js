@@ -6,7 +6,24 @@ import { requireAuth } from '../middleware/auth.js';
 import { enforceTenant } from '../middleware/tenant.js';
 import { checkObjectPermission } from '../middleware/permissions.js';
 
-const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } });
+const IMPORT_MIMES = new Set([
+  'application/vnd.ms-excel',
+  'application/vnd.openxmlformats-officedocument.spreadsheet.sheet',
+  'text/csv',
+  'text/plain',
+  'application/csv',
+]);
+
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 10 * 1024 * 1024 },
+  fileFilter: (_req, file, cb) => {
+    if (!IMPORT_MIMES.has(file.mimetype)) {
+      return cb(new Error(`Unsupported import file type: ${file.mimetype}`));
+    }
+    cb(null, true);
+  },
+});
 import { asyncHandler, sendSuccess, AppError } from '../utils/errors.js';
 import ObjectMeta from '../models/ObjectMeta.js';
 import FieldMeta from '../models/FieldMeta.js';

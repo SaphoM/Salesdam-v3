@@ -5,6 +5,7 @@ import toast from 'react-hot-toast';
 import api from '../../services/api';
 import Button from '../../components/common/Button/Button';
 import Layout from '../../layout/Layout';
+import DOMPurify from 'dompurify';
 import styles from './EmailTemplateEditor.module.css';
 
 // ─── Common merge fields available in all templates ───────────────────────────
@@ -133,9 +134,10 @@ function LivePreview({ subject, bodyHtml, bodyText, useHtml }) {
           <div
             className={styles.previewBody}
             dangerouslySetInnerHTML={{
-              __html:
+              __html: DOMPurify.sanitize(
                 interp(bodyHtml) ||
-                '<p style="color:#94a3b8;font-style:italic">HTML body is empty</p>',
+                  '<p style="color:#94a3b8;font-style:italic">HTML body is empty</p>',
+              ),
             }}
           />
         ) : (

@@ -41,9 +41,35 @@ import {
 import { enforceTenant } from '../middleware/tenant.js';
 
 const router = express.Router();
-const upload = multer({
+const IMAGE_MIMES = new Set(['image/jpeg', 'image/png', 'image/gif', 'image/webp']);
+const IMPORT_MIMES = new Set([
+  'application/vnd.ms-excel',
+  'application/vnd.openxmlformats-officedocument.spreadsheet.sheet',
+  'text/csv',
+  'text/plain',
+  'application/csv',
+]);
+
+const logoUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 5 * 1024 * 1024 },
+  fileFilter: (_req, file, cb) => {
+    if (!IMAGE_MIMES.has(file.mimetype)) {
+      return cb(new Error(`Unsupported logo file type: ${file.mimetype}`));
+    }
+    cb(null, true);
+  },
+});
+
+const importUpload = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: 10 * 1024 * 1024 },
+  fileFilter: (_req, file, cb) => {
+    if (!IMPORT_MIMES.has(file.mimetype)) {
+      return cb(new Error(`Unsupported import file type: ${file.mimetype}`));
+    }
+    cb(null, true);
+  },
 });
 
 router.use(requireAuth, enforceTenant);
@@ -57,7 +83,7 @@ router.get('/logs', requireAdmin, getAuditLogs);
 
 // Admin settings (company profile, targets, invoice/quote) — admin only
 router.get('/settings', requireAdmin, getAdminSettings);
-router.put('/settings', requireAdmin, upload.single('logoFile'), updateAdminSettings);
+router.put('/settings', requireAdmin, logoUpload.single('logoFile'), updateAdminSettings);
 
 // Storage usage — admin only
 router.get('/storage-usage', requireAdmin, getStorageUsage);
@@ -73,7 +99,7 @@ router.put('/subscription/payment-method', requireAdmin, updatePaymentMethod);
 router.post('/subscription/cancel', requireAdmin, cancelSubscription);
 
 // Data import/export with field selection and filters — admin only
-router.post('/import', requireAdmin, upload.single('file'), importRecords);
+router.post('/import', requireAdmin, importUpload.single('file'), importRecords);
 router.get('/export', requireAdmin, adminExport);
 
 // Tenant (workspace) management — superuser only

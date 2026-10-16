@@ -10,7 +10,7 @@ const apiKeySchema = new mongoose.Schema({
   },
   name: { type: String, required: true, trim: true },
   description: { type: String, trim: true },
-  keyHash: { type: String, required: true, select: false }, // bcrypt hash of the key
+  keyHash: { type: String, required: true, select: false }, // SHA-256 hash of the key
   keyPrefix: { type: String, required: true },               // First 8 chars for identification
   scopes: [{
     type: String,
