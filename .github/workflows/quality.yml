@@ -10,6 +10,14 @@ jobs:
   backend:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    services:
+      mongo:
+        image: mongo:7
+        ports:
+          - 27017:27017
+    env:
+      NODE_ENV: test
+      MONGO_URI: mongodb://127.0.0.1:27017/salesdam_ci
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -25,9 +33,12 @@ jobs:
         run: npm test
       - name: Run database-backed integration tests
         working-directory: backend
-        run: node tests/tenant-isolation.e2e.mjs && node tests/insurance-endorsements.e2e.mjs
-        env:
-          NODE_ENV: test
+        run: |
+          node tests/tenant-isolation.e2e.mjs
+          node tests/insurance-endorsements.e2e.mjs
+      - name: Run insurance domain suites
+        working-directory: backend
+        run: npm run test:insurance
 
   frontend:
     runs-on: ubuntu-latest

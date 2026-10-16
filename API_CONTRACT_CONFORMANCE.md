@@ -67,5 +67,7 @@ Recommendation: update the guide route index and mark extension clearly.
 
 ## Security-related contract notes that should remain in force
 - API keys are derived from environment state and key hash storage, not plaintext.
+- Paystack webhook signatures are verified with timing-safe HMAC-SHA512 over the
+  raw request bytes, not a re-serialized JSON body.
 - System and channel credentials remain external environment variables, not CRM user data.
 - No production credentials were stored as branch state or example values following this remediation.
