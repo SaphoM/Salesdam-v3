@@ -64,6 +64,10 @@ Recommendation: update the guide route index and mark extension clearly.
 - Incident moderation ("reporter or admin" edit/close/delete) now uses the
   authoritative `User.isAdmin()` check; the previous `systemRole` check never
   matched because that field is not persisted on the user document.
+- Dashboard visibility/edit sharing and layout resolution now read the single
+  populated `role` field. Previously they read a non-existent `roles` array,
+  which silently hid role-shared dashboards and returned 500 from
+  `GET /layouts/:objectApiName/resolve`.
 
 ## Security-related contract notes that should remain in force
 - API keys are derived from environment state and key hash storage, not plaintext.

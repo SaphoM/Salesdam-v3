@@ -12,12 +12,20 @@ import { asyncHandler, sendSuccess, AppError } from '../utils/errors.js';
 const router = express.Router();
 router.use(requireAuth, enforceTenant);
 
+// The user model has a single populated `role`; normalise it to an id list so
+// role-based sharing works (and never throws on a missing collection).
+function roleIdsOf(user) {
+  const role = user.role;
+  if (!role) return [];
+  return [role._id || role];
+}
+
 // ─── Visibility filter ────────────────────────────────────────────────────────
 // Returns a MongoDB query that finds dashboards the current user can see.
 function visibilityQuery(req) {
   const userId = req.user._id;
-  const roleIds = (req.user.roles || []).map((r) => r._id || r);
-  const isAdmin = ['superuser', 'admin'].includes(req.user.systemRole);
+  const roleIds = roleIdsOf(req.user);
+  const isAdmin = req.user.isAdmin();
 
   if (isAdmin) return { tenantId: req.tenantId }; // admins see everything
 
@@ -38,8 +46,8 @@ function visibilityQuery(req) {
 // Returns true if user can edit this dashboard
 function canEdit(dashboard, req) {
   const userId = req.user._id.toString();
-  const roleIds = (req.user.roles || []).map((r) => (r._id || r).toString());
-  if (['superuser', 'admin'].includes(req.user.systemRole)) return true;
+  const roleIds = roleIdsOf(req.user).map((r) => r.toString());
+  if (req.user.isAdmin()) return true;
   if (dashboard.createdBy.toString() === userId) return true;
   if (!dashboard.sharing.allowEdit) return false;
   if (dashboard.sharing.editableByUsers.some((u) => u.toString() === userId))
@@ -184,7 +192,7 @@ router.put(
     if (!dash) throw new AppError('Dashboard not found.', 404);
     if (
       dash.createdBy.toString() !== req.user._id.toString() &&
-      !['superuser', 'admin'].includes(req.user.systemRole)
+      !req.user.isAdmin()
     ) {
       throw new AppError('Only the owner can change sharing settings.', 403);
     }
@@ -221,7 +229,7 @@ router.delete(
     if (!dash) throw new AppError('Dashboard not found.', 404);
     if (
       dash.createdBy.toString() !== req.user._id.toString() &&
-      !['superuser', 'admin'].includes(req.user.systemRole)
+      !req.user.isAdmin()
     ) {
       throw new AppError('Only the owner can delete this dashboard.', 403);
     }

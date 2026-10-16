@@ -10,6 +10,13 @@ const router = express.Router();
 
 router.use(requireAuth, enforceTenant);
 
+// The user model has a single populated `role`; normalise it to an id list.
+function roleIdsOf(user) {
+  const role = user.role;
+  if (!role) return [];
+  return [role._id || role];
+}
+
 // Get layouts for an object — always fresh, never cached
 router.get('/:objectApiName', asyncHandler(async (req, res) => {
   res.set('Cache-Control', 'no-store');
@@ -23,7 +30,7 @@ router.get('/:objectApiName', asyncHandler(async (req, res) => {
 // Get the applicable layout for current user
 router.get('/:objectApiName/resolve', asyncHandler(async (req, res) => {
   const { objectApiName } = req.params;
-  const userRoleIds = req.user.roles.map(r => r._id || r);
+  const userRoleIds = roleIdsOf(req.user);
 
   // Try to find a role-specific layout first
   let layout = await Layout.findOne({

@@ -19,6 +19,7 @@ import ObjectMeta from '../models/ObjectMeta.js';
 import DynamicRecord from '../models/DynamicRecord.js';
 import File from '../models/File.js';
 import Incident from '../models/Incident.js';
+import Dashboard from '../models/Dashboard.js';
 import Session from '../models/Session.js';
 import { seedDefaultRoles } from '../services/roleService.js';
 
@@ -188,6 +189,25 @@ try {
   });
   check('A cannot comment on B incident', incWrite.status === 404, `HTTP ${incWrite.status}`);
 
+  // Layout resolution must not crash on the (single) role field.
+  const layoutResolve = await req(`/api/v1/layouts/policy/resolve`, { cookie: ca });
+  check('layout resolve returns 200', layoutResolve.status === 200, `HTTP ${layoutResolve.status}`);
+
+  // A dashboard shared with a role must be visible to members of that role,
+  // even when they do not own it.
+  await Dashboard.create({
+    tenantId: A.tenant._id,
+    name: `ROLE_SHARED_${RUN}`,
+    createdBy: new mongoose.Types.ObjectId(),
+    sharing: { access: 'roles', sharedWithRoles: [A.adminRole._id] },
+  });
+  const dashList = await req(`/api/v1/dashboards`, { cookie: ca });
+  check(
+    'role-shared dashboard is visible to the role member',
+    dashList.status === 200 && dashList.text.includes(`ROLE_SHARED_${RUN}`),
+    `HTTP ${dashList.status}`,
+  );
+
   // Client-supplied tenant header must not override the session tenant.
   const spoof = await req(`/api/v1/files/${B.file._id}`, {
     cookie: ca,
@@ -202,7 +222,7 @@ try {
 } finally {
   await Tenant.deleteMany({ _id: { $in: createdTenantIds } });
   await Promise.all(
-    [User, Role, ObjectMeta, DynamicRecord, File, Incident, Session].map((M) =>
+    [User, Role, ObjectMeta, DynamicRecord, File, Incident, Dashboard, Session].map((M) =>
       M.deleteMany({ tenantId: { $in: createdTenantIds } }).catch(() => {}),
     ),
   );
