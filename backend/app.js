@@ -60,6 +60,7 @@ import changeSetRoutes from './routes/changeSets.js';
 import channelRoutes from './routes/channels.js';
 import conversationRoutes from './routes/conversations.js';
 import messageTemplateRoutes from './routes/messageTemplates.js';
+import telephonyRoutes from './routes/telephony.js';
 
 const require = createRequire(import.meta.url);
 const { version } = require('./package.json');
@@ -223,6 +224,8 @@ app.use(`${API_V1_PREFIX}/change-sets`, changeSetRoutes);
 app.use(`${API_V1_PREFIX}/channels`, channelRoutes);
 app.use(`${API_V1_PREFIX}/conversations`, conversationRoutes);
 app.use(`${API_V1_PREFIX}/message-templates`, messageTemplateRoutes);
+// Call Centre / telephony: agent presence, dispositions & wrap-up (Core BRD §18).
+app.use(`${API_V1_PREFIX}/telephony`, telephonyRoutes);
 
 // 404 handler
 app.use((req, res) => {
