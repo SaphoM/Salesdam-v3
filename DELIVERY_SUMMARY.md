@@ -107,9 +107,23 @@ end-to-end suite and is wired into `.github/workflows/quality.yml`.
 | §3.4 | Configurable duplicate detection & matching | `/duplicate-rules` | `duplicate-detection.e2e.mjs` | 20/20 |
 | §23 | Communication consent & preferences | `/consents` | `consent.e2e.mjs` | 19/19 |
 | §24 | Activity & customer interaction timeline | `/activities` | `activity.e2e.mjs` | 17/17 |
-| §13 | Metadata deployment & change sets | `/change-sets` | `change-set.e2e.mjs` | 32/32 |
-| §16 | Omnichannel inbox, channels & messaging templates | `/channels`, `/conversations`, `/message-templates` | `omnichannel.e2e.mjs` | 35/35 |
+| §13 | Metadata deployment & change sets | `/change-sets` | `change-set.e2e.mjs` | 47/47 |
+| §16 | Omnichannel inbox, channels & messaging templates | `/channels`, `/conversations`, `/message-templates` | `omnichannel.e2e.mjs` | 42/42 |
 | §18 | Call centre/telephony presence, dispositions & wrap-up | `/telephony` | `telephony.e2e.mjs` | 16/16 |
+
+### Provider readiness & environment management (delivered 2026-10-16)
+
+Built on top of the seven features, everything that does not need vendor
+credentials or the Insurance ERD — plus explicit seams for the parts that do:
+
+| BRD | Capability | Surface |
+|-----|------------|---------|
+| §13 | Sandbox tenant cloning — copies a tenant's metadata (objects, fields, layouts, flows, approvals, duplicate rules, config overrides) into a new isolated tenant with no business data; role refs remap by name | `POST /change-sets/sandbox` (superuser) |
+| §13 | Deployment rollback — restores each component to its pre-deployment state (recreate prior snapshot, or delete if it did not exist), once per deployment | `POST /change-sets/deployment-log/:logId/rollback` (superuser) |
+| §16.1 | Provider catalog — required credentials and normalizer support per provider | `GET /channels/providers` |
+| §16.1 | Provider config validation — reports missing credentials for an account | `POST /channels/:id/validate` (admin) |
+| §16.1 | Inbound normalization — Meta WhatsApp Cloud API and Messenger/Instagram webhooks mapped to canonical events (batched, resilient per-event) | `POST /channels/webhook/whatsapp\|facebook\|instagram/:accountId` |
+| §18.5 | Telephony provider catalog and call-control seam — `dial/hangup/transfer/hold` decline with `501` until a provider contract is wired | `GET /telephony/providers`, `POST /telephony/calls` |
 
 ### Verified outcomes in these features
 
@@ -133,10 +147,11 @@ end-to-end suite and is wired into `.github/workflows/quality.yml`.
   gateway and Euphoria telephony calls are not integrated (no credentials,
   and Euphoria API docs were not supplied). The ingestion, inbox, template,
   consent and call-logging logic around them is tested; delivery itself is not.
+  The provider layer is now ready: credentials/contracts drop into the declared
+  provider definitions and the call-control seam.
 - **Deferred, noted in commits**: Meta Lead Ads capture (§16.1) pending a lead
-  field-mapping contract; sandbox tenant cloning and package rollback (§13);
-  on-approve flow triggering; duplicate record merge; creating a Lead/Contact
-  directly from a conversation.
+  field-mapping contract; on-approve flow triggering; duplicate record merge;
+  creating a Lead/Contact directly from a conversation.
 
 ---
 

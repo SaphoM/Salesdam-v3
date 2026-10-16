@@ -4,7 +4,7 @@ Source documents:
 
 - `Salesdam API and Integration Guide v1.0`, dated 14 October 2026 (provided as PDF).
 - `Salesdam V3 Platform Core BRD V2.1`, dated 10 October 2026.
-- Actual application code in `backend/` at master commit `6f89923`.
+- Actual application code in `backend/` at master commit `c131dae`.
 
 ## Conformance summary
 
@@ -84,20 +84,39 @@ end-to-end suite wired into `.github/workflows/quality.yml`.
 | §3.4 | Duplicate detection | `/duplicate-rules` | `tests/duplicate-detection.e2e.mjs` (20) |
 | §23 | Communication consent | `/consents` | `tests/consent.e2e.mjs` (19) |
 | §24 | Activity & interaction timeline | `/activities` | `tests/activity.e2e.mjs` (17) |
-| §13 | Metadata deployment / change sets | `/change-sets` | `tests/change-set.e2e.mjs` (32) |
-| §16 | Omnichannel inbox, channels, templates | `/channels`, `/conversations`, `/message-templates` | `tests/omnichannel.e2e.mjs` (35) |
+| §13 | Metadata deployment / change sets | `/change-sets` | `tests/change-set.e2e.mjs` (47) |
+| §16 | Omnichannel inbox, channels, templates | `/channels`, `/conversations`, `/message-templates` | `tests/omnichannel.e2e.mjs` (42) |
 | §18 | Call centre / telephony | `/telephony` | `tests/telephony.e2e.mjs` (16) |
+
+Environment & provider-readiness surfaces added on top of the change-set and
+omnichannel routes (all superuser- or admin-scoped; no live vendor calls):
+
+| BRD | Capability | Routes | Tests |
+| --- | --- | --- | --- |
+| §13 | Sandbox tenant cloning (config only, no data) | `POST /change-sets/sandbox` | `change-set.e2e.mjs` |
+| §13 | Deployment rollback (restore pre-deployment state) | `POST /change-sets/deployment-log/:logId/rollback` | `change-set.e2e.mjs` |
+| §16.1 | Provider catalog (required credentials, normalizer support) | `GET /channels/providers` | `omnichannel.e2e.mjs` |
+| §16.1 | Provider config validation | `POST /channels/:id/validate` | `omnichannel.e2e.mjs` |
+| §18.5 | Telephony provider catalog + call-control seam | `GET /telephony/providers`, `POST /telephony/calls` | `omnichannel.e2e.mjs` |
 
 Security posture of the new surfaces:
 
-- Cross-tenant metadata promotion (`/change-sets/:id/validate|deploy` and the
-  deployment log) is superuser-only; packaging stays admin-scoped to the
-  caller's own tenant.
+- Cross-tenant metadata promotion (`/change-sets/:id/validate|deploy`),
+  deployment rollback, the deployment log and sandbox cloning are
+  superuser-only; packaging stays admin-scoped to the caller's own tenant.
 - Channel webhooks (`POST /channels/webhook/:channel/:accountId`) authenticate
   by timing-safe HMAC-SHA256 over the raw request bytes and reject unsigned or
   wrongly signed payloads; an account without a signing secret accepts nothing.
+- Recognized provider webhook payloads (Meta WhatsApp Cloud API, Messenger /
+  Instagram Messaging) are normalized server-side into canonical events before
+  ingestion; unrecognized bodies fall through to the canonical shape used by
+  tests and development.
 - Channel provider credentials and webhook secrets are `select:false` and
-  stripped from JSON responses.
+  stripped from JSON responses; provider config validation reads them
+  server-side only.
+- Outbound provider delivery and telephony call control remain stubs that
+  return an explicit not-implemented status — nothing is reported as delivered
+  or dialled when it was not.
 - These routes fall under the existing `/api` global rate limiter; the webhook
   is intentionally public (no session) because the signature is the credential.
 
