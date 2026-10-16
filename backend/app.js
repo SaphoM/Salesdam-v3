@@ -52,6 +52,7 @@ import leadApprovalRoutes from './routes/leadApproval.js';
 import documentRoutes from './routes/documents.js';
 import insuranceRoutes from './routes/insurance.js';
 import configurationRoutes from './routes/configuration.js';
+import approvalProcessRoutes from './routes/approvalProcess.js';
 
 const require = createRequire(import.meta.url);
 const { version } = require('./package.json');
@@ -200,6 +201,8 @@ app.use(`${API_V1_PREFIX}/documents`, documentRoutes);
 app.use(`${API_V1_PREFIX}/insurance`, insuranceRoutes);
 // Platform-wide key/value settings with per-tenant overrides (Core BRD §14).
 app.use(`${API_V1_PREFIX}/configuration`, configurationRoutes);
+// Configurable multi-step approval processes (Core BRD §8).
+app.use(`${API_V1_PREFIX}/approval-processes`, approvalProcessRoutes);
 
 // 404 handler
 app.use((req, res) => {

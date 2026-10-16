@@ -33,6 +33,7 @@ import ListView from '../models/ListView.js';
 import RecentlyViewed from '../models/RecentlyViewed.js';
 import { buildFilterQuery, buildSort } from '../services/listViewService.js';
 import { defaultViewsFor } from '../config/listViews.js';
+import approvalProcessService from '../services/approvalProcessService.js';
 
 /**
  * Resolves a view key to its definition. Config-defined defaults are checked
@@ -489,6 +490,15 @@ const updateRecord = asyncHandler(async (req, res) => {
     }).session(session);
     if (!record) throw new AppError('Record not found.', 404);
 
+    if (
+      await approvalProcessService.isRecordLocked(req.tenantId, objectApiName, id)
+    ) {
+      throw new AppError(
+        'This record is locked while an approval is pending.',
+        423,
+      );
+    }
+
     const fields = await FieldMeta.find({
       tenantId: req.tenantId,
       objectApiName,
@@ -642,6 +652,15 @@ const deleteRecord = asyncHandler(async (req, res) => {
       isDeleted: false,
     }).session(session);
     if (!record) throw new AppError('Record not found.', 404);
+
+    if (
+      await approvalProcessService.isRecordLocked(req.tenantId, objectApiName, id)
+    ) {
+      throw new AppError(
+        'This record is locked while an approval is pending.',
+        423,
+      );
+    }
 
     record.isDeleted = true;
     record.deletedAt = new Date();
