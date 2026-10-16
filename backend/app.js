@@ -57,6 +57,9 @@ import duplicateRuleRoutes from './routes/duplicateRules.js';
 import consentRoutes from './routes/consents.js';
 import activityRoutes from './routes/activities.js';
 import changeSetRoutes from './routes/changeSets.js';
+import channelRoutes from './routes/channels.js';
+import conversationRoutes from './routes/conversations.js';
+import messageTemplateRoutes from './routes/messageTemplates.js';
 
 const require = createRequire(import.meta.url);
 const { version } = require('./package.json');
@@ -215,6 +218,11 @@ app.use(`${API_V1_PREFIX}/consents`, consentRoutes);
 app.use(`${API_V1_PREFIX}/activities`, activityRoutes);
 // Metadata deployment & change sets (Core BRD §13).
 app.use(`${API_V1_PREFIX}/change-sets`, changeSetRoutes);
+// Omnichannel inbox: channel accounts, conversations & messaging templates
+// (Core BRD §16).
+app.use(`${API_V1_PREFIX}/channels`, channelRoutes);
+app.use(`${API_V1_PREFIX}/conversations`, conversationRoutes);
+app.use(`${API_V1_PREFIX}/message-templates`, messageTemplateRoutes);
 
 // 404 handler
 app.use((req, res) => {
