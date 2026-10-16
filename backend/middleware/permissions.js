@@ -3,6 +3,22 @@ import User from '../models/User.js';
 import { AppError } from '../utils/errors.js';
 
 /**
+ * hasObjectPermission(user, action, objectApiName)
+ * Programmatic form of checkObjectPermission, for callers whose object is only
+ * known at runtime (e.g. "create the record this conversation maps to").
+ */
+const hasObjectPermission = async (user, action, objectApiName) => {
+  if (user?.role?.name === 'superuser' || user?.role?.name === 'admin') return true;
+  if (!objectApiName) return false;
+  const userRole = user?.role;
+  if (!userRole) return false;
+  const roleDoc = userRole.objectPermissions
+    ? userRole
+    : await Role.findById(userRole._id || userRole);
+  return Boolean(roleDoc && roleDoc.can(action, objectApiName));
+};
+
+/**
  * checkObjectPermission(action, objectApiName)
  * Factory middleware - verifies the user has the given action on the object.
  * Actions: 'create' | 'read' | 'update' | 'delete' | 'export'
@@ -22,31 +38,11 @@ const checkObjectPermission = (action, objectApiName) => {
           new AppError('Object API name required for permission check.', 400),
         );
 
-      const userRole = req.user.role;
-      if (!userRole) {
-        return next(
-          new AppError(
-            `You do not have permission to ${action} on ${objName}.`,
-            403,
-          ),
-        );
-      }
+      if (await hasObjectPermission(req.user, action, objName)) return next();
 
-      // Check if the user's role grants the required permission
-      const roleDoc = userRole.objectPermissions
-        ? userRole
-        : await Role.findById(userRole._id || userRole);
-
-      if (!roleDoc || !roleDoc.can(action, objName)) {
-        return next(
-          new AppError(
-            `You do not have permission to ${action} on ${objName}.`,
-            403,
-          ),
-        );
-      }
-
-      next();
+      return next(
+        new AppError(`You do not have permission to ${action} on ${objName}.`, 403),
+      );
     } catch (err) {
       next(err);
     }
@@ -231,6 +227,7 @@ const buildDataAccessFilter = async (user) => {
 
 export {
   checkObjectPermission,
+  hasObjectPermission,
   checkAppPermission,
   getVisibleFields,
   getEditableFields,

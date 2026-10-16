@@ -48,6 +48,10 @@ const channelAccountSchema = new mongoose.Schema(
     credentials: { type: mongoose.Schema.Types.Mixed, default: {}, select: false },
     webhookSecret: { type: String, select: false },
 
+    // Object created when an agent "creates a record" from a conversation
+    // (§16.4). Falls back to the first match rule's object when unset.
+    createObjectApiName: { type: String, trim: true },
+
     // How an inbound phone/email/handle is matched to an existing record.
     matchRules: { type: [matchRuleSchema], default: [] },
     // Optional default owner for records created from this channel.

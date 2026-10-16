@@ -61,6 +61,7 @@ const auditLogSchema = new mongoose.Schema(
         'incident_create',
         'incident_update',
         'incident_comment_create',
+        'merge',
       ],
     },
     resource: { type: String }, // "DynamicRecord", "User", "Role", etc.

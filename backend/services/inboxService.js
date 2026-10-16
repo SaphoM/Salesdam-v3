@@ -2,9 +2,20 @@ import Conversation from '../models/Conversation.js';
 import Message from '../models/Message.js';
 import ChannelAccount from '../models/ChannelAccount.js';
 import Activity from '../models/Activity.js';
+import DynamicRecord from '../models/DynamicRecord.js';
+import ObjectMeta from '../models/ObjectMeta.js';
+import FieldMeta from '../models/FieldMeta.js';
 import consentService from './consentService.js';
 import channelProviders from './channelProviders.js';
-import { AppError } from '../utils/errors.js';
+import duplicateDetectionService from './duplicateDetectionService.js';
+import { validateRecordData, runObjectValidationRules } from './validationService.js';
+import { buildSearchText } from './searchService.js';
+import { computeFormulaValues, computeAndSetFormulaValues } from './formulaService.js';
+import { applyAutoNumbers } from './autoNumberService.js';
+import { setRollupValuesOnRecord } from './rollupService.js';
+import { fireAutomations } from './automationService.js';
+import { getEditableFields, hasObjectPermission } from '../middleware/permissions.js';
+import { AppError, ValidationError } from '../utils/errors.js';
 
 /**
  * Omnichannel inbox service (Core BRD §16.2, §16.3, §16.4).
@@ -201,6 +212,132 @@ const addNote = async ({ tenantId, id, body, user }) => {
   });
 };
 
+/**
+ * Create a record from a conversation (Core BRD §16.4) — an agent turns a
+ * thread into a Lead/Contact/etc. The target object is the requested object,
+ * else the channel account's `createObjectApiName`, else its first match rule.
+ * Duplicate rules and field validation apply exactly as on manual capture.
+ */
+const createRecordFromConversation = async ({
+  tenantId,
+  id,
+  objectApiName,
+  data = {},
+  user,
+}) => {
+  const conversation = await getConversation({ tenantId, id });
+  if (conversation.linkedRecord) {
+    throw new AppError('This conversation is already linked to a record.', 409);
+  }
+  if (!data || typeof data !== 'object') {
+    throw new AppError('data must be an object.', 400);
+  }
+
+  const account = await ChannelAccount.findOne({
+    _id: conversation.channelAccountId,
+    tenantId,
+  });
+  const targetObject =
+    objectApiName ||
+    account?.createObjectApiName ||
+    account?.matchRules?.[0]?.objectApiName;
+  if (!targetObject) {
+    throw new AppError('No target object could be determined for this conversation.', 400);
+  }
+  if (!(await hasObjectPermission(user, 'create', targetObject))) {
+    throw new AppError(`You do not have permission to create ${targetObject}.`, 403);
+  }
+
+  const obj = await ObjectMeta.findOne({ tenantId, apiName: targetObject });
+  if (!obj) throw new AppError(`Object "${targetObject}" not found.`, 404);
+  const fields = await FieldMeta.find({ tenantId, objectApiName: targetObject });
+
+  // Prefill the matched identifier and the contact's display name; explicit
+  // caller data wins.
+  const payload = {};
+  const rule = (account?.matchRules || []).find(
+    (r) => r.objectApiName === targetObject,
+  );
+  if (rule?.fieldApiName && conversation.contactIdentifier) {
+    payload[rule.fieldApiName] = conversation.contactIdentifier;
+  }
+  const nameField = obj.nameFieldApiName || 'name';
+  if (conversation.contactName) payload[nameField] = conversation.contactName;
+  Object.assign(payload, data);
+
+  const duplicateCheck = await duplicateDetectionService.check(
+    tenantId,
+    targetObject,
+    payload,
+    {},
+  );
+  if (duplicateCheck.action === 'block') {
+    const err = new AppError('A potential duplicate record was found.', 409);
+    err.duplicates = duplicateCheck.matches;
+    throw err;
+  }
+
+  const editable = await getEditableFields(
+    user,
+    targetObject,
+    fields.map((f) => f.apiName),
+  );
+  const editableBody = Object.fromEntries(
+    Object.entries(payload).filter(([k]) => editable.includes(k)),
+  );
+
+  const { data: validated, errors, fieldErrors } = await validateRecordData(
+    editableBody,
+    fields,
+    tenantId,
+    null,
+  );
+  errors.push(
+    ...runObjectValidationRules(obj.validationRules || [], {
+      ...validated,
+      ...computeFormulaValues(validated, fields),
+    }),
+  );
+  if (errors.length > 0) {
+    throw new ValidationError(errors, 400, {
+      fieldErrors,
+      message: errors.join('; '),
+    });
+  }
+
+  const record = new DynamicRecord({
+    tenantId,
+    objectId: obj._id,
+    objectApiName: targetObject,
+    ownerId: conversation.assignedTo || account?.defaultOwnerId || user?._id,
+    createdBy: user?._id,
+    lastModifiedBy: user?._id,
+  });
+  Object.entries(validated).forEach(([key, value]) => record.setField(key, value));
+
+  await applyAutoNumbers(record, fields, tenantId, targetObject);
+  await setRollupValuesOnRecord(tenantId, record, fields);
+  await computeAndSetFormulaValues(record, fields);
+  record._searchText = await buildSearchText(record, fields);
+  await record.save();
+
+  conversation.linkedRecord = {
+    objectApiName: targetObject,
+    recordId: record._id,
+  };
+  await conversation.save();
+
+  fireAutomations('create', targetObject, record, tenantId).catch(() => {});
+
+  return {
+    record: record.toDataObject(),
+    objectApiName: targetObject,
+    duplicateMatches:
+      duplicateCheck.action === 'warn' ? duplicateCheck.matches : [],
+    conversationId: String(conversation._id),
+  };
+};
+
 export default {
   listConversations,
   getConversation,
@@ -210,4 +347,5 @@ export default {
   linkRecord,
   reply,
   addNote,
+  createRecordFromConversation,
 };

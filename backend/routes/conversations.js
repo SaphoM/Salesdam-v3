@@ -8,6 +8,7 @@ import {
   linkRecord,
   reply,
   addNote,
+  createRecordFromConversation,
 } from '../controllers/inboxController.js';
 import { requireAuth } from '../middleware/auth.js';
 import { enforceTenant } from '../middleware/tenant.js';
@@ -24,5 +25,6 @@ router.post('/:id/status', setStatus);
 router.post('/:id/link', linkRecord);
 router.post('/:id/reply', reply);
 router.post('/:id/notes', addNote);
+router.post('/:id/create-record', createRecordFromConversation);
 
 export default router;

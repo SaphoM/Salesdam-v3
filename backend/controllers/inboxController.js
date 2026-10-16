@@ -1,4 +1,5 @@
 import inboxService from '../services/inboxService.js';
+import { audit } from '../utils/auditLogger.js';
 import { asyncHandler, sendSuccess, AppError } from '../utils/errors.js';
 
 const listConversations = asyncHandler(async (req, res) => {
@@ -98,6 +99,43 @@ const addNote = asyncHandler(async (req, res) => {
   sendSuccess(res, { data: message }, 'Note added', 201);
 });
 
+const createRecordFromConversation = asyncHandler(async (req, res) => {
+  try {
+    const result = await inboxService.createRecordFromConversation({
+      tenantId: req.tenantId,
+      id: req.params.id,
+      objectApiName: req.body?.objectApiName,
+      data: req.body?.data,
+      user: req.user,
+    });
+
+    await audit({
+      tenantId: req.tenantId,
+      userId: req.user._id,
+      userEmail: req.user.email,
+      action: 'create',
+      resource: 'DynamicRecord',
+      resourceId: result.record.id,
+      objectApiName: result.objectApiName,
+      req,
+      details: { conversationId: result.conversationId },
+    });
+
+    sendSuccess(res, { data: result }, 'Record created from conversation', 201);
+  } catch (err) {
+    // Duplicate rules can block creation; surface the matches like the record
+    // API does so the client can offer "use existing" instead.
+    if (Array.isArray(err.duplicates)) {
+      return res.status(409).json({
+        success: false,
+        message: err.message,
+        duplicates: err.duplicates,
+      });
+    }
+    throw err;
+  }
+});
+
 export {
   listConversations,
   getConversation,
@@ -107,4 +145,5 @@ export {
   linkRecord,
   reply,
   addNote,
+  createRecordFromConversation,
 };

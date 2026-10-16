@@ -51,6 +51,7 @@ const createAccount = async ({ tenantId, data = {}, user }) => {
     webhookSecret: data.webhookSecret,
     matchRules: data.matchRules,
     defaultOwnerId: data.defaultOwnerId,
+    createObjectApiName: data.createObjectApiName,
     createdBy: user?._id,
   });
 };
@@ -64,6 +65,7 @@ const updateAccount = async ({ tenantId, id, updates = {} }) => {
     'webhookSecret',
     'matchRules',
     'defaultOwnerId',
+    'createObjectApiName',
   ];
   const patch = {};
   for (const key of allowed) {

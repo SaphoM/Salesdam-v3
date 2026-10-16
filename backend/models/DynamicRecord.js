@@ -38,6 +38,22 @@ const dynamicRecordSchema = new mongoose.Schema({
   deletedAt: { type: Date },
   deletedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
 
+  // Duplicate merge (Core BRD §3.4). A merged-away record points at its
+  // survivor; the survivor keeps an append-only history so a wrong merge can
+  // be traced and, if needed, un-picked.
+  mergedIntoId: { type: mongoose.Schema.Types.ObjectId, ref: 'DynamicRecord' },
+  mergeHistory: {
+    type: [
+      {
+        _id: false,
+        mergedAt: { type: Date },
+        mergedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+        sourceIds: [{ type: mongoose.Schema.Types.ObjectId, ref: 'DynamicRecord' }],
+      },
+    ],
+    default: [],
+  },
+
   // System fields
   createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', index: true },
   lastModifiedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },

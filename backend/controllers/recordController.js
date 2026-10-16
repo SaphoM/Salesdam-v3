@@ -35,6 +35,7 @@ import { buildFilterQuery, buildSort } from '../services/listViewService.js';
 import { defaultViewsFor } from '../config/listViews.js';
 import approvalProcessService from '../services/approvalProcessService.js';
 import duplicateDetectionService from '../services/duplicateDetectionService.js';
+import recordMergeService from '../services/recordMergeService.js';
 
 /**
  * Resolves a view key to its definition. Config-defined defaults are checked
@@ -901,6 +902,54 @@ function _triggerParentRollup(
 const CASCADE_MAX_DEPTH = 5;
 
 /**
+ * POST /api/records/:objectApiName/merge
+ *
+ * Folds one or more duplicate records into a surviving master record
+ * (Core BRD §3.4). Soft-deletes the duplicates, fills blank master fields from
+ * them, repoints inbound lookups and writes an audit entry.
+ */
+const mergeRecords = asyncHandler(async (req, res) => {
+  const { objectApiName } = req.params;
+  const { masterId, duplicateIds, fieldValues } = req.body || {};
+
+  const result = await recordMergeService.mergeRecords({
+    tenantId: req.tenantId,
+    objectApiName,
+    masterId,
+    duplicateIds,
+    fieldValues,
+    user: req.user,
+  });
+
+  await audit({
+    tenantId: req.tenantId,
+    userId: req.user._id,
+    userEmail: req.user.email,
+    action: 'merge',
+    resource: 'DynamicRecord',
+    resourceId: result.master._id,
+    objectApiName,
+    req,
+    details: {
+      mergedRecordIds: result.mergedRecordIds,
+      repointedReferences: result.repointedReferences,
+    },
+  });
+
+  sendSuccess(
+    res,
+    {
+      data: {
+        master: result.master.toDataObject(),
+        mergedRecordIds: result.mergedRecordIds,
+        repointedReferences: result.repointedReferences,
+      },
+    },
+    'Records merged',
+  );
+});
+
+/**
  * _cascadeDelete — soft-deletes the children of a deleted record.
  *
  * Finds every lookup / master-detail field across the tenant that points at
@@ -994,6 +1043,7 @@ export {
   updateRecord,
   deleteRecord,
   bulkDelete,
+  mergeRecords,
   // Exported so the cascade rules can be exercised directly in tests.
   _cascadeDelete,
 };

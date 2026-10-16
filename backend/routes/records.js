@@ -1,6 +1,6 @@
 import express from 'express';
 import multer from 'multer';
-import { listRecords, getRecord, createRecord, updateRecord, deleteRecord, bulkDelete } from '../controllers/recordController.js';
+import { listRecords, getRecord, createRecord, updateRecord, deleteRecord, bulkDelete, mergeRecords } from '../controllers/recordController.js';
 import { exportRecords, importRecords } from '../controllers/importExportController.js';
 import { requireAuth } from '../middleware/auth.js';
 import { enforceTenant } from '../middleware/tenant.js';
@@ -130,5 +130,6 @@ router.put('/:objectApiName/:id', checkObjectPermission('update'), updateRecord)
 router.patch('/:objectApiName/:id', checkObjectPermission('update'), updateRecord);
 router.delete('/:objectApiName/:id', checkObjectPermission('delete'), deleteRecord);
 router.post('/:objectApiName/bulk-delete', checkObjectPermission('delete'), bulkDelete);
+router.post('/:objectApiName/merge', checkObjectPermission('delete'), mergeRecords);
 
 export default router;
