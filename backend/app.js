@@ -54,6 +54,7 @@ import insuranceRoutes from './routes/insurance.js';
 import configurationRoutes from './routes/configuration.js';
 import approvalProcessRoutes from './routes/approvalProcess.js';
 import duplicateRuleRoutes from './routes/duplicateRules.js';
+import consentRoutes from './routes/consents.js';
 
 const require = createRequire(import.meta.url);
 const { version } = require('./package.json');
@@ -206,6 +207,8 @@ app.use(`${API_V1_PREFIX}/configuration`, configurationRoutes);
 app.use(`${API_V1_PREFIX}/approval-processes`, approvalProcessRoutes);
 // Configurable duplicate detection rules (Core BRD §3.4).
 app.use(`${API_V1_PREFIX}/duplicate-rules`, duplicateRuleRoutes);
+// Communication consent & preferences (Core BRD §23).
+app.use(`${API_V1_PREFIX}/consents`, consentRoutes);
 
 // 404 handler
 app.use((req, res) => {

@@ -36,6 +36,24 @@ export const SYSTEM_DEFAULTS = {
     description: 'ISO 4217 currency code used when none is specified.',
     editableByTenant: true,
   },
+  'consent.enforcement': {
+    value: false,
+    dataType: 'boolean',
+    category: 'consent',
+    label: 'Enforce Communication Consent',
+    description:
+      'When on, outbound communication is blocked for channels the customer has opted out of.',
+    editableByTenant: true,
+  },
+  'consent.default_opt_in': {
+    value: true,
+    dataType: 'boolean',
+    category: 'consent',
+    label: 'Default Opt-In (unknown consent)',
+    description:
+      'Whether a customer with no recorded consent may be contacted when enforcement is on.',
+    editableByTenant: true,
+  },
 };
 
 const hasDefault = (key) =>
