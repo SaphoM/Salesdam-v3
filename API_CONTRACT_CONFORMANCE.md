@@ -12,22 +12,31 @@ The platform implementation matches the guide for the main core routes and integ
 
 ## Confirmed direct conflicts
 
-### 1. Cross-tenant incidents admin endpoint
+### 1. Cross-tenant incidents admin endpoint — RESOLVED (2026-10-16)
 
 Guide text:
 
 - `GET /api/v1/incidents/admin/all` lists all incidents across tenants and is restricted to administrators.
 
-Implementation status:
+Original implementation status:
 
 - documented and available to both superusers and normal administrators.
 
 Security concern:
 
-- A normal tenant administrator can enumerate incidents from all tenants.
-- This directly conflicts with ordinary tenant isolation expectations and should be resolved as either a `superuser`-only platform capability or a documented and strictly controlled administrator workflow.
+- A normal tenant administrator could enumerate incidents from all tenants.
 
-Category: `G - security / operational risk`
+Implemented resolution:
+
+- The route stays admin-gated (tenant admins use it in the admin console), but
+  `getAllIncidents` now scopes the query to the caller's tenant unless the caller
+  is a platform operator (superuser). Cross-tenant listing is therefore
+  superuser-only.
+- Regression coverage: `backend/tests/tenant-isolation.e2e.mjs` asserts a tenant
+  admin's `/incidents/admin/all` response never contains another tenant's
+  incidents.
+
+Category: `G - security / operational risk` — remediated.
 
 Decision required: product owner or platform admin governance.
 
@@ -52,6 +61,9 @@ Recommendation: update the guide route index and mark extension clearly.
 - Upload handling now restricts import file types to spreadsheet/CSV payloads.
 - Email, PDF and Flow fields with user-generated HTML are sanitized before render.
 - `.gitignore` ignore rules use the correct lowercase path so protections are active.
+- Incident moderation ("reporter or admin" edit/close/delete) now uses the
+  authoritative `User.isAdmin()` check; the previous `systemRole` check never
+  matched because that field is not persisted on the user document.
 
 ## Security-related contract notes that should remain in force
 - API keys are derived from environment state and key hash storage, not plaintext.

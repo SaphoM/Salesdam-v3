@@ -18,6 +18,7 @@ import Role from '../models/Role.js';
 import ObjectMeta from '../models/ObjectMeta.js';
 import DynamicRecord from '../models/DynamicRecord.js';
 import File from '../models/File.js';
+import Incident from '../models/Incident.js';
 import Session from '../models/Session.js';
 import { seedDefaultRoles } from '../services/roleService.js';
 
@@ -77,7 +78,15 @@ const seedTenant = async (label) => {
     data: Buffer.from(`SECRET_${label}`).toString('base64'),
     sizeBytes: 10,
   });
-  return { tenant, user, adminRole, record, file };
+  const incident = await Incident.create({
+    tenantId: tenant._id,
+    title: `INCIDENT_SECRET_${label}_${RUN}`,
+    description: `Incident for tenant ${label}`,
+    priority: 'medium',
+    reportedBy: user._id,
+    createdBy: user._id,
+  });
+  return { tenant, user, adminRole, record, file, incident };
 };
 
 const server = app.listen(0);
@@ -156,6 +165,29 @@ try {
   const search = await req(`/api/v1/search?q=SECRET_b_${RUN}`, { cookie: ca });
   check('A search does not surface B records', !search.text.includes(String(B.record._id)), `searched SECRET_b_${RUN}`);
 
+  // Incidents — tenant admins must not reach another tenant's incidents.
+  const incB = await req(`/api/v1/incidents/${B.incident._id}`, { cookie: ca });
+  check('A cannot read B incident', incB.status === 404, `HTTP ${incB.status}`);
+  check('B incident content not leaked in body', !incB.text.includes(`INCIDENT_SECRET_b`));
+
+  const incList = await req(`/api/v1/incidents?limit=100`, { cookie: ca });
+  check('A incident list excludes B incidents', !incList.text.includes(`INCIDENT_SECRET_b`));
+
+  // /admin/all is admin-gated, but a tenant admin is scoped to their own tenant.
+  const incAdminAll = await req(`/api/v1/incidents/admin/all?limit=100`, { cookie: ca });
+  check(
+    'A admin/all excludes B incidents (tenant-scoped)',
+    incAdminAll.status === 200 && !incAdminAll.text.includes(`INCIDENT_SECRET_b`),
+    `HTTP ${incAdminAll.status}`,
+  );
+
+  const incWrite = await req(`/api/v1/incidents/${B.incident._id}/comments`, {
+    method: 'POST',
+    cookie: ca,
+    body: { content: 'cross-tenant comment attempt' },
+  });
+  check('A cannot comment on B incident', incWrite.status === 404, `HTTP ${incWrite.status}`);
+
   // Client-supplied tenant header must not override the session tenant.
   const spoof = await req(`/api/v1/files/${B.file._id}`, {
     cookie: ca,
@@ -170,7 +202,7 @@ try {
 } finally {
   await Tenant.deleteMany({ _id: { $in: createdTenantIds } });
   await Promise.all(
-    [User, Role, ObjectMeta, DynamicRecord, File, Session].map((M) =>
+    [User, Role, ObjectMeta, DynamicRecord, File, Incident, Session].map((M) =>
       M.deleteMany({ tenantId: { $in: createdTenantIds } }).catch(() => {}),
     ),
   );

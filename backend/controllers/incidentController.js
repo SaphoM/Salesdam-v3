@@ -15,6 +15,12 @@ const getAllIncidents = asyncHandler(async (req, res) => {
     isDeleted: false,
   };
 
+  // Cross-tenant listing is limited to platform operators; a tenant admin
+  // only ever sees their own tenant's incidents (multi-tenant containment).
+  if (!req.user.isSuperuser()) {
+    query.tenantId = req.tenantId;
+  }
+
   if (status) query.status = status;
   if (priority) query.priority = priority;
   if (search) {
@@ -103,6 +109,7 @@ const getIncident = asyncHandler(async (req, res) => {
 
   const comments = await IncidentComment.find({
     incidentId: req.params.id,
+    tenantId: req.tenantId,
     isDeleted: false,
   })
     .populate('author', 'firstName lastName email avatar')
@@ -263,7 +270,7 @@ const deleteComment = asyncHandler(async (req, res) => {
 
   if (!comment) throw new AppError('Comment not found', 404);
 
-  if (!comment.author.equals(req.user._id) && req.user.systemRole !== 'admin') {
+  if (!comment.author.equals(req.user._id) && !req.user.isAdmin()) {
     throw new AppError('Unauthorized to delete this comment', 403);
   }
 
@@ -295,7 +302,7 @@ const editIncident = asyncHandler(async (req, res) => {
   if (!incident) throw new AppError('Incident not found', 404);
 
   // Only reporter or admin can edit
-  if (!incident.reportedBy.equals(req.user._id) && req.user.systemRole !== 'admin') {
+  if (!incident.reportedBy.equals(req.user._id) && !req.user.isAdmin()) {
     throw new AppError('Only the reporter or admin can edit this incident', 403);
   }
 
@@ -359,7 +366,7 @@ const closeIncident = asyncHandler(async (req, res) => {
   if (!incident) throw new AppError('Incident not found', 404);
 
   // Only reporter or admin can close
-  if (!incident.reportedBy.equals(req.user._id) && req.user.systemRole !== 'admin') {
+  if (!incident.reportedBy.equals(req.user._id) && !req.user.isAdmin()) {
     throw new AppError('Only the reporter or admin can close this incident', 403);
   }
 
@@ -442,7 +449,7 @@ const deleteReply = asyncHandler(async (req, res) => {
   const reply = comment.replies.id(req.params.replyId);
   if (!reply) throw new AppError('Reply not found', 404);
 
-  if (!reply.author.equals(req.user._id) && req.user.systemRole !== 'admin') {
+  if (!reply.author.equals(req.user._id) && !req.user.isAdmin()) {
     throw new AppError('Unauthorized to delete this reply', 403);
   }
 

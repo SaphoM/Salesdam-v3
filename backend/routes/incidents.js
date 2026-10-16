@@ -23,7 +23,9 @@ router.use(requireAuth);
 router.use(enforceTenant);
 router.use(injectTenantId);
 
-// GET /api/incidents/admin/all - List all incidents across all tenants (admin only)
+// GET /api/incidents/admin/all - Incident administration.
+// Tenant admins see only their own tenant; cross-tenant listing is
+// limited to platform operators (superuser). See API_CONTRACT_CONFORMANCE.md.
 router.get('/admin/all', requireAdmin, getAllIncidents);
 
 // GET /api/incidents - List incidents
