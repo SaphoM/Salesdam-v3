@@ -6,6 +6,7 @@ import Button from '../../components/common/Button/Button';
 import FormInput from '../../components/common/FormInput/FormInput';
 import styles from './Login.module.css';
 import { useAuth } from '../../hooks/useAuth';
+import { version } from '../../../package.json';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -189,6 +190,7 @@ const Login = () => {
 
           <footer className={styles.copyright}>
             &copy; {new Date().getFullYear()} Salesdam. All rights reserved.
+            <span className={styles.version}>v{version}</span>
           </footer>
         </div>
       </div>
