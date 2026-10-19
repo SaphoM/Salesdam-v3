@@ -10,6 +10,9 @@ import { TenantProvider } from './context/TenantContext';
 import { AppProvider } from './context/AppContext';
 import { HelmetProvider } from 'react-helmet-async';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { OnboardingProvider } from './components/onboarding/OnboardingProvider';
+import WelcomeModal from './components/onboarding/WelcomeModal';
+import TourOverlay from './components/onboarding/TourOverlay';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
@@ -36,7 +39,12 @@ root.render(
           <AppProvider>
             <HelmetProvider>
               <QueryClientProvider client={queryClient}>
-                <App />
+                {/* Wraps App so both survive the per-route remount of Layout. */}
+                <OnboardingProvider>
+                  <App />
+                  <WelcomeModal />
+                  <TourOverlay />
+                </OnboardingProvider>
                 <Toaster
                   position="top-center"
                   toastOptions={{

@@ -50,6 +50,7 @@ const SidebarNavGroup = ({
         className={styles.navGroupToggle}
         onClick={toggle}
         aria-expanded={open}
+        data-tour-group={label}
       >
         <span className={styles.navGroupIcon}>{icon}</span>
         <span className={styles.navLabel}>{label}</span>

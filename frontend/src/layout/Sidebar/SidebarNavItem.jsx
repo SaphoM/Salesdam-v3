@@ -17,6 +17,7 @@ const SidebarNavItem = ({
   badge,
   iconColor,
   onNavigate,
+  dataTour,
 }) => {
   const chipBg = iconColor ? hexToChipBg(iconColor) : null;
 
@@ -28,6 +29,7 @@ const SidebarNavItem = ({
       }
       title={collapsed ? label : undefined}
       onClick={onNavigate}
+      data-tour={dataTour}
     >
       <span
         className={`${styles.navIcon} ${chipBg ? styles.navIconChip : ''}`}

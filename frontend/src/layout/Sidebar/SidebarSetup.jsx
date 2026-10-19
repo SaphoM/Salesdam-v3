@@ -86,6 +86,7 @@ const SidebarSetup = ({
           label="Object Settings"
           collapsed={sidebarCollapsed}
           onNavigate={onNavigate}
+          dataTour="objects"
         />
       )}
 
@@ -96,6 +97,7 @@ const SidebarSetup = ({
           label="Workspaces"
           collapsed={sidebarCollapsed}
           onNavigate={onNavigate}
+          dataTour="workspaces"
         />
       )}
 

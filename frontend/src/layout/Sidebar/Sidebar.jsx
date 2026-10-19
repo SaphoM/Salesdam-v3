@@ -121,6 +121,7 @@ const Sidebar = () => {
 
       <aside
         className={`${styles.sidebar} ${sidebarCollapsed ? styles.collapsed : ''}`}
+        data-tour="sidebar"
       >
         <SidebarHeader
           sidebarCollapsed={sidebarCollapsed}
@@ -151,6 +152,7 @@ const Sidebar = () => {
             label="Home"
             collapsed={sidebarCollapsed}
             onNavigate={handleMobileNav}
+            dataTour="home"
           />
 
           {tenantFeatures.enableSalesdamFeatures && tenantFeatures.salesdamFindTenders && (

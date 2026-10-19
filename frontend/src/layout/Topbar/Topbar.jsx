@@ -12,12 +12,15 @@ import {
   Maximize2,
   Minimize2,
   ChevronDown,
+  Sparkles,
 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { useAppContext } from '../../context/AppContext';
+import { useOnboarding } from '../../components/onboarding/OnboardingProvider';
 
 const Topbar = () => {
   const { user, logout } = useAuth();
+  const { replayTour } = useOnboarding();
   const {
     sidebarCollapsed,
     toggleTheme,
@@ -102,7 +105,11 @@ const Topbar = () => {
         </button>
 
         {/* Global Search */}
-        <form className={styles.searchForm} onSubmit={handleSearch}>
+        <form
+          className={styles.searchForm}
+          onSubmit={handleSearch}
+          data-tour="search"
+        >
           <Search size={16} className={styles.searchIcon} />
           <input
             type="text"
@@ -141,6 +148,7 @@ const Topbar = () => {
             className={`${styles.iconBtn} ${styles.notifBtn}`}
             onClick={() => setNotifOpen((o) => !o)}
             aria-label="Notifications"
+            data-tour="notifications"
           >
             <Bell size={18} />
             {unreadCount > 0 && (
@@ -194,6 +202,7 @@ const Topbar = () => {
             className={styles.profileBtn}
             onClick={() => setProfileOpen((o) => !o)}
             title="User menu"
+            data-tour="profile"
           >
             <div className={styles.avatar}>
               {user?.avatar ? (
@@ -242,6 +251,15 @@ const Topbar = () => {
                   <Settings size={14} /> Settings
                 </button>
               )}
+              <button
+                className={styles.dropdownItem}
+                onClick={() => {
+                  setProfileOpen(false);
+                  replayTour();
+                }}
+              >
+                <Sparkles size={14} /> Welcome tour
+              </button>
               <button className={styles.dropdownItem} onClick={handleLogout}>
                 <User size={14} /> Logout
               </button>
