@@ -12,7 +12,7 @@ import fs from 'fs';
 import http from 'http';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { MongoMemoryServer } from 'mongodb-memory-server';
+import { MongoMemoryReplSet } from 'mongodb-memory-server';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DB_PATH = process.env.LOCAL_MONGO_DB_PATH
@@ -25,18 +25,30 @@ async function main() {
   fs.mkdirSync(DB_PATH, { recursive: true });
 
   logger.info('Starting local MongoDB...');
-  const mongod = await MongoMemoryServer.create({
+  // A single-member replica set, not a plain standalone mongod: the app's
+  // record-creation path uses Mongoose transactions, which a standalone
+  // mongod rejects with "Transaction numbers are only allowed on a replica
+  // set member or mongos". MongoMemoryReplSet runs rs.initiate() for us;
+  // MongoMemoryServer with an `instance.replSet` flag does not, and so hangs
+  // with no primary until connection times out.
+  const mongod = await MongoMemoryReplSet.create({
     binary: {
       version: process.env.MONGOMS_VERSION || '8.2.6',
       checkMD5: false,
     },
-    instance: {
+    replSet: {
+      name: 'rs0',
+      count: 1,
       dbName: 'salesdam',
-      dbPath: DB_PATH,
       ip: '127.0.0.1',
-      port: Number(process.env.MONGO_PORT || 27017),
       storageEngine: 'wiredTiger',
     },
+    instanceOpts: [
+      {
+        port: Number(process.env.MONGO_PORT || 27017),
+        dbPath: DB_PATH,
+      },
+    ],
   });
 
   process.env.MONGO_URI = mongod.getUri('salesdam');

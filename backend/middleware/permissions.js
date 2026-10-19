@@ -127,9 +127,12 @@ const getVisibleFields = async (user, objectApiName, fieldApiNames) => {
 
 /**
  * getEditableFields - Returns fields the user can edit.
- * Name fields are read-only for non-admin users (all users can read them).
+ * Name fields are read-only for non-admin users once a record exists — a
+ * non-admin can still set the name while creating it (isCreate: true); the
+ * restriction is against renaming an existing record, not against naming a
+ * new one.
  */
-const getEditableFields = async (user, objectApiName, fieldApiNames) => {
+const getEditableFields = async (user, objectApiName, fieldApiNames, { isCreate = false } = {}) => {
   if (user.role?.name === 'superuser' || user.role?.name === 'admin') {
     return fieldApiNames;
   }
@@ -160,8 +163,10 @@ const getEditableFields = async (user, objectApiName, fieldApiNames) => {
       .map((fp) => fp.fieldApiName),
   );
 
-  // Always make the name field read-only for non-admin users
-  readOnlyFields.add(nameFieldApiName);
+  // Always make the name field read-only for non-admin users once the record
+  // exists — but not while it's being created, or no non-admin could ever
+  // name a new record.
+  if (!isCreate) readOnlyFields.add(nameFieldApiName);
 
   return fieldApiNames.filter((f) => !readOnlyFields.has(f));
 };

@@ -386,6 +386,7 @@ const createRecord = asyncHandler(async (req, res) => {
       req.user,
       objectApiName,
       fields.map((f) => f.apiName),
+      { isCreate: true },
     );
     const editableBody = Object.fromEntries(
       Object.entries(req.body).filter(([k]) => editableFieldNames.includes(k)),
@@ -553,6 +554,18 @@ const updateRecord = asyncHandler(async (req, res) => {
     const editableBody = Object.fromEntries(
       Object.entries(req.body).filter(([k]) => editableFieldNames.includes(k)),
     );
+    // A field the user can't edit (e.g. `name`, for a non-admin) is never in
+    // editableBody, even on a full PUT — required-field validation would then
+    // see it as missing and reject the update outright. Backfill it from the
+    // record as it already stands so "can't change this" doesn't become
+    // "can't save anything": the submitted value for it was already discarded
+    // above, so this can't be used to sneak an edit past the permission check.
+    const existingData = record.toDataObject();
+    for (const name of fields.map((f) => f.apiName)) {
+      if (!editableFieldNames.includes(name) && existingData[name] !== undefined) {
+        editableBody[name] = existingData[name];
+      }
+    }
 
     // PATCH = partial update — only validate/process fields that were actually sent
     const isPartial = req.method === 'PATCH';
