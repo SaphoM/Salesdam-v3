@@ -1,6 +1,6 @@
 {
   "name": "etenders-service",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Fetches tenders from the eTenders SA portal on a schedule, stores them in MongoDB, and exposes them via a filterable, token-protected REST API.",
   "main": "server.js",
   "type": "module",
