@@ -1,5 +1,13 @@
 import api from '../api';
 
+// Fired after any change to workspaces or their membership. AuthContext
+// listens for it and reloads the signed-in user's workspace list, so the
+// sidebar switcher reflects new/changed workspaces without a re-login.
+export const WORKSPACES_CHANGED = 'salesdam:workspaces-changed';
+const notifyWorkspacesChanged = () => {
+  if (typeof window !== 'undefined') window.dispatchEvent(new Event(WORKSPACES_CHANGED));
+};
+
 // ── Workspace management (admin — within current tenant) ─────────────────────
 export const getWorkspaces = async (params) => {
   try {
@@ -26,6 +34,7 @@ export const getWorkspace = async (id) => {
 export const createWorkspace = async (data) => {
   try {
     const res = await api.post('/workspaces', data);
+    notifyWorkspacesChanged();
     return res?.data?.data;
   } catch (err) {
     throw new Error(
@@ -37,6 +46,7 @@ export const createWorkspace = async (data) => {
 export const updateWorkspace = async (id, data) => {
   try {
     const res = await api.put(`/workspaces/${id}`, data);
+    notifyWorkspacesChanged();
     return res?.data?.data;
   } catch (err) {
     throw new Error(
@@ -48,6 +58,7 @@ export const updateWorkspace = async (id, data) => {
 export const deleteWorkspace = async (id) => {
   try {
     const res = await api.delete(`/workspaces/${id}`);
+    notifyWorkspacesChanged();
     return res?.data?.data;
   } catch (err) {
     throw new Error(
@@ -60,6 +71,7 @@ export const deleteWorkspace = async (id) => {
 export const addWorkspaceMember = async (id, userId) => {
   try {
     const res = await api.post(`/workspaces/${id}/members`, { userId });
+    notifyWorkspacesChanged();
     return res?.data?.data;
   } catch (err) {
     throw new Error(
@@ -71,6 +83,7 @@ export const addWorkspaceMember = async (id, userId) => {
 export const removeWorkspaceMember = async (id, userId) => {
   try {
     const res = await api.delete(`/workspaces/${id}/members/${userId}`);
+    notifyWorkspacesChanged();
     return res?.data?.data;
   } catch (err) {
     throw new Error(
@@ -96,6 +109,7 @@ export const updateWorkspaceObjects = async (id, objectIds) => {
     const res = await api.put(`/workspaces/${id}`, {
       allowedObjects: objectIds,
     });
+    notifyWorkspacesChanged();
     return res?.data?.data;
   } catch (err) {
     throw new Error(
@@ -110,6 +124,7 @@ export const updateWorkspaceObjectGroups = async (id, objectGroups) => {
     const res = await api.put(`/workspaces/${id}/object-groups`, {
       objectGroups,
     });
+    notifyWorkspacesChanged();
     return res?.data?.data;
   } catch (err) {
     throw new Error(

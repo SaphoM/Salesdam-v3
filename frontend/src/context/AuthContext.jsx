@@ -6,6 +6,7 @@ import {
   useCallback,
 } from 'react';
 import api from '../services/api';
+import { WORKSPACES_CHANGED } from '../services/api/workspaces';
 
 const AuthContext = createContext(null);
 
@@ -74,6 +75,15 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     fetchMe();
+  }, [fetchMe]);
+
+  // The workspace list comes from /auth/me, loaded once at sign-in. Reload it
+  // whenever a workspace is created, changed, deleted or gains/loses members,
+  // so the sidebar switcher reflects it without signing out and back in.
+  useEffect(() => {
+    const onChanged = () => fetchMe();
+    window.addEventListener(WORKSPACES_CHANGED, onChanged);
+    return () => window.removeEventListener(WORKSPACES_CHANGED, onChanged);
   }, [fetchMe]);
 
   const buildPermissions = (userData) => {
