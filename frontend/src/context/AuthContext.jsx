@@ -46,13 +46,21 @@ export const AuthProvider = ({ children }) => {
 
       const activeWorkspaceId = localStorage.getItem(ACTIVE_WORKSPACE_KEY);
 
-      const activeWs = activeWorkspaceId
+      // The stored id may belong to a different user who last signed in on
+      // this browser; if this user isn't a member of it, fall back to one
+      // they are a member of rather than leaving them with no workspace.
+      const storedWs = activeWorkspaceId
         ? userWorkspaces.find(
             (w) =>
               w._id === activeWorkspaceId ||
               w._id?.toString() === activeWorkspaceId,
           )
-        : userWorkspaces.find((w) => w.isDefault) || userWorkspaces[0] || null;
+        : null;
+      const activeWs =
+        storedWs ||
+        userWorkspaces.find((w) => w.isDefault) ||
+        userWorkspaces[0] ||
+        null;
       setActiveWorkspace(activeWs || null);
 
       buildPermissions(userData);

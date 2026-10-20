@@ -53,10 +53,11 @@ const Sidebar = () => {
     }, 0);
   };
 
-  const handleSwitchWorkspace = async (ws) => {
+  // SidebarWorkspaceSelector calls this with the workspace id, not the object.
+  const handleSwitchWorkspace = async (workspaceId) => {
     setSwitching(true);
     try {
-      await switchWorkspace(ws._id);
+      await switchWorkspace(workspaceId);
       setWsDropOpen(false);
     } finally {
       setSwitching(false);

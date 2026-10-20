@@ -75,6 +75,10 @@ const userSchema = new mongoose.Schema(
         ref: 'Dashboard',
         default: null,
       },
+      // First-login welcome/tour state (welcomeSeenAt, tourStatus) written by
+      // the frontend OnboardingProvider. Without it here Mongoose strips the
+      // value on save and the welcome modal reappears on every page load.
+      onboarding: { type: mongoose.Schema.Types.Mixed, default: undefined },
     },
 
     lastLogin: { type: Date },
